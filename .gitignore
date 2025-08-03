@@ -29,6 +29,12 @@ dist-ssr
 .env.development.local
 .env.test.local
 .env.production.local
+.env.*.local
+
+# API Keys and Secrets
+*.pem
+*.key
+service-account-*.json
 
 # Testing
 coverage
