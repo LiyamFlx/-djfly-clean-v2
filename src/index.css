@@ -1,0 +1,30 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  body {
+    @apply bg-rich-black text-white;
+    font-family: system-ui, -apple-system, sans-serif;
+    font-feature-settings: "rlig" 1, "calt" 1;
+  }
+}
+
+@layer components {
+  .club-button {
+    @apply bg-gradient-to-r from-electric-blue to-bright-turquoise;
+    @apply text-rich-black font-bold px-6 py-3 rounded-lg;
+    @apply transform transition-all duration-200;
+    @apply hover:scale-105 hover:shadow-lg hover:shadow-electric-blue/25;
+    @apply active:scale-95;
+  }
+  
+  .glass-card {
+    @apply bg-white/10 backdrop-blur-sm border border-white/20 rounded-xl;
+  }
+  
+  .gradient-text {
+    @apply bg-gradient-to-r from-electric-blue via-bright-turquoise to-laser-pink;
+    @apply bg-clip-text text-transparent;
+  }
+}
