@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Outlet, Link, useLocation } from 'react-router-dom';
+import { Outlet, Link, useLocation, Navigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { Sparkles, Mic, Settings, HelpCircle } from 'lucide-react';
 import { ROUTES } from '@/constants/routes';
@@ -12,12 +12,9 @@ const StudioPage: React.FC = () => {
   const isMatchActive = location.pathname.includes('/match');
   
   // If we're on the main studio route, redirect to match (most popular)
-  React.useEffect(() => {
-    if (location.pathname === ROUTES.STUDIO) {
-      // Use replace to avoid adding to history
-      window.history.replaceState(null, '', ROUTES.STUDIO_MATCH);
-    }
-  }, [location.pathname]);
+  if (location.pathname === ROUTES.STUDIO) {
+    return <Navigate to={ROUTES.STUDIO_MATCH} replace />;
+  }
   
   return (
     <div className="min-h-screen bg-club-gradient">
