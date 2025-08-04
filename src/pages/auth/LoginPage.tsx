@@ -1,4 +1,3 @@
-import React from 'react';
 import { createPage, ComingSoon } from '@/utils/pageUtils';
 
 const LoginPage = createPage(

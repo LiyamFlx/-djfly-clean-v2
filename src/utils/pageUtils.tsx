@@ -1,15 +1,9 @@
 import React from 'react';
 import { motion } from 'framer-motion';
 
-interface PageProps {
-  title: string;
-  children: React.ReactNode;
-  className?: string;
-}
-
-export const createPage = (title: string, content: React.ReactNode) => {
-  const PageComponent: React.FC<{ className?: string }> = ({ className = '' }) => (
-    <div className={`container mx-auto px-4 py-8 ${className}`}>
+export const createPage = (title: string, content: React.ReactNode, className?: string) => {
+  const PageComponent: React.FC = () => (
+    <div className={`container mx-auto px-4 py-8 ${className || ''}`}>
       <motion.h1 
         className="text-3xl font-bold text-white mb-6"
         initial={{ opacity: 0, y: -20 }}
