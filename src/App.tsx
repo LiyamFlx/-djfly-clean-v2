@@ -14,8 +14,8 @@ const HomePage = () => (
       <h1 className="text-4xl font-bold text-blue-400 mb-8">DJfly</h1>
       <p className="text-xl mb-8">AI-powered DJ platform</p>
       <div className="space-x-4">
-        <Link to="/studio" className="bg-blue-600 px-6 py-3 rounded">Studio</Link>
-        <Link to="/player" className="bg-purple-600 px-6 py-3 rounded">Player</Link>
+        <Link to="/studio" className="bg-blue-600 px-6 py-3 rounded hover:bg-blue-700 transition-colors">Studio</Link>
+        <Link to="/player" className="bg-purple-600 px-6 py-3 rounded hover:bg-purple-700 transition-colors">Player</Link>
       </div>
     </div>
   </div>
@@ -26,11 +26,11 @@ const StudioPage = () => (
     <div className="max-w-4xl mx-auto text-center">
       <h1 className="text-3xl font-bold mb-8">Studio</h1>
       <div className="grid md:grid-cols-2 gap-8">
-        <Link to="/studio/match" className="bg-blue-600 p-8 rounded-xl">
+        <Link to="/studio/match" className="bg-blue-600 p-8 rounded-xl hover:bg-blue-700 transition-colors">
           <h2 className="text-xl font-bold mb-4">🎯 Magic Match</h2>
           <p>Analyze crowd and generate playlist</p>
         </Link>
-        <Link to="/studio/set" className="bg-purple-600 p-8 rounded-xl">
+        <Link to="/studio/set" className="bg-purple-600 p-8 rounded-xl hover:bg-purple-700 transition-colors">
           <h2 className="text-xl font-bold mb-4">🎵 Magic Set</h2>
           <p>Create custom playlist</p>
         </Link>
@@ -48,56 +48,70 @@ const MagicMatchPage = () => {
     setTimeout(() => {
       setStatus('complete');
       appState.queue = [
-        { id: '1', title: 'High Energy Track', artist: 'AI Generated' },
-        { id: '2', title: 'Crowd Pleaser', artist: 'DJ AI' }
+        { id: 1, title: 'Track 1', artist: 'Artist 1', bpm: 120, key: 'C' },
+        { id: 2, title: 'Track 2', artist: 'Artist 2', bpm: 122, key: 'C#' },
+        { id: 3, title: 'Track 3', artist: 'Artist 3', bpm: 124, key: 'D' },
       ];
-      appState.currentTrack = appState.queue[0];
     }, 2000);
-  };
-  
-  const goToPlayer = () => {
-    navigate('/player');
   };
 
   return (
     <div className="min-h-screen bg-gray-900 text-white p-8">
-      <div className="max-w-2xl mx-auto text-center">
-        <h1 className="text-3xl font-bold mb-8">Magic Match</h1>
+      <div className="max-w-4xl mx-auto">
+        <h1 className="text-3xl font-bold mb-8">🎯 Magic Match</h1>
         
-        <div 
-          className={`w-32 h-32 mx-auto mb-8 rounded-full flex items-center justify-center cursor-pointer ${
-            status === 'recording' ? 'bg-red-600 animate-pulse' : 'bg-blue-600 hover:bg-blue-500'
-          }`}
-          onClick={handleAnalyze}
-        >
-          <span className="text-4xl">{status === 'recording' ? '🔴' : '🎤'}</span>
-        </div>
-        
-        <h2 className="text-xl mb-8">
-          {status === 'ready' && 'Tap to analyze crowd'}
-          {status === 'recording' && 'Listening...'}
-          {status === 'complete' && 'Analysis complete!'}
-        </h2>
-        
-        {status === 'complete' && (
-          <div className="bg-gray-800 p-6 rounded-xl mb-8">
-            <h3 className="text-lg font-bold mb-4">Crowd Analysis</h3>
-            <div className="grid grid-cols-2 gap-4 mb-6">
-              <div>
-                <div className="text-2xl font-bold text-blue-400">80%</div>
-                <div className="text-sm">Energy</div>
+        {status === 'ready' && (
+          <div className="text-center">
+            <p className="mb-6">Record crowd noise to analyze the vibe</p>
+            <button 
+              onClick={handleAnalyze}
+              className="bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-8 rounded-full text-lg transition-colors"
+            >
+              Start Recording
+            </button>
+          </div>
+        )}
+
+        {status === 'recording' && (
+          <div className="text-center">
+            <div className="mb-6">
+              <div className="h-4 w-full bg-gray-700 rounded-full overflow-hidden">
+                <div className="h-full bg-blue-500 animate-pulse"></div>
               </div>
-              <div>
-                <div className="text-2xl font-bold text-green-400">High</div>
-                <div className="text-sm">Engagement</div>
+              <p className="mt-2">Analyzing crowd noise...</p>
+            </div>
+          </div>
+        )}
+
+        {status === 'complete' && (
+          <div className="text-center">
+            <div className="bg-green-900 bg-opacity-30 p-6 rounded-lg mb-8">
+              <h2 className="text-2xl font-bold mb-2">Analysis Complete!</h2>
+              <p className="mb-4">We've generated the perfect playlist for your crowd.</p>
+              <button 
+                onClick={() => navigate('/player')}
+                className="bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-6 rounded-full transition-colors"
+              >
+                Go to Player
+              </button>
+            </div>
+            
+            <div className="text-left">
+              <h3 className="text-xl font-semibold mb-4">Recommended Tracks</h3>
+              <div className="space-y-4">
+                {appState.queue.map((track) => (
+                  <div key={track.id} className="bg-gray-800 p-4 rounded-lg flex items-center justify-between">
+                    <div>
+                      <p className="font-medium">{track.title}</p>
+                      <p className="text-gray-400 text-sm">{track.artist}</p>
+                    </div>
+                    <div className="text-sm text-gray-400">
+                      {track.bpm} BPM • {track.key}
+                    </div>
+                  </div>
+                ))}
               </div>
             </div>
-            <button 
-              onClick={goToPlayer}
-              className="bg-gradient-to-r from-blue-600 to-purple-600 px-8 py-4 rounded font-bold"
-            >
-              🎵 Go to Player
-            </button>
           </div>
         )}
       </div>
@@ -106,191 +120,208 @@ const MagicMatchPage = () => {
 };
 
 const MagicSetPage = () => {
-  const navigate = useNavigate();
-  const [prompt, setPrompt] = useState('');
-  const [status, setStatus] = useState('ready');
+  const [tracks, setTracks] = useState([
+    { id: 1, title: 'Track 1', artist: 'Artist 1', bpm: 120, key: 'C', selected: false },
+    { id: 2, title: 'Track 2', artist: 'Artist 2', bpm: 122, key: 'C#', selected: false },
+    { id: 3, title: 'Track 3', artist: 'Artist 3', bpm: 124, key: 'D', selected: false },
+  ]);
 
-  const generateSet = () => {
-    if (!prompt.trim()) {
-      alert('Please enter a description');
-      return;
-    }
-    
-    setStatus('generating');
-    setTimeout(() => {
-      setStatus('complete');
-      appState.queue = [
-        { id: '1', title: 'Custom Track 1', artist: 'Generated' },
-        { id: '2', title: 'Custom Track 2', artist: 'AI Mix' }
-      ];
-      appState.currentTrack = appState.queue[0];
-    }, 2000);
+  const toggleTrack = (id: number) => {
+    setTracks(tracks.map(track => 
+      track.id === id ? { ...track, selected: !track.selected } : track
+    ));
   };
 
-  const goToPlayer = () => {
-    navigate('/player');
+  const addToQueue = () => {
+    const selectedTracks = tracks.filter(track => track.selected);
+    appState.queue = [...appState.queue, ...selectedTracks];
+    alert(`${selectedTracks.length} tracks added to queue!`);
   };
 
   return (
     <div className="min-h-screen bg-gray-900 text-white p-8">
-      <div className="max-w-2xl mx-auto">
-        <h1 className="text-3xl font-bold text-center mb-8">Magic Set</h1>
+      <div className="max-w-4xl mx-auto">
+        <h1 className="text-3xl font-bold mb-8">🎵 Magic Set</h1>
         
-        <div className="bg-gray-800 p-6 rounded-xl mb-8">
-          <h2 className="text-xl mb-4">Describe Your Set</h2>
-          <textarea 
-            value={prompt}
-            onChange={(e) => setPrompt(e.target.value)}
-            placeholder="e.g., High energy dance music for a party"
-            className="w-full bg-gray-700 p-4 rounded text-white h-24 resize-none"
-          />
-          <button 
-            onClick={generateSet}
-            disabled={status === 'generating'}
-            className="bg-purple-600 hover:bg-purple-700 px-6 py-3 rounded mt-4 w-full disabled:opacity-50"
-          >
-            {status === 'generating' ? 'Generating...' : 'Generate Set'}
-          </button>
-        </div>
-        
-        {status === 'generating' && (
-          <div className="text-center py-8">
-            <div className="animate-spin w-16 h-16 border-4 border-purple-500 border-t-transparent rounded-full mx-auto mb-4"></div>
-            <p>Creating your playlist...</p>
-          </div>
-        )}
-        
-        {status === 'complete' && (
-          <div className="bg-gray-800 p-6 rounded-xl">
-            <h3 className="text-xl font-bold mb-4">Generated Set</h3>
-            <div className="space-y-3 mb-6">
-              {appState.queue.map((track: any, index: number) => (
-                <div key={track.id} className="flex items-center space-x-4 bg-gray-700 p-3 rounded">
-                  <span className="text-lg font-bold text-purple-400">{index + 1}</span>
-                  <div>
-                    <div className="font-semibold">{track.title}</div>
-                    <div className="text-gray-400">{track.artist}</div>
+        <div className="mb-8">
+          <h2 className="text-xl font-semibold mb-4">Available Tracks</h2>
+          <div className="space-y-2">
+            {tracks.map(track => (
+              <div 
+                key={track.id} 
+                className={`p-4 rounded-lg cursor-pointer transition-colors ${track.selected ? 'bg-blue-900 bg-opacity-50' : 'bg-gray-800 hover:bg-gray-750'}`}
+                onClick={() => toggleTrack(track.id)}
+              >
+                <div className="flex items-center">
+                  <input 
+                    type="checkbox" 
+                    checked={track.selected}
+                    onChange={() => {}}
+                    className="h-5 w-5 text-blue-600 rounded focus:ring-blue-500"
+                  />
+                  <div className="ml-4 flex-1">
+                    <p className="font-medium">{track.title}</p>
+                    <p className="text-gray-400 text-sm">{track.artist}</p>
+                  </div>
+                  <div className="text-sm text-gray-400">
+                    {track.bpm} BPM • {track.key}
                   </div>
                 </div>
-              ))}
-            </div>
-            <button 
-              onClick={goToPlayer}
-              className="bg-green-600 hover:bg-green-700 px-8 py-4 rounded font-bold w-full"
-            >
-              ▶️ Go to Player
-            </button>
+              </div>
+            ))}
           </div>
-        )}
+        </div>
+
+        <div className="flex justify-end space-x-4">
+          <button 
+            onClick={() => {
+              const selected = tracks.filter(t => t.selected);
+              setTracks(tracks.map(t => ({ ...t, selected: false })));
+              alert(`Cleared ${selected.length} selections`);
+            }}
+            className="px-4 py-2 border border-red-500 text-red-500 rounded hover:bg-red-900 hover:bg-opacity-30 transition-colors"
+          >
+            Clear Selection
+          </button>
+          <button 
+            onClick={addToQueue}
+            className="px-6 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 transition-colors"
+          >
+            Add to Queue
+          </button>
+        </div>
       </div>
     </div>
   );
 };
 
 const PlayerPage = () => {
-  const [, forceUpdate] = useState({});
+  const [isPlaying, setIsPlaying] = useState(false);
+  const [currentTime, setCurrentTime] = useState(0);
+  const [volume, setVolume] = useState(80);
   
-  // Force re-render when needed
-  const refresh = () => forceUpdate({});
-
+  const currentTrack = appState.currentTrack || appState.queue[0];
+  
   const togglePlay = () => {
-    appState.isPlaying = !appState.isPlaying;
-    refresh();
+    setIsPlaying(!isPlaying);
+    appState.isPlaying = !isPlaying;
   };
-
+  
   const nextTrack = () => {
-    const currentIndex = appState.queue.findIndex((t: any) => t.id === appState.currentTrack?.id);
+    const currentIndex = appState.queue.findIndex(t => t.id === currentTrack?.id);
     const nextIndex = (currentIndex + 1) % appState.queue.length;
     appState.currentTrack = appState.queue[nextIndex];
-    refresh();
+    setCurrentTime(0);
   };
-
-  if (!appState.currentTrack) {
-    return (
-      <div className="min-h-screen bg-gray-900 text-white p-8">
-        <div className="max-w-2xl mx-auto text-center">
-          <h1 className="text-3xl font-bold mb-8">Player</h1>
-          <div className="bg-gray-800 p-8 rounded-xl">
-            <div className="text-6xl mb-4">🎵</div>
-            <h2 className="text-xl mb-4">No Track Loaded</h2>
-            <p className="text-gray-400 mb-8">Generate a playlist in Studio first</p>
-            <Link to="/studio" className="bg-blue-600 px-6 py-3 rounded">Go to Studio</Link>
-          </div>
-        </div>
-      </div>
-    );
-  }
+  
+  const prevTrack = () => {
+    const currentIndex = appState.queue.findIndex(t => t.id === currentTrack?.id);
+    const prevIndex = (currentIndex - 1 + appState.queue.length) % appState.queue.length;
+    appState.currentTrack = appState.queue[prevIndex];
+    setCurrentTime(0);
+  };
+  
+  const handleVolumeChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const newVolume = parseInt(e.target.value);
+    setVolume(newVolume);
+  };
 
   return (
     <div className="min-h-screen bg-gray-900 text-white p-8">
-      <div className="max-w-2xl mx-auto text-center">
+      <div className="max-w-4xl mx-auto">
         <h1 className="text-3xl font-bold mb-8">🎧 Player</h1>
         
-        <div className="bg-gray-800 p-8 rounded-xl mb-8">
-          <div className={`w-48 h-48 mx-auto mb-6 bg-gradient-to-br from-blue-600 to-purple-600 rounded-full flex items-center justify-center ${
-            appState.isPlaying ? 'animate-spin' : ''
-          }`} style={{ animationDuration: '4s' }}>
-            <span className="text-6xl">🎵</span>
-          </div>
-          
-          <h2 className="text-2xl font-bold mb-2">{appState.currentTrack.title}</h2>
-          <p className="text-gray-400 mb-6">{appState.currentTrack.artist}</p>
-          
-          <div className="flex items-center justify-center space-x-6 mb-6">
-            <button 
-              onClick={nextTrack}
-              className="bg-gray-700 hover:bg-gray-600 p-3 rounded-full"
-            >
-              ⏮
-            </button>
-            
-            <button 
-              onClick={togglePlay}
-              className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 p-6 rounded-full text-3xl"
-            >
-              {appState.isPlaying ? '⏸' : '▶️'}
-            </button>
-            
-            <button 
-              onClick={nextTrack}
-              className="bg-gray-700 hover:bg-gray-600 p-3 rounded-full"
-            >
-              ⏭
-            </button>
-          </div>
-          
+        {currentTrack ? (
           <div className="text-center">
-            <span className={`px-4 py-2 rounded-full text-sm font-bold ${
-              appState.isPlaying ? 'bg-green-600' : 'bg-gray-600'
-            }`}>
-              {appState.isPlaying ? '🔴 PLAYING' : '⏸ PAUSED'}
-            </span>
-          </div>
-        </div>
-        
-        {appState.queue.length > 0 && (
-          <div className="bg-gray-800 p-6 rounded-xl">
-            <h3 className="text-lg font-bold mb-4">Queue ({appState.queue.length} tracks)</h3>
-            <div className="space-y-2">
-              {appState.queue.map((track: any, index: number) => (
-                <div 
-                  key={track.id} 
-                  className={`flex items-center space-x-3 p-3 rounded cursor-pointer ${
-                    track.id === appState.currentTrack?.id ? 'bg-blue-600' : 'bg-gray-700 hover:bg-gray-600'
-                  }`}
-                  onClick={() => {
-                    appState.currentTrack = track;
-                    refresh();
-                  }}
-                >
-                  <span className="text-sm w-6">{index + 1}</span>
-                  <div className="flex-1 text-left">
-                    <div className="font-semibold">{track.title}</div>
-                    <div className="text-gray-400 text-sm">{track.artist}</div>
-                  </div>
-                </div>
-              ))}
+            <div className="w-64 h-64 bg-gray-800 rounded-xl mx-auto mb-8 overflow-hidden">
+              <div className="w-full h-full flex items-center justify-center text-6xl">
+                🎵
+              </div>
             </div>
+            
+            <h2 className="text-2xl font-bold">{currentTrack.title}</h2>
+            <p className="text-gray-400 mb-8">{currentTrack.artist}</p>
+            
+            <div className="mb-4">
+              <div className="h-1 bg-gray-700 rounded-full overflow-hidden mb-2">
+                <div 
+                  className="h-full bg-blue-500" 
+                  style={{ width: `${(currentTime / 180) * 100}%` }}
+                ></div>
+              </div>
+              <div className="flex justify-between text-sm text-gray-400">
+                <span>0:{Math.floor(currentTime).toString().padStart(2, '0')}</span>
+                <span>3:00</span>
+              </div>
+            </div>
+            
+            <div className="flex items-center justify-center space-x-6 mb-8">
+              <button 
+                onClick={prevTrack}
+                className="p-2 rounded-full hover:bg-gray-800 transition-colors"
+                aria-label="Previous track"
+              >
+                ⏮
+              </button>
+              <button 
+                onClick={togglePlay}
+                className="w-16 h-16 bg-blue-600 rounded-full flex items-center justify-center hover:bg-blue-700 transition-colors"
+                aria-label={isPlaying ? 'Pause' : 'Play'}
+              >
+                {isPlaying ? '⏸' : '▶'}
+              </button>
+              <button 
+                onClick={nextTrack}
+                className="p-2 rounded-full hover:bg-gray-800 transition-colors"
+                aria-label="Next track"
+              >
+                ⏭
+              </button>
+            </div>
+            
+            <div className="flex items-center justify-center space-x-4">
+              <span className="text-gray-400">🔈</span>
+              <input 
+                type="range" 
+                min="0" 
+                max="100" 
+                value={volume} 
+                onChange={handleVolumeChange}
+                className="w-32 accent-blue-500"
+              />
+              <span className="text-gray-400 w-10 text-right">{volume}%</span>
+            </div>
+            
+            <div className="mt-12">
+              <h3 className="text-lg font-semibold mb-4">Up Next</h3>
+              <div className="space-y-2 max-h-48 overflow-y-auto pr-2">
+                {appState.queue.map((track, index) => (
+                  <div 
+                    key={track.id} 
+                    className={`p-3 rounded-lg ${track.id === currentTrack.id ? 'bg-blue-900 bg-opacity-30' : 'bg-gray-800'}`}
+                  >
+                    <div className="flex items-center">
+                      <span className="w-6 text-gray-400">{index + 1}.</span>
+                      <div className="flex-1">
+                        <p className={`${track.id === currentTrack.id ? 'text-blue-400' : ''}`}>{track.title}</p>
+                        <p className="text-sm text-gray-400">{track.artist}</p>
+                      </div>
+                      <span className="text-xs text-gray-500">{track.bpm} BPM</span>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+        ) : (
+          <div className="text-center py-16">
+            <p className="text-xl text-gray-400 mb-6">No tracks in queue</p>
+            <Link 
+              to="/studio" 
+              className="inline-block bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-6 rounded-full transition-colors"
+            >
+              Add Tracks
+            </Link>
           </div>
         )}
       </div>
@@ -298,32 +329,41 @@ const PlayerPage = () => {
   );
 };
 
-const Navigation = () => (
-  <nav className="fixed top-0 left-0 right-0 bg-gray-900 border-b border-gray-700 z-50">
-    <div className="max-w-7xl mx-auto px-4 h-16 flex items-center justify-between">
-      <Link to="/" className="text-xl font-bold text-blue-400">DJfly</Link>
-      <div className="space-x-6">
-        <Link to="/" className="text-gray-300 hover:text-white">Home</Link>
-        <Link to="/studio" className="text-gray-300 hover:text-white">Studio</Link>
-        <Link to="/player" className="text-gray-300 hover:text-white">Player</Link>
+const Navigation = () => {
+  return (
+    <nav className="fixed bottom-0 left-0 right-0 bg-gray-900 border-t border-gray-800 z-10">
+      <div className="max-w-lg mx-auto px-4">
+        <div className="flex justify-around">
+          <Link to="/" className="flex-1 py-4 text-center hover:bg-gray-800 transition-colors">
+            🏠 Home
+          </Link>
+          <Link to="/studio" className="flex-1 py-4 text-center hover:bg-gray-800 transition-colors">
+            🎛️ Studio
+          </Link>
+          <Link to="/player" className="flex-1 py-4 text-center hover:bg-gray-800 transition-colors">
+            🎧 Player
+          </Link>
+        </div>
       </div>
-    </div>
-  </nav>
-);
+    </nav>
+  );
+};
 
-const App = () => (
-  <BrowserRouter>
-    <Navigation />
-    <div className="pt-16">
-      <Routes>
-        <Route path="/" element={<HomePage />} />
-        <Route path="/studio" element={<StudioPage />} />
-        <Route path="/studio/match" element={<MagicMatchPage />} />
-        <Route path="/studio/set" element={<MagicSetPage />} />
-        <Route path="/player" element={<PlayerPage />} />
-      </Routes>
-    </div>
-  </BrowserRouter>
-);
+function App() {
+  return (
+    <BrowserRouter>
+      <div className="pb-16">
+        <Routes>
+          <Route path="/" element={<HomePage />} />
+          <Route path="/studio" element={<StudioPage />} />
+          <Route path="/studio/match" element={<MagicMatchPage />} />
+          <Route path="/studio/set" element={<MagicSetPage />} />
+          <Route path="/player" element={<PlayerPage />} />
+        </Routes>
+      </div>
+      <Navigation />
+    </BrowserRouter>
+  );
+}
 
 export default App;
