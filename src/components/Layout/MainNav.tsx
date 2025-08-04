@@ -60,14 +60,17 @@ const MainNav: React.FC = () => {
   useEffect(() => {
     const handleScroll = () => {
       const isScrolled = window.scrollY > 10;
-      if (isScrolled !== scrolled) {
-        setScrolled(isScrolled);
-      }
+      setScrolled(prevScrolled => {
+        if (prevScrolled !== isScrolled) {
+          return isScrolled;
+        }
+        return prevScrolled;
+      });
     };
 
     window.addEventListener('scroll', handleScroll, { passive: true });
     return () => window.removeEventListener('scroll', handleScroll);
-  }, [scrolled]);
+  }, []); // Remove scrolled from dependency array
 
   return (
     <nav 
