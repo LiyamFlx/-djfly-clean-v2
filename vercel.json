@@ -1,1 +1,11 @@
-{ "build": { "env": { "NPM_CONFIG_USER_AGENT": "npm" } } }
+{
+  "buildCommand": "npm run build",
+  "outputDirectory": "dist",
+  "installCommand": "npm install --legacy-peer-deps",
+  "build": {
+    "env": {
+      "NPM_CONFIG_USER_AGENT": "npm",
+      "NPM_CONFIG_CACHE": "/tmp/.npm"
+    }
+  }
+}
