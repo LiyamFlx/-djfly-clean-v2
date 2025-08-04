@@ -1,15 +1,25 @@
 /// <reference types="vitest" />
 import { defineConfig } from 'vite'
-import react from '@vitejs/plugin-react'
-import { resolve } from 'path'
+import type { PluginOption } from 'vite'
+import { visualizer } from 'rollup-plugin-visualizer'
+import react from '@vitejs/plugin-react-swc'
 
 // https://vitejs.dev/config/
 export default defineConfig({
-  plugins: [react()],
+  plugins: [
+    react(),
+    visualizer({
+      template: 'treemap',
+      open: false,
+      gzipSize: true,
+      brotliSize: true,
+      filename: 'bundle-analysis.html'
+    }) as PluginOption
+  ],
   resolve: {
     alias: {
-      '@': resolve(__dirname, './src'),
-    },
+      '@': '/src'
+    }
   },
   server: {
     port: 5173,
@@ -24,6 +34,10 @@ export default defineConfig({
   build: {
     outDir: 'dist',
     sourcemap: true,
+    minify: 'terser',
+    cssMinify: true,
+    reportCompressedSize: true,
+    chunkSizeWarningLimit: 1000,
     rollupOptions: {
       output: {
         manualChunks: {
