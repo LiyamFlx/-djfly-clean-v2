@@ -1,4 +1,5 @@
 export const ROUTES = {
+  // Main navigation
   HOME: '/',
   STUDIO: '/studio',
   STUDIO_SET: '/studio/set',
@@ -8,6 +9,18 @@ export const ROUTES = {
   PROFILE: '/profile',
   LIBRARY: '/library',
   DOCS: '/docs',
+  
+  // Legal and support
+  PRIVACY: '/privacy',
+  TERMS: '/terms',
+  CONTACT: '/contact',
+  HELP: '/help',
+  
+  // Auth
+  LOGIN: '/login',
+  SIGNUP: '/signup',
+  FORGOT_PASSWORD: '/forgot-password',
+  RESET_PASSWORD: '/reset-password',
 } as const;
 
 export type RouteKey = keyof typeof ROUTES;

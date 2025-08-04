@@ -4,23 +4,36 @@ import MainNav from './MainNav';
 import Footer from './Footer';
 import { ROUTES } from '@/constants/routes';
 
+// Pages where navigation should be hidden for an immersive experience
+const IMMERSIVE_PAGES: string[] = [
+  ROUTES.PLAYER,
+  // Add other immersive pages here
+];
+
 const AppLayout: React.FC = () => {
-  const location = useLocation();
+  const { pathname } = useLocation();
   
-  // Hide nav/footer on certain pages for immersive experience
-  const hideNavigation = [ROUTES.PLAYER].includes(location.pathname as any);
+  // Check if navigation should be hidden for the current route
+  const shouldHideNavigation = React.useMemo(
+    () => IMMERSIVE_PAGES.some(route => pathname.startsWith(route)),
+    [pathname]
+  );
   
   return (
     <div className="min-h-screen bg-club-gradient flex flex-col">
-      {!hideNavigation && <MainNav />}
+      {!shouldHideNavigation && <MainNav />}
       
-      <main className={`flex-1 ${!hideNavigation ? 'pt-16' : ''}`}>
+      <main 
+        className={`flex-1 transition-all duration-300 ${
+          !shouldHideNavigation ? 'pt-16' : ''
+        }`}
+      >
         <Outlet />
       </main>
       
-      {!hideNavigation && <Footer />}
+      {!shouldHideNavigation && <Footer />}
     </div>
   );
 };
 
-export default AppLayout;
+export default React.memo(AppLayout);
