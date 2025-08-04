@@ -1,10 +1,20 @@
 import { useState } from 'react';
 import { BrowserRouter, Routes, Route, Link, useNavigate } from 'react-router-dom';
 
+// Track interface
+interface Track {
+  id: number;
+  title: string;
+  artist: string;
+  bpm: number;
+  key: string;
+  genre?: string;
+}
+
 // Simple state management
 let appState = {
-  currentTrack: null as any,
-  queue: [] as any[],
+  currentTrack: null as Track | null,
+  queue: [] as Track[],
   isPlaying: false
 };
 
@@ -120,22 +130,39 @@ const MagicMatchPage = () => {
 };
 
 const MagicSetPage = () => {
-  const [tracks, setTracks] = useState([
-    { id: 1, title: 'Track 1', artist: 'Artist 1', bpm: 120, key: 'C', selected: false },
-    { id: 2, title: 'Track 2', artist: 'Artist 2', bpm: 122, key: 'C#', selected: false },
-    { id: 3, title: 'Track 3', artist: 'Artist 3', bpm: 124, key: 'D', selected: false },
-  ]);
+  const navigate = useNavigate();
+  const [prompt, setPrompt] = useState('');
+  const [status, setStatus] = useState('ready'); // ready, generating, complete
+  const [generatedTracks, setGeneratedTracks] = useState<Track[]>([]);
 
-  const toggleTrack = (id: number) => {
-    setTracks(tracks.map(track => 
-      track.id === id ? { ...track, selected: !track.selected } : track
-    ));
+  const generatePlaylist = () => {
+    if (!prompt.trim()) {
+      alert('Please describe the playlist you want to create!');
+      return;
+    }
+
+    setStatus('generating');
+    
+    // Simulate AI generation
+    setTimeout(() => {
+      const mockTracks = [
+        { id: 1, title: 'Summer Vibes', artist: 'AI Generated', bpm: 120, key: 'C', genre: 'Electronic' },
+        { id: 2, title: 'Deep House Flow', artist: 'AI Generated', bpm: 122, key: 'G', genre: 'House' },
+        { id: 3, title: 'Energetic Beats', artist: 'AI Generated', bpm: 128, key: 'Am', genre: 'Techno' },
+        { id: 4, title: 'Chill Sunset', artist: 'AI Generated', bpm: 110, key: 'F', genre: 'Ambient' },
+        { id: 5, title: 'Party Anthem', artist: 'AI Generated', bpm: 132, key: 'D', genre: 'Progressive' },
+      ];
+      
+      setGeneratedTracks(mockTracks);
+      setStatus('complete');
+      appState.queue = mockTracks;
+    }, 3000);
   };
 
-  const addToQueue = () => {
-    const selectedTracks = tracks.filter(track => track.selected);
-    appState.queue = [...appState.queue, ...selectedTracks];
-    alert(`${selectedTracks.length} tracks added to queue!`);
+  const resetGenerator = () => {
+    setStatus('ready');
+    setPrompt('');
+    setGeneratedTracks([]);
   };
 
   return (
@@ -143,53 +170,139 @@ const MagicSetPage = () => {
       <div className="max-w-4xl mx-auto">
         <h1 className="text-3xl font-bold mb-8">🎵 Magic Set</h1>
         
-        <div className="mb-8">
-          <h2 className="text-xl font-semibold mb-4">Available Tracks</h2>
-          <div className="space-y-2">
-            {tracks.map(track => (
-              <div 
-                key={track.id} 
-                className={`p-4 rounded-lg cursor-pointer transition-colors ${track.selected ? 'bg-blue-900 bg-opacity-50' : 'bg-gray-800 hover:bg-gray-750'}`}
-                onClick={() => toggleTrack(track.id)}
-              >
-                <div className="flex items-center">
-                  <input 
-                    type="checkbox" 
-                    checked={track.selected}
-                    onChange={() => {}}
-                    className="h-5 w-5 text-blue-600 rounded focus:ring-blue-500"
-                  />
-                  <div className="ml-4 flex-1">
-                    <p className="font-medium">{track.title}</p>
-                    <p className="text-gray-400 text-sm">{track.artist}</p>
-                  </div>
-                  <div className="text-sm text-gray-400">
-                    {track.bpm} BPM • {track.key}
-                  </div>
-                </div>
+        {status === 'ready' && (
+          <div className="mb-8">
+            <div className="bg-gray-800 p-6 rounded-xl mb-6">
+              <h2 className="text-xl font-semibold mb-4">Describe Your Perfect Playlist</h2>
+              <p className="text-gray-300 mb-4">
+                Tell our AI what kind of playlist you want. Be specific about mood, genre, energy level, or the occasion.
+              </p>
+              
+              <textarea
+                value={prompt}
+                onChange={(e) => setPrompt(e.target.value)}
+                placeholder="e.g., 'Create an upbeat electronic playlist for a beach party with progressive house and tech house tracks that build energy throughout the night...'"
+                className="w-full h-32 p-4 bg-gray-700 border border-gray-600 rounded-lg text-white placeholder-gray-400 focus:border-blue-500 focus:outline-none resize-none"
+                maxLength={500}
+              />
+              
+              <div className="flex justify-between items-center mt-4">
+                <span className="text-sm text-gray-400">{prompt.length}/500 characters</span>
+                <button
+                  onClick={generatePlaylist}
+                  disabled={!prompt.trim()}
+                  className="px-8 py-3 bg-purple-600 text-white font-semibold rounded-lg hover:bg-purple-700 disabled:bg-gray-600 disabled:cursor-not-allowed transition-colors"
+                >
+                  ✨ Generate Playlist
+                </button>
               </div>
-            ))}
-          </div>
-        </div>
+            </div>
 
-        <div className="flex justify-end space-x-4">
-          <button 
-            onClick={() => {
-              const selected = tracks.filter(t => t.selected);
-              setTracks(tracks.map(t => ({ ...t, selected: false })));
-              alert(`Cleared ${selected.length} selections`);
-            }}
-            className="px-4 py-2 border border-red-500 text-red-500 rounded hover:bg-red-900 hover:bg-opacity-30 transition-colors"
-          >
-            Clear Selection
-          </button>
-          <button 
-            onClick={addToQueue}
-            className="px-6 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 transition-colors"
-          >
-            Add to Queue
-          </button>
-        </div>
+            <div className="bg-gray-800 p-6 rounded-xl">
+              <h3 className="text-lg font-semibold mb-4">💡 Example Prompts</h3>
+              <div className="grid md:grid-cols-2 gap-4">
+                <button
+                  onClick={() => setPrompt('Create a high-energy electronic dance playlist with progressive house and techno tracks for a nightclub setting')}
+                  className="text-left p-3 bg-gray-700 hover:bg-gray-600 rounded-lg transition-colors"
+                >
+                  <div className="font-medium text-blue-400">🔥 High Energy Club</div>
+                  <div className="text-sm text-gray-300">Progressive house & techno</div>
+                </button>
+                
+                <button
+                  onClick={() => setPrompt('Generate a chill downtempo playlist with ambient and deep house for a sunset lounge session')}
+                  className="text-left p-3 bg-gray-700 hover:bg-gray-600 rounded-lg transition-colors"
+                >
+                  <div className="font-medium text-orange-400">🌅 Sunset Lounge</div>
+                  <div className="text-sm text-gray-300">Ambient & deep house</div>
+                </button>
+                
+                <button
+                  onClick={() => setPrompt('Create a workout playlist with high BPM electronic tracks that motivate and energize')}
+                  className="text-left p-3 bg-gray-700 hover:bg-gray-600 rounded-lg transition-colors"
+                >
+                  <div className="font-medium text-green-400">💪 Workout Energy</div>
+                  <div className="text-sm text-gray-300">High BPM motivation</div>
+                </button>
+                
+                <button
+                  onClick={() => setPrompt('Generate a sophisticated deep house playlist for an upscale cocktail party with smooth transitions')}
+                  className="text-left p-3 bg-gray-700 hover:bg-gray-600 rounded-lg transition-colors"
+                >
+                  <div className="font-medium text-purple-400">🍸 Cocktail Party</div>
+                  <div className="text-sm text-gray-300">Sophisticated deep house</div>
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {status === 'generating' && (
+          <div className="text-center mb-8">
+            <div className="bg-blue-900 bg-opacity-30 p-8 rounded-xl">
+              <h2 className="text-2xl font-bold mb-4">🤖 AI is Generating Your Playlist...</h2>
+              <p className="text-gray-300 mb-6">Analyzing your request: "{prompt}"</p>
+              
+              <div className="w-full bg-gray-700 rounded-full h-3 mb-4">
+                <div className="bg-blue-500 h-3 rounded-full animate-pulse" style={{ width: '60%' }}></div>
+              </div>
+              
+              <div className="space-y-2 text-sm text-gray-400">
+                <p>🎯 Matching musical preferences...</p>
+                <p>🎵 Selecting optimal tracks...</p>
+                <p>🔄 Arranging perfect flow...</p>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {status === 'complete' && (
+          <div className="mb-8">
+            <div className="bg-green-900 bg-opacity-30 p-6 rounded-xl mb-6">
+              <h2 className="text-2xl font-bold mb-2">✅ Playlist Generated!</h2>
+              <p className="mb-4">Perfect tracks selected based on: "{prompt}"</p>
+              <div className="flex gap-4">
+                <button 
+                  onClick={() => navigate('/player')}
+                  className="bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-6 rounded-full transition-colors"
+                >
+                  ▶ Play Now
+                </button>
+                <button 
+                  onClick={resetGenerator}
+                  className="bg-gray-600 hover:bg-gray-700 text-white font-bold py-2 px-6 rounded-full transition-colors"
+                >
+                  🔄 Create Another
+                </button>
+              </div>
+            </div>
+            
+            <div className="bg-gray-800 p-6 rounded-xl">
+              <h3 className="text-xl font-semibold mb-4">Generated Tracks ({generatedTracks.length})</h3>
+              <div className="space-y-3">
+                {generatedTracks.map((track, index) => (
+                  <div key={track.id} className="bg-gray-700 p-4 rounded-lg">
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-4">
+                        <div className="w-8 h-8 bg-purple-600 rounded-full flex items-center justify-center text-sm font-bold">
+                          {index + 1}
+                        </div>
+                        <div>
+                          <p className="font-medium">{track.title}</p>
+                          <p className="text-gray-400 text-sm">{track.artist}</p>
+                        </div>
+                      </div>
+                      <div className="text-right">
+                        <div className="text-sm text-gray-300">{track.bpm} BPM • {track.key}</div>
+                        <div className="text-xs text-purple-400">{track.genre}</div>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );
