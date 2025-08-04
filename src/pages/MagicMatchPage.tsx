@@ -81,18 +81,17 @@ const MagicMatchPage: React.FC = () => {
     });
   };
   
+  const { generateSet } = useAIActions();
+
   const generatePlaylist = async () => {
-    // Use crowd analysis to generate appropriate playlist
     const energyLevel = crowdState.currentEnergy > 0.7 ? 'high energy' : 
                       crowdState.currentEnergy > 0.4 ? 'medium energy' : 'chill';
     
-    const prompt = `Create a ${energyLevel} ${crowdState.mood} playlist for a crowd of ${crowdState.crowdSize} people`;
+    const prompt = `Create a ${energyLevel} ${crowdState.mood} playlist for a crowd of around ${crowdState.crowdSize} people`;
     
-    // This would call the AI service
-    console.log('Generating playlist with prompt:', prompt);
+    await generateSet(prompt);
     
-    // For demo, redirect to player
-    navigate(ROUTES.PLAYER);
+    navigate(ROUTES.STUDIO_SET);
   };
   
   return (

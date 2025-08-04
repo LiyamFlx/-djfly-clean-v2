@@ -6,10 +6,15 @@ import type {
   CrowdState, 
   AIState, 
   SessionState, 
-  UIState 
+  UIState,
+  AuthState,
 } from '@/types';
+import { User, Session } from '@supabase/supabase-js';
 
 interface DJflyStore {
+  // Auth slice
+  auth: AuthState;
+
   // Audio slice
   audio: AudioState;
   
@@ -24,15 +29,20 @@ interface DJflyStore {
   
   // UI slice
   ui: UIState;
+
+  // Auth actions
+  setUser: (user: User | null) => void;
+  setSession: (session: Session | null) => void;
   
   // Audio actions
-  setCurrentTrack: (track: Track | null) => void;
+  setTrackForDeck: (deck: 'A' | 'B', track: Track | null) => void;
   setQueue: (tracks: Track[]) => void;
   addToQueue: (track: Track) => void;
   removeFromQueue: (trackId: string) => void;
-  togglePlayback: () => void;
+  toggleDeckPlayback: (deck: 'A' | 'B') => void;
   setVolume: (volume: number) => void;
-  updateProgress: (currentTime: number, duration: number) => void;
+  updateDeckProgress: (deck: 'A' | 'B', currentTime: number, duration: number) => void;
+  setCrossfader: (value: number) => void;
   
   // Crowd actions
   startListening: () => void;
@@ -42,6 +52,8 @@ interface DJflyStore {
   // AI actions
   generateSet: (prompt: string) => Promise<void>;
   analyzeAudio: (audioData: ArrayBuffer) => Promise<void>;
+  fetchSavedSets: () => Promise<void>;
+  deleteSet: (setId: string) => Promise<void>;
   
   // Session actions
   startSession: () => void;
@@ -52,19 +64,32 @@ interface DJflyStore {
   setCurrentPage: (page: string) => void;
   toggleOnboarding: () => void;
   setMobileView: (isMobile: boolean) => void;
+  setMasterTabId: (tabId: string) => void;
 }
 
 export const useDJflyStore = create<DJflyStore>()(
   immer((set) => ({
     // Initial state
+    auth: {
+      user: null,
+      session: null,
+    },
     audio: {
-      isPlaying: false,
-      currentTrack: null,
+      deckA: {
+        track: null,
+        currentTime: 0,
+        duration: 0,
+        isPlaying: false,
+      },
+      deckB: {
+        track: null,
+        currentTime: 0,
+        duration: 0,
+        isPlaying: false,
+      },
       queue: [],
-      currentTime: 0,
-      duration: 0,
+      crossfader: 0.5,
       volume: 0.8,
-      crossfadeTime: 3,
     },
     
     crowd: {
@@ -82,6 +107,7 @@ export const useDJflyStore = create<DJflyStore>()(
       isGenerating: false,
       prompt: '',
       generatedTracks: [],
+      savedSets: [],
       error: null,
       progress: 0,
     },
@@ -100,43 +126,62 @@ export const useDJflyStore = create<DJflyStore>()(
       showOnboarding: true,
       theme: 'dark',
       isMobileView: false,
+      masterTabId: null,
     },
     
     // Audio actions
-    setCurrentTrack: (track) =>
+    setTrackForDeck: (deck, track) =>
       set((state) => {
-        state.audio.currentTrack = track;
+        if (deck === 'A') {
+          state.audio.deckA.track = track;
+        } else {
+          state.audio.deckB.track = track;
+        }
       }),
-      
+
     setQueue: (tracks) =>
       set((state) => {
         state.audio.queue = tracks;
       }),
-      
+
     addToQueue: (track) =>
       set((state) => {
         state.audio.queue.push(track);
       }),
-      
+
     removeFromQueue: (trackId) =>
       set((state) => {
-        state.audio.queue = state.audio.queue.filter(t => t.id !== trackId);
+        state.audio.queue = state.audio.queue.filter((t) => t.id !== trackId);
       }),
-      
-    togglePlayback: () =>
+
+    toggleDeckPlayback: (deck) =>
       set((state) => {
-        state.audio.isPlaying = !state.audio.isPlaying;
+        if (deck === 'A') {
+          state.audio.deckA.isPlaying = !state.audio.deckA.isPlaying;
+        } else {
+          state.audio.deckB.isPlaying = !state.audio.deckB.isPlaying;
+        }
       }),
-      
+
     setVolume: (volume) =>
       set((state) => {
         state.audio.volume = Math.max(0, Math.min(1, volume));
       }),
-      
-    updateProgress: (currentTime, duration) =>
+
+    updateDeckProgress: (deck, currentTime, duration) =>
       set((state) => {
-        state.audio.currentTime = currentTime;
-        state.audio.duration = duration;
+        if (deck === 'A') {
+          state.audio.deckA.currentTime = currentTime;
+          state.audio.deckA.duration = duration;
+        } else {
+          state.audio.deckB.currentTime = currentTime;
+          state.audio.deckB.duration = duration;
+        }
+      }),
+
+    setCrossfader: (value) =>
+      set((state) => {
+        state.audio.crossfader = value;
       }),
     
     // Crowd actions
@@ -165,48 +210,66 @@ export const useDJflyStore = create<DJflyStore>()(
         state.ai.error = null;
         state.ai.progress = 0;
       });
-      
+
       try {
-        // Simulate AI generation with demo tracks
-        const demoTracks: Track[] = [
-          {
-            id: '1',
-            title: 'Electronic Vibes',
-            artist: 'AI Generated',
-            duration: 180,
-            image: 'https://via.placeholder.com/300x300/00D4FF/FFFFFF?text=Track+1',
-            source: 'demo',
-            bpm: 128,
-            energy: 0.8,
-            valence: 0.7,
-          },
-          {
-            id: '2', 
-            title: 'Deep House Mix',
-            artist: 'AI Generated',
-            duration: 240,
-            image: 'https://via.placeholder.com/300x300/00FFCC/FFFFFF?text=Track+2',
-            source: 'demo',
-            bpm: 122,
-            energy: 0.6,
-            valence: 0.8,
-          },
-        ];
-        
-        // Simulate progress
-        for (let i = 0; i <= 100; i += 10) {
-          await new Promise(resolve => setTimeout(resolve, 100));
-          set((state) => {
-            state.ai.progress = i;
-          });
-        }
-        
-        set((state) => {
-          state.ai.generatedTracks = demoTracks;
-          state.ai.isGenerating = false;
-          state.audio.queue = demoTracks;
+        const response = await fetch('/.netlify/functions/generate-set', {
+          method: 'POST',
+          body: JSON.stringify({ prompt }),
         });
-        
+
+        if (!response.ok) {
+          throw new Error('Failed to generate set');
+        }
+
+        const { tracks } = await response.json();
+
+        const enrichedTracks = await Promise.all(
+          tracks.map(async (track: any) => {
+            const searchResponse = await fetch('/.netlify/functions/spotify-proxy', {
+              method: 'POST',
+              body: JSON.stringify({
+                endpoint: 'search',
+                q: `${track.title} ${track.artist}`,
+                type: 'track',
+                limit: 1,
+              }),
+            });
+
+            if (!searchResponse.ok) {
+              return { ...track, source: 'demo' }; // Keep placeholder if search fails
+            }
+
+            const searchData = await searchResponse.json();
+            const spotifyTrack = searchData.tracks?.items[0];
+
+            if (spotifyTrack) {
+              return {
+                id: spotifyTrack.id,
+                title: spotifyTrack.name,
+                artist: spotifyTrack.artists.map((a: any) => a.name).join(', '),
+                duration: spotifyTrack.duration_ms / 1000,
+                image: spotifyTrack.album.images[0]?.url,
+                preview_url: spotifyTrack.preview_url,
+                spotify_url: spotifyTrack.external_urls.spotify,
+                source: 'spotify',
+                bpm: spotifyTrack.tempo,
+                key: spotifyTrack.key,
+                energy: spotifyTrack.energy,
+                valence: spotifyTrack.valence,
+                danceability: spotifyTrack.danceability,
+                popularity: spotifyTrack.popularity,
+              };
+            }
+
+            return { ...track, source: 'demo' }; // Keep placeholder if no track found
+          })
+        );
+
+        set((state) => {
+          state.ai.generatedTracks = enrichedTracks;
+          state.ai.isGenerating = false;
+          state.audio.queue = enrichedTracks;
+        });
       } catch (_error) {
         set((state) => {
           state.ai.error = _error instanceof Error ? _error.message : 'Generation failed';
@@ -214,33 +277,82 @@ export const useDJflyStore = create<DJflyStore>()(
         });
       }
     },
+
+    fetchSavedSets: async () => {
+      const { auth } = useDJflyStore.getState();
+      if (!auth.user) return;
+
+      const { data, error } = await supabase
+        .from('sets')
+        .select('*')
+        .eq('user_id', auth.user.id);
+
+      if (error) {
+        console.error('Failed to fetch saved sets:', error);
+        return;
+      }
+
+      set((state) => {
+        state.ai.savedSets = data;
+      });
+    },
+
+    deleteSet: async (setId: string) => {
+      const { error } = await supabase.from('sets').delete().eq('id', setId);
+
+      if (error) {
+        console.error('Failed to delete set:', error);
+        return;
+      }
+
+      const { fetchSavedSets } = useDJflyStore.getState().ai;
+      fetchSavedSets();
+    },
     
-    analyzeAudio: async (_audioData: ArrayBuffer) => {
+    analyzeAudio: async (audioData: ArrayBuffer) => {
       set((state) => {
         state.crowd.isListening = true;
       });
-      
+
       try {
-        // Simulate audio analysis
-        await new Promise(resolve => setTimeout(resolve, 2000));
+        const audioContext = new AudioContext();
+        const audioBuffer = await audioContext.decodeAudioData(audioData);
+        const analyser = audioContext.createAnalyser();
+        analyser.fftSize = 2048;
+
+        const source = audioContext.createBufferSource();
+        source.buffer = audioBuffer;
+        source.connect(analyser);
         
-        // Generate mock crowd metrics
-        const mockMetrics = {
-          currentEnergy: Math.random() * 0.4 + 0.3, // 0.3 to 0.7
-          mood: ['excited', 'chill', 'energetic', 'mellow'][Math.floor(Math.random() * 4)] as any,
-          engagementLevel: ['low', 'medium', 'high'][Math.floor(Math.random() * 3)] as any,
-          crowdSize: Math.floor(Math.random() * 200) + 50,
+        const dataArray = new Uint8Array(analyser.frequencyBinCount);
+        analyser.getByteFrequencyData(dataArray);
+
+        let sum = 0;
+        for (let i = 0; i < dataArray.length; i++) {
+          sum += dataArray[i];
+        }
+        const average = sum / dataArray.length;
+        const energy = average / 255; // Normalize to 0-1
+
+        const mood = energy > 0.7 ? 'energetic' : energy > 0.4 ? 'excited' : 'chill';
+        const engagementLevel = energy > 0.6 ? 'high' : energy > 0.3 ? 'medium' : 'low';
+
+        const newMetrics = {
+          currentEnergy: energy,
+          mood,
+          engagementLevel,
         };
-        
+
         set((state) => {
-          Object.assign(state.crowd, mockMetrics);
+          Object.assign(state.crowd, newMetrics);
           state.crowd.isListening = false;
           state.crowd.lastUpdated = new Date();
         });
-        
+
       } catch (_error) {
         set((state) => {
           state.crowd.isListening = false;
+          state.ai.error = _error instanceof Error ? _error.message : 'Audio analysis failed';
         });
       }
     },
@@ -278,10 +390,27 @@ export const useDJflyStore = create<DJflyStore>()(
       set((state) => {
         state.ui.isMobileView = isMobile;
       }),
+
+    setMasterTabId: (tabId) =>
+      set((state) => {
+        state.ui.masterTabId = tabId;
+      }),
+
+    // Auth actions
+    setUser: (user) =>
+      set((state) => {
+        state.auth.user = user;
+      }),
+
+    setSession: (session) =>
+      set((state) => {
+        state.auth.session = session;
+      }),
   }))
 );
 
 // Selector hooks for easier usage
+export const useAuthState = () => useDJflyStore((state) => state.auth);
 export const useAudioState = () => useDJflyStore((state) => state.audio);
 export const useCrowdState = () => useDJflyStore((state) => state.crowd);
 export const useAIState = () => useDJflyStore((state) => state.ai);
@@ -289,14 +418,20 @@ export const useSessionState = () => useDJflyStore((state) => state.session);
 export const useUIState = () => useDJflyStore((state) => state.ui);
 
 // Action hooks
+export const useAuthActions = () => useDJflyStore((state) => ({
+  setUser: state.setUser,
+  setSession: state.setSession,
+}));
+
 export const useAudioActions = () => useDJflyStore((state) => ({
-  setCurrentTrack: state.setCurrentTrack,
+  setTrackForDeck: state.setTrackForDeck,
   setQueue: state.setQueue,
   addToQueue: state.addToQueue,
   removeFromQueue: state.removeFromQueue,
-  togglePlayback: state.togglePlayback,
+  toggleDeckPlayback: state.toggleDeckPlayback,
   setVolume: state.setVolume,
-  updateProgress: state.updateProgress,
+  updateDeckProgress: state.updateDeckProgress,
+  setCrossfader: state.setCrossfader,
 }));
 
 export const useCrowdActions = () => useDJflyStore((state) => ({
@@ -308,6 +443,8 @@ export const useCrowdActions = () => useDJflyStore((state) => ({
 export const useAIActions = () => useDJflyStore((state) => ({
   generateSet: state.generateSet,
   analyzeAudio: state.analyzeAudio,
+  fetchSavedSets: state.fetchSavedSets,
+  deleteSet: state.deleteSet,
 }));
 
 export const useSessionActions = () => useDJflyStore((state) => ({
@@ -320,4 +457,5 @@ export const useUIActions = () => useDJflyStore((state) => ({
   setCurrentPage: state.setCurrentPage,
   toggleOnboarding: state.toggleOnboarding,
   setMobileView: state.setMobileView,
+  setMasterTabId: state.setMasterTabId,
 }));

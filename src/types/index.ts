@@ -1,3 +1,5 @@
+import { User, Session } from '@supabase/supabase-js';
+
 // Core track interface
 export interface Track {
   id: string;
@@ -20,14 +22,19 @@ export interface Track {
 }
 
 // Audio state
-export interface AudioState {
-  isPlaying: boolean;
-  currentTrack: Track | null;
-  queue: Track[];
+export interface DeckState {
+  track: Track | null;
   currentTime: number;
   duration: number;
+  isPlaying: boolean;
+}
+
+export interface AudioState {
+  deckA: DeckState;
+  deckB: DeckState;
+  queue: Track[];
+  crossfader: number; // 0 for Deck A, 1 for Deck B
   volume: number;
-  crossfadeTime: number;
 }
 
 // Crowd analysis state
@@ -67,4 +74,20 @@ export interface UIState {
   showOnboarding: boolean;
   theme: 'dark' | 'light';
   isMobileView: boolean;
+  masterTabId: string | null;
+}
+
+// Auth state
+export interface AuthState {
+  user: User | null;
+  session: Session | null;
+}
+
+// Saved set
+export interface SavedSet {
+  id: string;
+  name: string;
+  tracks: Track[];
+  created_at: string;
+  user_id: string;
 }

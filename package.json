@@ -18,17 +18,24 @@
     "analyze": "vite build --mode analyze"
   },
   "dependencies": {
+    "@radix-ui/react-label": "^2.1.7",
+    "@radix-ui/react-slider": "^1.3.5",
+    "@radix-ui/react-slot": "^1.2.3",
     "@react-spring/web": "^10.0.1",
     "@sentry/integrations": "^7.120.4",
     "@sentry/react": "^10.0.0",
     "@sentry/tracing": "^7.120.4",
+    "@supabase/supabase-js": "^2.53.0",
     "framer-motion": "^12.23.12",
     "howler": "^2.2.4",
     "immer": "^10.1.1",
     "lucide-react": "^0.344.0",
+    "node-fetch": "^3.3.2",
+    "openai": "^5.11.0",
     "react": "^19.1.1",
     "react-dom": "^19.1.1",
     "react-router-dom": "^6.30.1",
+    "tailwindcss-animate": "^1.0.7",
     "zustand": "^5.0.7"
   },
   "devDependencies": {

@@ -1,18 +1,21 @@
 import React, { useState } from 'react';
 import { motion } from 'framer-motion';
-import { Sparkles, Plus, Play, Trash2 } from 'lucide-react';
+import { Sparkles, Plus, Play, Trash2, Save } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
-import { useAIActions, useAIState, useAudioActions } from '@/store';
+import { useAIActions, useAIState, useAudioActions, useAuthState } from '@/store';
 import { ROUTES } from '@/constants/routes';
 import type { Track } from '@/types';
+import { supabase } from '@/lib/supabase';
 
 const MagicSetPage: React.FC = () => {
   const navigate = useNavigate();
   const [prompt, setPrompt] = useState('');
+  const [setName, setSetName] = useState('');
   
   const { generateSet } = useAIActions();
   const { setQueue, setCurrentTrack } = useAudioActions();
   const aiState = useAIState();
+  const { user } = useAuthState();
   
   const handleGenerateSet = async () => {
     if (!prompt.trim()) return;
@@ -21,6 +24,27 @@ const MagicSetPage: React.FC = () => {
       await generateSet(prompt);
     } catch (error) {
       console.error('Failed to generate set:', error);
+    }
+  };
+
+  const handleSaveSet = async () => {
+    if (!setName.trim() || !user || aiState.generatedTracks.length === 0) {
+      return;
+    }
+
+    const { error } = await supabase.from('sets').insert([
+      {
+        name: setName,
+        user_id: user.id,
+        tracks: aiState.generatedTracks,
+      },
+    ]);
+
+    if (error) {
+      console.error('Failed to save set:', error);
+    } else {
+      // Maybe show a success message
+      console.log('Set saved successfully');
     }
   };
   
@@ -120,6 +144,21 @@ const MagicSetPage: React.FC = () => {
             <div className="flex items-center justify-between mb-6">
               <h3 className="text-xl font-semibold">Generated Set</h3>
               <div className="flex gap-2">
+                <input
+                  type="text"
+                  placeholder="Set Name"
+                  value={setName}
+                  onChange={(e) => setSetName(e.target.value)}
+                  className="flex-1 px-4 py-2 bg-rich-black/50 border border-white/20 rounded-lg text-white placeholder-gray-400 focus:border-electric-blue focus:ring-1 focus:ring-electric-blue focus:outline-none"
+                />
+                <button
+                  onClick={handleSaveSet}
+                  className="club-button flex items-center gap-2"
+                  disabled={!setName.trim() || !user}
+                >
+                  <Save className="w-4 h-4" />
+                  Save Set
+                </button>
                 <button
                   onClick={handlePlaySet}
                   className="club-button flex items-center gap-2"
