@@ -43,3 +43,4 @@ test-results
 # Misc
 *.tgz
 *.tar.gz
+.vercel

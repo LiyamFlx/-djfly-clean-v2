@@ -22,7 +22,6 @@
     "@sentry/integrations": "^7.120.4",
     "@sentry/react": "^10.0.0",
     "@sentry/tracing": "^7.120.4",
-    "@vitejs/plugin-react-swc": "^3.11.0",
     "framer-motion": "^12.23.12",
     "howler": "^2.2.4",
     "immer": "^10.1.1",
@@ -30,7 +29,6 @@
     "react": "^19.1.1",
     "react-dom": "^19.1.1",
     "react-router-dom": "^6.30.1",
-    "rollup-plugin-visualizer": "^6.0.3",
     "zustand": "^5.0.7"
   },
   "devDependencies": {
