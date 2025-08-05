@@ -21,7 +21,8 @@
       "Bash(rm:*)",
       "WebFetch(domain:djfly-clean-v2-ct98hxg7g-liyams-projects.vercel.app)",
       "Bash(git checkout:*)",
-      "Bash(git fetch:*)"
+      "Bash(git fetch:*)",
+      "Bash(git branch:*)"
     ],
     "deny": []
   }
