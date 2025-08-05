@@ -1,7 +1,7 @@
 {
   "name": "djfly-clean",
   "private": true,
-  "version": "0.0.0",
+  "version": "1.2.0",
   "type": "module",
   "scripts": {
     "dev": "vite",
@@ -15,7 +15,9 @@
     "test:coverage": "vitest run --coverage",
     "typecheck": "tsc --noEmit",
     "format": "prettier --write .",
-    "analyze": "vite build --mode analyze"
+    "analyze": "vite build --mode analyze",
+    "deploy": "npm run build && netlify deploy --prod",
+    "deploy:preview": "npm run build && netlify deploy"
   },
   "dependencies": {
     "@react-spring/web": "^10.0.1",
