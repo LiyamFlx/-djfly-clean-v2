@@ -61,7 +61,7 @@ export async function searchSpotifyTrack(query: string): Promise<Track | null> {
     artist: item.artists.map((a: any) => a.name).join(', '),
     image: item.album.images[0]?.url || '/default-album-art.png',
     duration: item.duration_ms / 1000,
-    previewUrl: item.preview_url,
+    preview_url: item.preview_url,
     bpm: 0, // Spotify API doesn't provide BPM directly in search
     energy: 0, // Requires audio analysis
     genre: '', // Not in standard track object
@@ -122,3 +122,8 @@ export async function getAiPlaylist(prompt: string, onProgress: (progress: numbe
 
   return tracks.filter((track): track is Track => track !== null);
 }
+
+export const createSessionRecord = async (sessionData: { sessionTime: number; tracksPlayed: number; }) => {
+  console.log('Creating session record:', sessionData);
+  return Promise.resolve({ success: true });
+};

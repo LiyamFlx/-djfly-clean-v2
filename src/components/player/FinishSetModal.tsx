@@ -1,4 +1,4 @@
-import React from "react";
+
 import { motion } from "framer-motion";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
@@ -9,16 +9,18 @@ interface DJSet {
 }
 
 interface Props {
-  set: DJSet;
+  isOpen: boolean;
   onClose: () => void;
+  onConfirm: () => void;
+  sessionTime: number;
+  tracksPlayed: number;
 }
-
 const FinishSetModal = ({ set, onClose }: Props) => {
   const navigate = useNavigate();
 
   const handleSubmit = async () => {
     try {
-      await createSessionRecord(set.sessionId);
+      await createSessionRecord({ sessionTime, tracksPlayed });
       onClose();
       navigate("/studio");
     } catch (error) {
