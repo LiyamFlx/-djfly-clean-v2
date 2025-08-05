@@ -1,4 +1,6 @@
 import { cache } from '@/utils/cache';
+import { supabase } from '@/lib/supabase';
+import type { User as SupabaseUser } from '@supabase/supabase-js';
 
 export interface User {
   id: string;
@@ -350,6 +352,246 @@ class AuthService {
     }
 
     return response.json();
+  }
+
+  /**
+   * Supabase authentication methods
+   */
+  async supabaseLogin(credentials: LoginCredentials): Promise<{ user: User; token: string }> {
+    try {
+      const { data, error } = await supabase.auth.signInWithPassword({
+        email: credentials.email,
+        password: credentials.password,
+      });
+
+      if (error) throw error;
+      if (!data.user || !data.session) throw new Error('Authentication failed');
+
+      // Get or create user profile
+      const profile = await this.getOrCreateProfile(data.user);
+      
+      const user: User = {
+        id: data.user.id,
+        email: data.user.email || '',
+        name: profile.username,
+        avatar: profile.avatar_url || undefined,
+        subscription: 'free', // Default subscription
+        preferences: {
+          theme: 'dark',
+          defaultGenre: 'electronic',
+          autoPlay: true,
+          crossfadeDuration: 3000,
+        },
+        stats: {
+          totalSessions: 0,
+          totalTracks: 0,
+          favoriteGenres: [],
+        },
+      };
+
+      this.saveTokenToStorage(data.session.access_token);
+      cache.set('user_data', user, 60 * 60 * 1000);
+      
+      return { user, token: data.session.access_token };
+    } catch (error) {
+      console.error('Supabase login error:', error);
+      throw error;
+    }
+  }
+
+  async supabaseSignup(userData: SignupData): Promise<{ user: User; token: string }> {
+    try {
+      const { data, error } = await supabase.auth.signUp({
+        email: userData.email,
+        password: userData.password,
+        options: {
+          data: {
+            username: userData.name,
+          },
+        },
+      });
+
+      if (error) throw error;
+      if (!data.user) throw new Error('Signup failed');
+
+      // Create user profile
+      const { error: profileError } = await supabase
+        .from('profiles')
+        .insert({
+          id: data.user.id,
+          username: userData.name,
+        });
+
+      if (profileError) {
+        console.error('Profile creation error:', profileError);
+      }
+
+      if (data.session) {
+        const user: User = {
+          id: data.user.id,
+          email: data.user.email || '',
+          name: userData.name,
+          subscription: 'free',
+          preferences: {
+            theme: 'dark',
+            defaultGenre: 'electronic',
+            autoPlay: true,
+            crossfadeDuration: 3000,
+          },
+          stats: {
+            totalSessions: 0,
+            totalTracks: 0,
+            favoriteGenres: [],
+          },
+        };
+
+        this.saveTokenToStorage(data.session.access_token);
+        cache.set('user_data', user, 60 * 60 * 1000);
+        
+        return { user, token: data.session.access_token };
+      }
+
+      throw new Error('Please check your email to verify your account');
+    } catch (error) {
+      console.error('Supabase signup error:', error);
+      throw error;
+    }
+  }
+
+  async supabaseLogout(): Promise<void> {
+    try {
+      const { error } = await supabase.auth.signOut();
+      if (error) throw error;
+    } catch (error) {
+      console.error('Supabase logout error:', error);
+    } finally {
+      this.removeTokenFromStorage();
+      cache.delete('user_data');
+    }
+  }
+
+  async getCurrentSupabaseUser(): Promise<User | null> {
+    try {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) return null;
+
+      const profile = await this.getOrCreateProfile(user);
+      
+      return {
+        id: user.id,
+        email: user.email || '',
+        name: profile.username,
+        avatar: profile.avatar_url || undefined,
+        subscription: 'free',
+        preferences: {
+          theme: 'dark',
+          defaultGenre: 'electronic',
+          autoPlay: true,
+          crossfadeDuration: 3000,
+        },
+        stats: {
+          totalSessions: 0,
+          totalTracks: 0,
+          favoriteGenres: [],
+        },
+      };
+    } catch (error) {
+      console.error('Get current Supabase user error:', error);
+      return null;
+    }
+  }
+
+  private async getOrCreateProfile(user: SupabaseUser) {
+    let { data: profile, error } = await supabase
+      .from('profiles')
+      .select('*')
+      .eq('id', user.id)
+      .single();
+
+    if (error && error.code === 'PGRST116') {
+      // Profile doesn't exist, create it
+      const { data: newProfile, error: createError } = await supabase
+        .from('profiles')
+        .insert({
+          id: user.id,
+          username: user.user_metadata?.username || user.email?.split('@')[0] || 'User',
+          avatar_url: user.user_metadata?.avatar_url,
+        })
+        .select()
+        .single();
+
+      if (createError) throw createError;
+      profile = newProfile;
+    } else if (error) {
+      throw error;
+    }
+
+    return profile!;
+  }
+
+  /**
+   * OAuth with Supabase (Google, GitHub, etc.)
+   */
+  async supabaseOAuthLogin(provider: 'google' | 'github' | 'discord'): Promise<void> {
+    try {
+      const { error } = await supabase.auth.signInWithOAuth({
+        provider,
+        options: {
+          redirectTo: `${window.location.origin}/auth/callback`,
+        },
+      });
+
+      if (error) throw error;
+    } catch (error) {
+      console.error('OAuth login error:', error);
+      throw error;
+    }
+  }
+
+  /**
+   * Password reset with Supabase
+   */
+  async supabaseRequestPasswordReset(email: string): Promise<void> {
+    try {
+      const { error } = await supabase.auth.resetPasswordForEmail(email, {
+        redirectTo: `${window.location.origin}/auth/reset-password`,
+      });
+
+      if (error) throw error;
+    } catch (error) {
+      console.error('Password reset request error:', error);
+      throw error;
+    }
+  }
+
+  /**
+   * Update password with Supabase
+   */
+  async supabaseUpdatePassword(newPassword: string): Promise<void> {
+    try {
+      const { error } = await supabase.auth.updateUser({
+        password: newPassword,
+      });
+
+      if (error) throw error;
+    } catch (error) {
+      console.error('Password update error:', error);
+      throw error;
+    }
+  }
+
+  /**
+   * Listen to auth state changes
+   */
+  onAuthStateChange(callback: (user: User | null) => void) {
+    return supabase.auth.onAuthStateChange(async (event, session) => {
+      if (session?.user) {
+        const user = await this.getCurrentSupabaseUser();
+        callback(user);
+      } else {
+        callback(null);
+      }
+    });
   }
 
   /**

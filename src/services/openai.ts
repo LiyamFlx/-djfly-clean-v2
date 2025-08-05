@@ -210,6 +210,129 @@ class OpenAIService {
   }
 
   /**
+   * Generate mix transitions and BPM suggestions
+   */
+  async suggestTransitions(currentTrack: Track, nextTrack: Track): Promise<{
+    suggestion: string;
+    bpmAdjustment?: number;
+    crossfadePoint?: number;
+    effects?: string[];
+  }> {
+    if (!this.apiKey) {
+      throw new Error('OpenAI API key not configured');
+    }
+
+    const messages: OpenAIMessage[] = [
+      {
+        role: 'system',
+        content: `You are a professional DJ mixing consultant. Analyze two tracks and provide specific mixing advice including BPM adjustments, crossfade timing, and effects suggestions.
+        
+        Consider:
+        - Key compatibility (harmonic mixing)
+        - BPM differences and sync strategies
+        - Energy flow and crowd psychology
+        - Optimal crossfade points
+        - Effects that would enhance the transition`
+      },
+      {
+        role: 'user',
+        content: `Help me transition from "${currentTrack.artist} - ${currentTrack.title}" (${currentTrack.bpm || 'unknown'} BPM, ${currentTrack.key || 'unknown'} key) to "${nextTrack.artist} - ${nextTrack.title}" (${nextTrack.bpm || 'unknown'} BPM, ${nextTrack.key || 'unknown'} key). Provide JSON with: suggestion (string), bpmAdjustment (number), crossfadePoint (seconds), effects (array).`
+      }
+    ];
+
+    try {
+      const response = await fetch(`${this.baseUrl}/chat/completions`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${this.apiKey}`
+        },
+        body: JSON.stringify({
+          model: 'gpt-4',
+          messages,
+          response_format: { type: 'json_object' },
+          temperature: 0.6,
+          max_tokens: 500
+        })
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to get transition suggestions');
+      }
+
+      const data: OpenAIResponse = await response.json();
+      return JSON.parse(data.choices[0].message.content);
+    } catch (error) {
+      console.error('Transition suggestion failed:', error);
+      return {
+        suggestion: 'Standard crossfade recommended',
+        crossfadePoint: 30
+      };
+    }
+  }
+
+  /**
+   * Analyze playlist flow and suggest improvements
+   */
+  async analyzePlaylistFlow(tracks: Track[]): Promise<{
+    score: number;
+    suggestions: string[];
+    reorderedTracks?: Track[];
+  }> {
+    if (!this.apiKey || tracks.length < 3) {
+      return {
+        score: 0.8,
+        suggestions: ['Add more tracks for better analysis']
+      };
+    }
+
+    const trackList = tracks.map((t, i) => 
+      `${i + 1}. ${t.artist} - ${t.title} (${t.bpm || '?'} BPM, ${t.key || '?'} key, Energy: ${t.energy || '?'})`
+    ).join('\n');
+
+    const messages: OpenAIMessage[] = [
+      {
+        role: 'system',
+        content: `You are a DJ consultant analyzing playlist flow. Rate the playlist flow from 0-1 and provide specific suggestions for improvement. Consider BPM progression, key harmony, energy curves, and crowd psychology.`
+      },
+      {
+        role: 'user',
+        content: `Analyze this playlist flow:\n${trackList}\n\nProvide JSON with: score (0-1), suggestions (array of strings).`
+      }
+    ];
+
+    try {
+      const response = await fetch(`${this.baseUrl}/chat/completions`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${this.apiKey}`
+        },
+        body: JSON.stringify({
+          model: 'gpt-4',
+          messages,
+          response_format: { type: 'json_object' },
+          temperature: 0.5,
+          max_tokens: 600
+        })
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to analyze playlist flow');
+      }
+
+      const data: OpenAIResponse = await response.json();
+      return JSON.parse(data.choices[0].message.content);
+    } catch (error) {
+      console.error('Playlist analysis failed:', error);
+      return {
+        score: 0.7,
+        suggestions: ['Consider BPM progression and key harmony']
+      };
+    }
+  }
+
+  /**
    * Check if OpenAI is properly configured
    */
   isConfigured(): boolean {

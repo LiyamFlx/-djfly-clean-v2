@@ -268,6 +268,90 @@ class SpotifyService {
   }
 
   /**
+   * Get playlists for a user (requires user authentication)
+   */
+  async getUserPlaylists(userId: string, token: string): Promise<any[]> {
+    try {
+      const response = await fetch(
+        `https://api.spotify.com/v1/users/${userId}/playlists`,
+        {
+          headers: {
+            'Authorization': `Bearer ${token}`
+          }
+        }
+      );
+
+      if (!response.ok) {
+        throw new Error(`Failed to get playlists: ${response.statusText}`);
+      }
+
+      const data = await response.json();
+      return data.items;
+    } catch (error) {
+      console.error('Get playlists error:', error);
+      return [];
+    }
+  }
+
+  /**
+   * Create a new playlist (requires user authentication)
+   */
+  async createPlaylist(userId: string, token: string, name: string, description?: string): Promise<any> {
+    try {
+      const response = await fetch(
+        `https://api.spotify.com/v1/users/${userId}/playlists`,
+        {
+          method: 'POST',
+          headers: {
+            'Authorization': `Bearer ${token}`,
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({
+            name,
+            description: description || `Created by DJfly - ${new Date().toLocaleDateString()}`,
+            public: false
+          })
+        }
+      );
+
+      if (!response.ok) {
+        throw new Error(`Failed to create playlist: ${response.statusText}`);
+      }
+
+      return await response.json();
+    } catch (error) {
+      console.error('Create playlist error:', error);
+      throw error;
+    }
+  }
+
+  /**
+   * Add tracks to a playlist (requires user authentication)
+   */
+  async addTracksToPlaylist(playlistId: string, token: string, trackUris: string[]): Promise<boolean> {
+    try {
+      const response = await fetch(
+        `https://api.spotify.com/v1/playlists/${playlistId}/tracks`,
+        {
+          method: 'POST',
+          headers: {
+            'Authorization': `Bearer ${token}`,
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({
+            uris: trackUris
+          })
+        }
+      );
+
+      return response.ok;
+    } catch (error) {
+      console.error('Add tracks to playlist error:', error);
+      return false;
+    }
+  }
+
+  /**
    * Get enhanced tracks with audio features
    */
   async getTracksWithFeatures(tracks: Track[]): Promise<Track[]> {
