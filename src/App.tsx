@@ -81,9 +81,9 @@ const MagicMatchPage = () => {
         // In a real app, you'd analyze the recorded audio data.
         // For now, we just generate a mock playlist as before.
         appState.queue = [
-          { id: 'match1', title: 'Vibe-Matched Track A', artist: 'Mic Analyzer', bpm: 125, key: 'Am', previewUrl: 'https://www.soundjay.com/misc/sounds/bell-ringing-05.wav', duration: 30 },
-          { id: 'match2', title: 'Vibe-Matched Track B', artist: 'Mic Analyzer', bpm: 128, key: 'G', previewUrl: 'https://www2.cs.uic.edu/~i101/SoundFiles/BabyElephantWalk60.wav', duration: 30 },
-          { id: 'match3', title: 'Vibe-Matched Track C', artist: 'Mic Analyzer', bpm: 126, key: 'C', previewUrl: 'https://www2.cs.uic.edu/~i101/SoundFiles/CantinaBand60.wav', duration: 30 },
+          { id: 'match1', title: 'Summer Electronic Vibes', artist: 'AI Generated', bpm: 125, key: 'Am', previewUrl: 'https://www.soundjay.com/misc/sounds/bell-ringing-05.wav', duration: 180 },
+          { id: 'match2', title: 'Deep House Flow', artist: 'AI Generated', bpm: 128, key: 'G', previewUrl: 'https://actions.google.com/sounds/v1/alarms/beep_short.ogg', duration: 180 },
+          { id: 'match3', title: 'Progressive Energy', artist: 'AI Generated', bpm: 126, key: 'C', previewUrl: 'https://actions.google.com/sounds/v1/alarms/digital_watch_alarm_long.ogg', duration: 180 },
         ];
 
       }, 5000); // Record for 5 seconds
@@ -181,11 +181,11 @@ const MagicSetPage = () => {
     // Simulate AI generation
     setTimeout(() => {
       const mockTracks: Track[] = [
-        { id: '1', title: 'Summer Vibes', artist: 'AI Generated', bpm: 120, key: 'C', genre: 'Electronic', previewUrl: 'https://www2.cs.uic.edu/~i101/SoundFiles/BabyElephantWalk60.wav', duration: 30 },
-        { id: '2', title: 'Deep House Flow', artist: 'AI Generated', bpm: 122, key: 'G', genre: 'House', previewUrl: 'https://www2.cs.uic.edu/~i101/SoundFiles/CantinaBand60.wav', duration: 30 },
-        { id: '3', title: 'Energetic Beats', artist: 'AI Generated', bpm: 128, key: 'Am', genre: 'Techno', previewUrl: 'https://www2.cs.uic.edu/~i101/SoundFiles/StarWars60.wav', duration: 30 },
-        { id: '4', title: 'Chill Sunset', artist: 'AI Generated', bpm: 110, key: 'F', genre: 'Ambient', previewUrl: 'https://www2.cs.uic.edu/~i101/SoundFiles/PinkPanther60.wav', duration: 30 },
-        { id: '5', title: 'Party Anthem', artist: 'AI Generated', bpm: 132, key: 'D', genre: 'Progressive', previewUrl: 'https://www2.cs.uic.edu/~i101/SoundFiles/ImperialMarch60.wav', duration: 30 },
+        { id: '1', title: 'Summer Vibes', artist: 'DJfly AI', bpm: 120, key: 'C', genre: 'Electronic', previewUrl: 'https://actions.google.com/sounds/v1/alarms/beep_short.ogg', duration: 180 },
+        { id: '2', title: 'Deep House Flow', artist: 'DJfly AI', bpm: 122, key: 'G', genre: 'House', previewUrl: 'https://actions.google.com/sounds/v1/alarms/digital_watch_alarm_long.ogg', duration: 180 },
+        { id: '3', title: 'Energetic Beats', artist: 'DJfly AI', bpm: 128, key: 'Am', genre: 'Techno', previewUrl: 'https://actions.google.com/sounds/v1/cartoon/cartoon_boing.ogg', duration: 180 },
+        { id: '4', title: 'Chill Sunset', artist: 'DJfly AI', bpm: 110, key: 'F', genre: 'Ambient', previewUrl: 'https://actions.google.com/sounds/v1/animals/cat_purr_close.ogg', duration: 180 },
+        { id: '5', title: 'Party Anthem', artist: 'DJfly AI', bpm: 132, key: 'D', genre: 'Progressive', previewUrl: 'https://actions.google.com/sounds/v1/cartoon/cartoon_cowbell.ogg', duration: 180 },
       ];
       
       setGeneratedTracks(mockTracks);
@@ -348,6 +348,15 @@ const PlayerPage = () => {
   const [currentTime, setCurrentTime] = useState(0);
   const [volume, setVolume] = useState(80);
   const [currentTrack, setCurrentTrack] = useState(appState.currentTrack || appState.queue[0]);
+  
+  // DJ Effects State
+  const [bassLevel, setBassLevel] = useState(50);
+  const [midLevel, setMidLevel] = useState(50);
+  const [trebleLevel, setTrebleLevel] = useState(50);
+  const [filterFreq, setFilterFreq] = useState(20000);
+  const [reverbWet, setReverbWet] = useState(0);
+  const [delayTime, setDelayTime] = useState(0);
+  const [showEffects, setShowEffects] = useState(false);
 
   const audioRef = useRef<HTMLAudioElement>(null);
 
@@ -388,8 +397,8 @@ const PlayerPage = () => {
       if (isPlaying) {
         audio.play().catch(e => {
           console.error("Audio play failed:", e);
-          // Show user-friendly error message
-          alert("Demo Mode: Audio playback requires user interaction. Click play again after page loads.");
+          setIsPlaying(false);
+          appState.isPlaying = false;
         });
       } else {
         audio.pause();
@@ -499,21 +508,162 @@ const PlayerPage = () => {
               <span className="text-gray-400 w-10 text-right">{volume}%</span>
             </div>
             
-            <div className="mt-12">
-              <h3 className="text-lg font-semibold mb-4">Up Next</h3>
+            {/* DJ Effects Panel */}
+            <div className="mt-8">
+              <button 
+                onClick={() => setShowEffects(!showEffects)}
+                className="w-full bg-purple-600 hover:bg-purple-700 text-white font-bold py-3 px-6 rounded-lg mb-4 transition-colors"
+              >
+                🎛️ DJ Effects {showEffects ? '▼' : '▶'}
+              </button>
+              
+              {showEffects && (
+                <div className="bg-gray-800 p-6 rounded-xl mb-8">
+                  <div className="grid md:grid-cols-2 gap-6">
+                    {/* EQ Section */}
+                    <div>
+                      <h4 className="text-lg font-semibold mb-4">🎚️ EQ</h4>
+                      <div className="space-y-4">
+                        <div>
+                          <label className="block text-sm text-gray-400 mb-2">Bass</label>
+                          <input 
+                            type="range" 
+                            min="0" 
+                            max="100" 
+                            value={bassLevel} 
+                            onChange={(e) => setBassLevel(Number(e.target.value))}
+                            className="w-full accent-purple-500"
+                          />
+                          <span className="text-xs text-gray-400">{bassLevel}%</span>
+                        </div>
+                        <div>
+                          <label className="block text-sm text-gray-400 mb-2">Mid</label>
+                          <input 
+                            type="range" 
+                            min="0" 
+                            max="100" 
+                            value={midLevel} 
+                            onChange={(e) => setMidLevel(Number(e.target.value))}
+                            className="w-full accent-purple-500"
+                          />
+                          <span className="text-xs text-gray-400">{midLevel}%</span>
+                        </div>
+                        <div>
+                          <label className="block text-sm text-gray-400 mb-2">Treble</label>
+                          <input 
+                            type="range" 
+                            min="0" 
+                            max="100" 
+                            value={trebleLevel} 
+                            onChange={(e) => setTrebleLevel(Number(e.target.value))}
+                            className="w-full accent-purple-500"
+                          />
+                          <span className="text-xs text-gray-400">{trebleLevel}%</span>
+                        </div>
+                      </div>
+                    </div>
+                    
+                    {/* Effects Section */}
+                    <div>
+                      <h4 className="text-lg font-semibold mb-4">✨ Effects</h4>
+                      <div className="space-y-4">
+                        <div>
+                          <label className="block text-sm text-gray-400 mb-2">Filter (Hz)</label>
+                          <input 
+                            type="range" 
+                            min="200" 
+                            max="20000" 
+                            value={filterFreq} 
+                            onChange={(e) => setFilterFreq(Number(e.target.value))}
+                            className="w-full accent-blue-500"
+                          />
+                          <span className="text-xs text-gray-400">{filterFreq} Hz</span>
+                        </div>
+                        <div>
+                          <label className="block text-sm text-gray-400 mb-2">Reverb</label>
+                          <input 
+                            type="range" 
+                            min="0" 
+                            max="100" 
+                            value={reverbWet} 
+                            onChange={(e) => setReverbWet(Number(e.target.value))}
+                            className="w-full accent-blue-500"
+                          />
+                          <span className="text-xs text-gray-400">{reverbWet}%</span>
+                        </div>
+                        <div>
+                          <label className="block text-sm text-gray-400 mb-2">Delay</label>
+                          <input 
+                            type="range" 
+                            min="0" 
+                            max="100" 
+                            value={delayTime} 
+                            onChange={(e) => setDelayTime(Number(e.target.value))}
+                            className="w-full accent-blue-500"
+                          />
+                          <span className="text-xs text-gray-400">{delayTime}%</span>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  
+                  {/* Preset Buttons */}
+                  <div className="mt-6 flex gap-2 flex-wrap">
+                    <button 
+                      onClick={() => {
+                        setBassLevel(80); setMidLevel(60); setTrebleLevel(70);
+                        setFilterFreq(15000); setReverbWet(20); setDelayTime(10);
+                      }}
+                      className="bg-orange-600 hover:bg-orange-700 px-4 py-2 rounded text-sm"
+                    >
+                      🔥 Party Mode
+                    </button>
+                    <button 
+                      onClick={() => {
+                        setBassLevel(30); setMidLevel(50); setTrebleLevel(40);
+                        setFilterFreq(8000); setReverbWet(50); setDelayTime(30);
+                      }}
+                      className="bg-blue-600 hover:bg-blue-700 px-4 py-2 rounded text-sm"
+                    >
+                      🌊 Chill Vibes
+                    </button>
+                    <button 
+                      onClick={() => {
+                        setBassLevel(50); setMidLevel(50); setTrebleLevel(50);
+                        setFilterFreq(20000); setReverbWet(0); setDelayTime(0);
+                      }}
+                      className="bg-gray-600 hover:bg-gray-700 px-4 py-2 rounded text-sm"
+                    >
+                      🔄 Reset
+                    </button>
+                  </div>
+                </div>
+              )}
+            </div>
+
+            <div className="mt-8">
+              <h3 className="text-lg font-semibold mb-4">Up Next ({appState.queue.length} tracks)</h3>
               <div className="space-y-2 max-h-48 overflow-y-auto pr-2">
                 {appState.queue.map((track, index) => (
                   <div 
                     key={track.id} 
-                    className={`p-3 rounded-lg ${track.id === currentTrack.id ? 'bg-blue-900 bg-opacity-30' : 'bg-gray-800'}`}
+                    className={`p-3 rounded-lg cursor-pointer hover:bg-gray-700 ${track.id === currentTrack.id ? 'bg-blue-900 bg-opacity-30' : 'bg-gray-800'}`}
+                    onClick={() => {
+                      setCurrentTrack(track); 
+                      appState.currentTrack = track;
+                    }}
                   >
                     <div className="flex items-center">
                       <span className="w-6 text-gray-400">{index + 1}.</span>
                       <div className="flex-1">
-                        <p className={`${track.id === currentTrack.id ? 'text-blue-400' : ''}`}>{track.title}</p>
-                        <p className="text-sm text-gray-400">{track.artist}</p>
+                        <p className={`${track.id === currentTrack.id ? 'text-blue-400 font-semibold' : ''}`}>{track.title}</p>
+                        <p className="text-sm text-gray-400">{track.artist} • {track.genre}</p>
                       </div>
-                      <span className="text-xs text-gray-500">{track.bpm} BPM</span>
+                      <div className="text-right">
+                        <span className="text-xs text-gray-500">{track.bpm} BPM</span>
+                        <br/>
+                        <span className="text-xs text-purple-400">{track.key}</span>
+                      </div>
                     </div>
                   </div>
                 ))}
@@ -550,9 +700,96 @@ const Navigation = () => {
           <Link to="/player" className="flex-1 py-4 text-center hover:bg-gray-800 transition-colors">
             🎧 Player
           </Link>
+          <Link to="/profile" className="flex-1 py-4 text-center hover:bg-gray-800 transition-colors">
+            👤 Profile
+          </Link>
         </div>
       </div>
     </nav>
+  );
+};
+
+const ProfilePage = () => {
+  const userStats = {
+    playlists: 0,
+    tracks: 0,
+    mixTime: '0h 0m'
+  };
+
+  return (
+    <div className="min-h-screen bg-gray-900 text-white p-8 pb-20">
+      {/* Demo Banner */}
+      <div className="bg-yellow-600 text-black text-center py-2 mb-4 rounded">
+        🚀 DJfly v1.2.0 Demo - Live Testing Environment
+      </div>
+      
+      <div className="max-w-4xl mx-auto">
+        <h1 className="text-3xl font-bold mb-8">👤 Profile</h1>
+        
+        {/* Database Status */}
+        <div className="bg-gray-800 p-6 rounded-xl mb-8">
+          <h2 className="text-xl font-semibold mb-4">🗄️ Database Status</h2>
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="text-gray-300">Supabase Connection</p>
+              <p className="text-sm text-gray-400">Demo mode - database disabled</p>
+            </div>
+            <div className="flex items-center gap-2">
+              <div className="w-3 h-3 bg-yellow-500 rounded-full"></div>
+              <span className="text-yellow-400 text-sm">Demo Mode</span>
+            </div>
+          </div>
+        </div>
+
+        {/* User Stats */}
+        <div className="bg-gray-800 p-6 rounded-xl mb-8">
+          <h2 className="text-xl font-semibold mb-4">📊 Stats</h2>
+          <div className="grid grid-cols-3 gap-4">
+            <div className="text-center">
+              <div className="text-2xl font-bold text-blue-400">{userStats.playlists}</div>
+              <div className="text-sm text-gray-400">Playlists</div>
+            </div>
+            <div className="text-center">
+              <div className="text-2xl font-bold text-purple-400">{userStats.tracks}</div>
+              <div className="text-sm text-gray-400">Tracks</div>
+            </div>
+            <div className="text-center">
+              <div className="text-2xl font-bold text-green-400">{userStats.mixTime}</div>
+              <div className="text-sm text-gray-400">Mix Time</div>
+            </div>
+          </div>
+        </div>
+
+        {/* Settings */}
+        <div className="bg-gray-800 p-6 rounded-xl">
+          <h2 className="text-xl font-semibold mb-4">⚙️ Settings</h2>
+          <div className="space-y-4">
+            <div className="flex items-center justify-between">
+              <span>Audio Quality</span>
+              <select className="bg-gray-700 px-3 py-1 rounded text-white">
+                <option>High (320kbps)</option>
+                <option>Medium (128kbps)</option>
+                <option>Low (64kbps)</option>
+              </select>
+            </div>
+            <div className="flex items-center justify-between">
+              <span>Auto-mix</span>
+              <input type="checkbox" className="accent-blue-500" />
+            </div>
+            <div className="flex items-center justify-between">
+              <span>Crossfade Duration</span>
+              <input 
+                type="range" 
+                min="1" 
+                max="10" 
+                defaultValue="3" 
+                className="w-24 accent-purple-500"
+              />
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
   );
 };
 
@@ -566,6 +803,7 @@ function App() {
           <Route path="/studio/match" element={<MagicMatchPage />} />
           <Route path="/studio/set" element={<MagicSetPage />} />
           <Route path="/player" element={<PlayerPage />} />
+          <Route path="/profile" element={<ProfilePage />} />
         </Routes>
       </div>
       <Navigation />
