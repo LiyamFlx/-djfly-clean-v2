@@ -62,6 +62,7 @@ export async function searchSpotifyTrack(query: string): Promise<Track | null> {
     image: item.album.images[0]?.url || '/default-album-art.png',
     duration: item.duration_ms / 1000,
     preview_url: item.preview_url,
+    source: 'spotify' as const,
     bpm: 0, // Spotify API doesn't provide BPM directly in search
     energy: 0, // Requires audio analysis
     genre: '', // Not in standard track object

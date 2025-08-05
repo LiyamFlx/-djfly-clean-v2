@@ -4,10 +4,6 @@ import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { createSessionRecord } from "@/services/api";
 
-interface DJSet {
-  sessionId: string;
-}
-
 interface Props {
   isOpen: boolean;
   onClose: () => void;
@@ -15,7 +11,7 @@ interface Props {
   sessionTime: number;
   tracksPlayed: number;
 }
-const FinishSetModal = ({ set, onClose }: Props) => {
+const FinishSetModal = ({ sessionTime, tracksPlayed, onClose }: Props) => {
   const navigate = useNavigate();
 
   const handleSubmit = async () => {
