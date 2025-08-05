@@ -192,7 +192,7 @@ export const useDJflyStore = create<DJflyStore>()(
       }
     },
     
-    analyzeAudio: async (_audioData: ArrayBuffer) => {
+    analyzeAudio: async (audioData: ArrayBuffer) => {
       set((state) => {
         state.crowd.isListening = true;
       });
@@ -202,12 +202,18 @@ export const useDJflyStore = create<DJflyStore>()(
         await new Promise(resolve => setTimeout(resolve, 2000));
         
         // Generate mock crowd metrics
+        const moods: Array<'excited' | 'chill' | 'energetic' | 'mellow'> = ['excited', 'chill', 'energetic', 'mellow'];
+        const engagements: Array<'low' | 'medium' | 'high'> = ['low', 'medium', 'high'];
+        
         const mockMetrics = {
           currentEnergy: Math.random() * 0.4 + 0.3, // 0.3 to 0.7
-          mood: ['excited', 'chill', 'energetic', 'mellow'][Math.floor(Math.random() * 4)] as any,
-          engagementLevel: ['low', 'medium', 'high'][Math.floor(Math.random() * 3)] as any,
+          mood: moods[Math.floor(Math.random() * 4)],
+          engagementLevel: engagements[Math.floor(Math.random() * 3)],
           crowdSize: Math.floor(Math.random() * 200) + 50,
         };
+        
+        // Log audio data analysis (in real implementation, would analyze the buffer)
+        console.log('Analyzing audio data of length:', audioData.byteLength);
 
         set((state) => {
           Object.assign(state.crowd, mockMetrics);
@@ -215,7 +221,8 @@ export const useDJflyStore = create<DJflyStore>()(
           state.crowd.lastUpdated = new Date();
         });
 
-      } catch (_error) {
+      } catch (error) {
+        console.error('Audio analysis error:', error);
         set((state) => {
           state.crowd.isListening = false;
         });

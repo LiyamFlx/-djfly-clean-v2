@@ -1,4 +1,9 @@
-declare const global: any;
+declare const global: {
+  AudioContext: unknown;
+  MediaRecorder: unknown;
+  IntersectionObserver: unknown;
+  ResizeObserver: unknown;
+};
 import '@testing-library/jest-dom';
 import { vi } from 'vitest';
 
@@ -36,12 +41,14 @@ global.MediaRecorder = class MockMediaRecorder {
   
   start = vi.fn();
   stop = vi.fn();
-  ondataavailable: ((event: any) => void) | null = null;
+  ondataavailable: ((event: BlobEvent) => void) | null = null;
   onstop: (() => void) | null = null;
   state = 'inactive';
   
-  constructor(_stream: MediaStream, _options?: MediaRecorderOptions) {}
-} as any;
+  constructor(stream: MediaStream, options?: MediaRecorderOptions) {
+    console.log('Mock MediaRecorder created with stream:', stream, 'options:', options);
+  }
+};
 
 // Mock IntersectionObserver
 global.IntersectionObserver = vi.fn().mockImplementation(() => ({

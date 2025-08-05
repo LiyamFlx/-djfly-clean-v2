@@ -16,7 +16,7 @@ interface Track {
 }
 
 // Simple state management
-let appState = {
+const appState = {
   currentTrack: null as Track | null,
   queue: [] as Track[],
   isPlaying: false
@@ -367,7 +367,7 @@ const PlayerPage = () => {
       audio.removeEventListener('timeupdate', handleTimeUpdate);
       audio.removeEventListener('ended', handleEnded);
     };
-  }, [currentTrack]);
+  }, [currentTrack, handleNextTrack]);
 
   useEffect(() => {
     const audio = audioRef.current;

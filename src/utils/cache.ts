@@ -4,7 +4,7 @@ interface CacheItem<T> {
 }
 
 class Cache {
-  private cache: Map<string, CacheItem<any>> = new Map();
+  private cache: Map<string, CacheItem<unknown>> = new Map();
   private maxSize: number = 1000; // Maximum number of items to store
 
   /**

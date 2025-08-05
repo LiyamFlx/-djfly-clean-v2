@@ -58,7 +58,7 @@ export async function searchSpotifyTrack(query: string): Promise<Track | null> {
   return {
     id: item.id,
     title: item.name,
-    artist: item.artists.map((a: any) => a.name).join(', '),
+    artist: item.artists.map((a: { name: string }) => a.name).join(', '),
     image: item.album.images[0]?.url || '/default-album-art.png',
     duration: item.duration_ms / 1000,
     preview_url: item.preview_url,
