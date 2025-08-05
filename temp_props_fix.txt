@@ -1,7 +1,0 @@
-interface Props {
-  isOpen: boolean;
-  onClose: () => void;
-  onConfirm: () => void;
-  sessionTime: number;
-  tracksPlayed: number;
-}
