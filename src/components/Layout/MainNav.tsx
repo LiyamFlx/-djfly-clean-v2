@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
-import { Music, Home, Sparkles, Play, Library, User, Menu, X } from 'lucide-react';
+import { Music, Home, Sparkles, Play, BarChart, User, Menu, X } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { ROUTES } from '@/constants/routes';
 
@@ -15,7 +15,7 @@ const navItems: NavItemProps[] = [
   { path: ROUTES.HOME, icon: Home, label: 'Home' },
   { path: ROUTES.STUDIO, icon: Sparkles, label: 'Studio' },
   { path: ROUTES.PLAYER, icon: Play, label: 'Player' },
-  { path: ROUTES.LIBRARY, icon: Library, label: 'Library' },
+  { path: ROUTES.PRODUCER, icon: BarChart, label: 'Analytics' },
   { path: ROUTES.PROFILE, icon: User, label: 'Profile' },
 ];
 

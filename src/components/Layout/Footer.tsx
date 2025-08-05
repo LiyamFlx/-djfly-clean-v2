@@ -33,6 +33,13 @@ const Footer: React.FC = () => {
     }
   ];
 
+  const footerLinks = [
+    { name: 'Privacy Policy', href: ROUTES.PRIVACY },
+    { name: 'Terms of Service', href: ROUTES.TERMS },
+    { name: 'Contact Us', href: ROUTES.CONTACT },
+    { name: 'Help Center', href: ROUTES.HELP }
+  ];
+
   return (
     <footer 
       className="bg-rich-black/90 backdrop-blur-sm border-t border-white/10 py-12"
@@ -67,7 +74,19 @@ const Footer: React.FC = () => {
         </div>
         
         <div className="mt-8 border-t border-gray-800 pt-8 md:flex md:items-center md:justify-between">
-          <p className="text-xs text-gray-500 md:order-1">
+          <div className="flex space-x-6 md:order-2">
+            {footerLinks.map((item) => (
+              <Link
+                key={item.name}
+                to={item.href}
+                className="text-sm text-gray-400 hover:text-white transition-colors duration-200"
+              >
+                {item.name}
+              </Link>
+            ))}
+          </div>
+
+          <p className="mt-8 text-xs text-gray-500 md:mt-0 md:order-1">
             &copy; {currentYear} DJfly. All rights reserved.
           </p>
         </div>
