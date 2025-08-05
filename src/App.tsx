@@ -178,47 +178,20 @@ const MagicSetPage = () => {
 
     setStatus('generating');
     
-    // Try real API first, fallback to mock
-    try {
-      const { generatePlaylistWithAPI } = await import('./services/api');
-      generatePlaylistWithAPI(description, (progress) => {
-        console.log('Generation progress:', progress);
-      }).then((tracks) => {
-        if (tracks.length > 0) {
-          setGeneratedTracks(tracks);
-          setStatus('complete');
-          appState.queue = tracks;
-        } else {
-          throw new Error('No tracks generated');
-        }
-      }).catch(() => {
-        // Fallback to demo tracks
-        const mockTracks: Track[] = [
-          { id: '1', title: 'Summer Vibes', artist: 'DJfly AI', bpm: 120, key: 'C', genre: 'Electronic', previewUrl: 'https://actions.google.com/sounds/v1/alarms/beep_short.ogg', duration: 180 },
-          { id: '2', title: 'Deep House Flow', artist: 'DJfly AI', bpm: 122, key: 'G', genre: 'House', previewUrl: 'https://actions.google.com/sounds/v1/alarms/digital_watch_alarm_long.ogg', duration: 180 },
-          { id: '3', title: 'Energetic Beats', artist: 'DJfly AI', bpm: 128, key: 'Am', genre: 'Techno', previewUrl: 'https://actions.google.com/sounds/v1/cartoon/cartoon_boing.ogg', duration: 180 },
-          { id: '4', title: 'Chill Sunset', artist: 'DJfly AI', bpm: 110, key: 'F', genre: 'Ambient', previewUrl: 'https://actions.google.com/sounds/v1/animals/cat_purr_close.ogg', duration: 180 },
-          { id: '5', title: 'Party Anthem', artist: 'DJfly AI', bpm: 132, key: 'D', genre: 'Progressive', previewUrl: 'https://actions.google.com/sounds/v1/cartoon/cartoon_cowbell.ogg', duration: 180 },
-        ];
-        setGeneratedTracks(mockTracks);
-        setStatus('complete');
-        appState.queue = mockTracks;
-      });
-    } catch {
-      // Fallback to demo tracks immediately if import fails
-      setTimeout(() => {
-        const mockTracks: Track[] = [
-          { id: '1', title: 'Summer Vibes', artist: 'DJfly AI', bpm: 120, key: 'C', genre: 'Electronic', previewUrl: 'https://actions.google.com/sounds/v1/alarms/beep_short.ogg', duration: 180 },
-          { id: '2', title: 'Deep House Flow', artist: 'DJfly AI', bpm: 122, key: 'G', genre: 'House', previewUrl: 'https://actions.google.com/sounds/v1/alarms/digital_watch_alarm_long.ogg', duration: 180 },
-          { id: '3', title: 'Energetic Beats', artist: 'DJfly AI', bpm: 128, key: 'Am', genre: 'Techno', previewUrl: 'https://actions.google.com/sounds/v1/cartoon/cartoon_boing.ogg', duration: 180 },
-          { id: '4', title: 'Chill Sunset', artist: 'DJfly AI', bpm: 110, key: 'F', genre: 'Ambient', previewUrl: 'https://actions.google.com/sounds/v1/animals/cat_purr_close.ogg', duration: 180 },
-          { id: '5', title: 'Party Anthem', artist: 'DJfly AI', bpm: 132, key: 'D', genre: 'Progressive', previewUrl: 'https://actions.google.com/sounds/v1/cartoon/cartoon_cowbell.ogg', duration: 180 },
-        ];
-        setGeneratedTracks(mockTracks);
-        setStatus('complete');
-        appState.queue = mockTracks;
-      }, 3000);
-    }
+    // Simulate AI generation (keeping working demo)
+    setTimeout(() => {
+      const mockTracks: Track[] = [
+        { id: '1', title: 'Summer Vibes', artist: 'DJfly AI', bpm: 120, key: 'C', genre: 'Electronic', previewUrl: 'https://actions.google.com/sounds/v1/alarms/beep_short.ogg', duration: 180 },
+        { id: '2', title: 'Deep House Flow', artist: 'DJfly AI', bpm: 122, key: 'G', genre: 'House', previewUrl: 'https://actions.google.com/sounds/v1/alarms/digital_watch_alarm_long.ogg', duration: 180 },
+        { id: '3', title: 'Energetic Beats', artist: 'DJfly AI', bpm: 128, key: 'Am', genre: 'Techno', previewUrl: 'https://actions.google.com/sounds/v1/cartoon/cartoon_boing.ogg', duration: 180 },
+        { id: '4', title: 'Chill Sunset', artist: 'DJfly AI', bpm: 110, key: 'F', genre: 'Ambient', previewUrl: 'https://actions.google.com/sounds/v1/animals/cat_purr_close.ogg', duration: 180 },
+        { id: '5', title: 'Party Anthem', artist: 'DJfly AI', bpm: 132, key: 'D', genre: 'Progressive', previewUrl: 'https://actions.google.com/sounds/v1/cartoon/cartoon_cowbell.ogg', duration: 180 },
+      ];
+      
+      setGeneratedTracks(mockTracks);
+      setStatus('complete');
+      appState.queue = mockTracks;
+    }, 3000);
   };
 
   const resetGenerator = () => {

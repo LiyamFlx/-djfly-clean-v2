@@ -2,7 +2,7 @@
 import { motion } from "framer-motion";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import { createSessionRecord } from "@/services/api";
+// import { createSessionRecord } from "@/services/api";
 
 interface Props {
   isOpen: boolean;
@@ -11,12 +11,12 @@ interface Props {
   sessionTime: number;
   tracksPlayed: number;
 }
-const FinishSetModal = ({ sessionTime, tracksPlayed, onClose }: Props) => {
+const FinishSetModal = ({ sessionTime: _sessionTime, tracksPlayed: _tracksPlayed, onClose }: Props) => {
   const navigate = useNavigate();
 
   const handleSubmit = async () => {
     try {
-      await createSessionRecord({ sessionTime, tracksPlayed });
+      // await createSessionRecord({ sessionTime, tracksPlayed });
       onClose();
       navigate("/studio");
     } catch (error) {

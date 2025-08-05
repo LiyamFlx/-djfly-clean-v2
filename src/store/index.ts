@@ -1,6 +1,6 @@
 import { create } from 'zustand';
 import { immer } from 'zustand/middleware/immer';
-import { getAiPlaylist } from '@/services/api';
+// import { getAiPlaylist } from '@/services/api';
 import type { 
   Track, 
   AudioState, 
@@ -168,14 +168,11 @@ export const useDJflyStore = create<DJflyStore>()(
         state.ai.generatedTracks = [];
       });
 
-      const onProgress = (progress: number) => {
-        set((state) => {
-          state.ai.progress = progress;
-        });
-      };
+      // Progress tracking removed for demo
 
       try {
-        const tracks = await getAiPlaylist(prompt, onProgress);
+        // const tracks = await getAiPlaylist(prompt, onProgress);
+        const tracks: Track[] = []; // Placeholder
 
         set((state) => {
           state.ai.generatedTracks = tracks;
