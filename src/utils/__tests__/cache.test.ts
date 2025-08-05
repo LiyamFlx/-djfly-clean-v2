@@ -7,9 +7,6 @@ describe('Cache', () => {
     vi.useFakeTimers();
   });
 
-  afterEach(() => {
-    vi.useRealTimers();
-  });
 
   it('stores and retrieves values correctly', () => {
     const testData = { message: 'Hello World' };

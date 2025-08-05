@@ -238,7 +238,7 @@ class AudioAnalysisService {
    */
   private determineMood(
     energy: number, 
-    spectralCentroid: number, 
+    _spectralCentroid: number, 
     tempo: number
   ): 'excited' | 'chill' | 'energetic' | 'mellow' {
     if (energy > 0.7 && tempo > 140) {

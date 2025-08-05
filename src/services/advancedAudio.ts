@@ -138,7 +138,7 @@ class AdvancedAudioService {
     return filtered;
   }
 
-  private detectOnsets(data: Float32Array, sampleRate: number): number[] {
+  private detectOnsets(data: Float32Array, _sampleRate: number): number[] {
     const onsets: number[] = [];
     const windowSize = Math.floor(sampleRate * 0.1); // 100ms windows
     const hopSize = Math.floor(windowSize / 2);

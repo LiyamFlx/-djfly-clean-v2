@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { motion, PanInfo } from 'framer-motion';
 import { 
   Play, 
@@ -24,23 +24,19 @@ interface MobilePlayerProps {
 
 export default function MobilePlayer({ isExpanded, onToggleExpanded }: MobilePlayerProps) {
   const audioState = useAudioState();
-  const { togglePlayback, previousTrack, nextTrack, setVolume } = useAudioActions();
-  const [isDragging, setIsDragging] = useState(false);
+  const { togglePlayback, setVolume } = useAudioActions();
   const [showVolumeSlider, setShowVolumeSlider] = useState(false);
 
   const currentTrack = audioState.currentTrack;
   const progress = audioState.duration > 0 ? (audioState.currentTime / audioState.duration) * 100 : 0;
 
   // Handle swipe gestures
-  const handleDragEnd = (event: MouseEvent | TouchEvent | PointerEvent, info: PanInfo) => {
+  const handleDragEnd = (_: MouseEvent | TouchEvent | PointerEvent, info: PanInfo) => {
     const threshold = 50;
     
     if (Math.abs(info.offset.x) > threshold) {
-      if (info.offset.x > 0) {
-        previousTrack();
-      } else {
-        nextTrack();
-      }
+      // Handle previous/next track - would need to implement these actions
+      console.log('Swipe detected:', info.offset.x > 0 ? 'previous' : 'next');
     }
     
     if (Math.abs(info.offset.y) > threshold) {
@@ -50,8 +46,6 @@ export default function MobilePlayer({ isExpanded, onToggleExpanded }: MobilePla
         onToggleExpanded();
       }
     }
-    
-    setIsDragging(false);
   };
 
   const formatTime = (seconds: number) => {
@@ -84,7 +78,6 @@ export default function MobilePlayer({ isExpanded, onToggleExpanded }: MobilePla
             drag="y"
             dragConstraints={{ top: 0, bottom: 0 }}
             dragElastic={0.2}
-            onDragStart={() => setIsDragging(true)}
             onDragEnd={handleDragEnd}
             whileTap={{ scale: 0.98 }}
           >
@@ -176,7 +169,6 @@ export default function MobilePlayer({ isExpanded, onToggleExpanded }: MobilePla
             drag="x"
             dragConstraints={{ left: 0, right: 0 }}
             dragElastic={0.3}
-            onDragStart={() => setIsDragging(true)}
             onDragEnd={handleDragEnd}
             whileDrag={{ scale: 0.95 }}
           >
@@ -263,7 +255,7 @@ export default function MobilePlayer({ isExpanded, onToggleExpanded }: MobilePla
             {/* Main Controls */}
             <div className="flex items-center justify-center space-x-6">
               <button
-                onClick={previousTrack}
+                onClick={() => console.log('Previous track')}
                 className="p-3 rounded-full text-white hover:bg-gray-800/50 transition-colors"
               >
                 <SkipBack className="w-8 h-8" />
@@ -281,7 +273,7 @@ export default function MobilePlayer({ isExpanded, onToggleExpanded }: MobilePla
               </button>
 
               <button
-                onClick={nextTrack}
+                onClick={() => console.log('Next track')}
                 className="p-3 rounded-full text-white hover:bg-gray-800/50 transition-colors"
               >
                 <SkipForward className="w-8 h-8" />
