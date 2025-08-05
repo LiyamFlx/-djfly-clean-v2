@@ -58,11 +58,10 @@ export async function searchSpotifyTrack(query: string): Promise<Track | null> {
   return {
     id: item.id,
     title: item.name,
-    artist: item.artists.map((a: { name: string }) => a.name).join(', '),
+    artist: item.artists.map((a: any) => a.name).join(', '),
     image: item.album.images[0]?.url || '/default-album-art.png',
     duration: item.duration_ms / 1000,
-    preview_url: item.preview_url,
-    source: 'spotify' as const,
+    previewUrl: item.preview_url,
     bpm: 0, // Spotify API doesn't provide BPM directly in search
     energy: 0, // Requires audio analysis
     genre: '', // Not in standard track object
@@ -89,7 +88,7 @@ export async function getAiPlaylist(prompt: string, onProgress: (progress: numbe
       messages: [
         {
           role: "system",
-          content: "You are a world-class DJ assistant. Based on the user's prompt, generate a list of 10-15 tracks. Your response should be a JSON object with a single key 'playlist' which is an array of strings, where each string is in the format 'Artist - Song Title'. Do not include any other text or explanation."
+          content: "You are a world-class DJ assistant. Based on the user's prompt, generate a list of 8-10 tracks. Your response must be a JSON object with a single key 'playlist' which is an array of strings, where each string is in the format 'Artist - Song Title'. Do not include any other text, just the JSON."
         },
         {
           role: "user",
@@ -111,6 +110,8 @@ export async function getAiPlaylist(prompt: string, onProgress: (progress: numbe
   const content = JSON.parse(data.choices[0].message.content);
   const trackQueries: string[] = content.playlist;
 
+  console.log("AI Generated Track Queries:", trackQueries); // Verification log
+
   onProgress(60);
 
   const trackPromises = trackQueries.map(async (query, index) => {
@@ -121,10 +122,9 @@ export async function getAiPlaylist(prompt: string, onProgress: (progress: numbe
 
   const tracks = await Promise.all(trackPromises);
 
-  return tracks.filter((track): track is Track => track !== null);
-}
+  const finalTracks = tracks.filter((track): track is Track => track !== null && !!track.previewUrl);
 
-export const createSessionRecord = async (sessionData: { sessionTime: number; tracksPlayed: number; }) => {
-  console.log('Creating session record:', sessionData);
-  return Promise.resolve({ success: true });
-};
+  console.log("Fetched Spotify Tracks with Previews:", finalTracks); // Verification log
+
+  return finalTracks;
+}
