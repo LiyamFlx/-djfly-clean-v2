@@ -4,10 +4,15 @@ import { Button } from "@/components/ui/button";
 import { createSessionRecord } from "@/services/api";
 import { FC } from "react";
 
+<<<<<<< HEAD
 // Extendable type for a DJ set
 interface DJSet {
   sessionId: string;
   // Add more properties as needed
+=======
+interface DJSet {
+  sessionId: string;
+>>>>>>> 76f6768 (Fix FinishSetModal merge conflict)
 }
 
 interface FinishSetModalProps {

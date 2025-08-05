@@ -1,13 +1,17 @@
-import { useState } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { BrowserRouter, Routes, Route, Link, useNavigate } from 'react-router-dom';
+import { motion } from 'framer-motion';
 
 // Track interface
 interface Track {
-  id: number;
+  id: string; // Spotify IDs are strings
   title: string;
   artist: string;
-  bpm: number;
-  key: string;
+  image?: string;
+  duration?: number;
+  previewUrl?: string;
+  bpm?: number;
+  key?: string;
   genre?: string;
 }
 
@@ -53,16 +57,34 @@ const MagicMatchPage = () => {
   const navigate = useNavigate();
   const [status, setStatus] = useState('ready');
   
-  const handleAnalyze = () => {
+  const handleAnalyze = async () => {
     setStatus('recording');
-    setTimeout(() => {
-      setStatus('complete');
-      appState.queue = [
-        { id: 1, title: 'Track 1', artist: 'Artist 1', bpm: 120, key: 'C' },
-        { id: 2, title: 'Track 2', artist: 'Artist 2', bpm: 122, key: 'C#' },
-        { id: 3, title: 'Track 3', artist: 'Artist 3', bpm: 124, key: 'D' },
-      ];
-    }, 2000);
+    try {
+      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+      const recorder = new MediaRecorder(stream);
+      recorder.start();
+
+      setTimeout(() => {
+        recorder.stop();
+        stream.getTracks().forEach(track => track.stop()); // Stop microphone access
+
+        // Simulate analysis and generate playlist
+        setStatus('complete');
+        // In a real app, you'd analyze the recorded audio data.
+        // For now, we just generate a mock playlist as before.
+        appState.queue = [
+          { id: 'match1', title: 'Vibe-Matched Track A', artist: 'Mic Analyzer', bpm: 125, key: 'Am', previewUrl: 'https://cdn.pixabay.com/audio/2022/08/04/audio_2bbe651082.mp3', duration: 30 },
+          { id: 'match2', title: 'Vibe-Matched Track B', artist: 'Mic Analyzer', bpm: 128, key: 'G', previewUrl: 'https://cdn.pixabay.com/audio/2024/02/08/audio_79071a44a2.mp3', duration: 30 },
+          { id: 'match3', title: 'Vibe-Matched Track C', artist: 'Mic Analyzer', bpm: 126, key: 'C', previewUrl: 'https://cdn.pixabay.com/audio/2023/09/14/audio_3702ff6b59.mp3', duration: 30 },
+        ];
+
+      }, 5000); // Record for 5 seconds
+
+    } catch (err) {
+      console.error("Microphone access denied:", err);
+      alert("Microphone access is required for Magic Match. Please allow access and try again.");
+      setStatus('ready');
+    }
   };
 
   return (
@@ -86,9 +108,14 @@ const MagicMatchPage = () => {
           <div className="text-center">
             <div className="mb-6">
               <div className="h-4 w-full bg-gray-700 rounded-full overflow-hidden">
-                <div className="h-full bg-blue-500 animate-pulse"></div>
+                <motion.div
+                  className="h-full bg-blue-500"
+                  initial={{ width: '0%' }}
+                  animate={{ width: '100%' }}
+                  transition={{ duration: 5, ease: 'linear' }}
+                />
               </div>
-              <p className="mt-2">Analyzing crowd noise...</p>
+              <p className="mt-2 animate-pulse">Recording for 5 seconds...</p>
             </div>
           </div>
         )}
@@ -145,12 +172,12 @@ const MagicSetPage = () => {
     
     // Simulate AI generation
     setTimeout(() => {
-      const mockTracks = [
-        { id: 1, title: 'Summer Vibes', artist: 'AI Generated', bpm: 120, key: 'C', genre: 'Electronic' },
-        { id: 2, title: 'Deep House Flow', artist: 'AI Generated', bpm: 122, key: 'G', genre: 'House' },
-        { id: 3, title: 'Energetic Beats', artist: 'AI Generated', bpm: 128, key: 'Am', genre: 'Techno' },
-        { id: 4, title: 'Chill Sunset', artist: 'AI Generated', bpm: 110, key: 'F', genre: 'Ambient' },
-        { id: 5, title: 'Party Anthem', artist: 'AI Generated', bpm: 132, key: 'D', genre: 'Progressive' },
+      const mockTracks: Track[] = [
+        { id: '1', title: 'Summer Vibes', artist: 'AI Generated', bpm: 120, key: 'C', genre: 'Electronic', previewUrl: 'https://cdn.pixabay.com/audio/2022/08/04/audio_2bbe651082.mp3', duration: 30 },
+        { id: '2', title: 'Deep House Flow', artist: 'AI Generated', bpm: 122, key: 'G', genre: 'House', previewUrl: 'https://cdn.pixabay.com/audio/2024/02/08/audio_79071a44a2.mp3', duration: 30 },
+        { id: '3', title: 'Energetic Beats', artist: 'AI Generated', bpm: 128, key: 'Am', genre: 'Techno', previewUrl: 'https://cdn.pixabay.com/audio/2023/09/14/audio_3702ff6b59.mp3', duration: 30 },
+        { id: '4', title: 'Chill Sunset', artist: 'AI Generated', bpm: 110, key: 'F', genre: 'Ambient', previewUrl: 'https://cdn.pixabay.com/audio/2022/08/04/audio_2bbe651082.mp3', duration: 30 },
+        { id: '5', title: 'Party Anthem', artist: 'AI Generated', bpm: 132, key: 'D', genre: 'Progressive', previewUrl: 'https://cdn.pixabay.com/audio/2024/02/08/audio_79071a44a2.mp3', duration: 30 },
       ];
       
       setGeneratedTracks(mockTracks);
@@ -309,29 +336,81 @@ const MagicSetPage = () => {
 };
 
 const PlayerPage = () => {
-  const [isPlaying, setIsPlaying] = useState(false);
+  const [isPlaying, setIsPlaying] = useState(appState.isPlaying);
   const [currentTime, setCurrentTime] = useState(0);
   const [volume, setVolume] = useState(80);
+  const [currentTrack, setCurrentTrack] = useState(appState.currentTrack || appState.queue[0]);
+
+  const audioRef = useRef<HTMLAudioElement>(null);
+
+  const handleNextTrack = () => {
+    const currentIndex = appState.queue.findIndex(t => t.id === currentTrack?.id);
+    if (currentIndex !== -1) {
+      const nextIndex = (currentIndex + 1) % appState.queue.length;
+      const nextTrack = appState.queue[nextIndex];
+      appState.currentTrack = nextTrack;
+      setCurrentTrack(nextTrack);
+    }
+  };
+
+  useEffect(() => {
+    const audio = audioRef.current;
+    if (!audio) return;
+
+    const handleTimeUpdate = () => setCurrentTime(audio.currentTime);
+    const handleEnded = () => handleNextTrack();
+
+    audio.addEventListener('timeupdate', handleTimeUpdate);
+    audio.addEventListener('ended', handleEnded);
+
+    return () => {
+      audio.removeEventListener('timeupdate', handleTimeUpdate);
+      audio.removeEventListener('ended', handleEnded);
+    };
+  }, [currentTrack]);
+
+  useEffect(() => {
+    const audio = audioRef.current;
+    if (!audio) return;
+
+    if (currentTrack && currentTrack.previewUrl) {
+      if (audio.src !== currentTrack.previewUrl) {
+        audio.src = currentTrack.previewUrl;
+      }
+      if (isPlaying) {
+        audio.play().catch(e => console.error("Audio play failed:", e));
+      } else {
+        audio.pause();
+      }
+    } else {
+      audio.pause();
+    }
+  }, [currentTrack, isPlaying]);
   
-  const currentTrack = appState.currentTrack || appState.queue[0];
-  
+  useEffect(() => {
+    if (audioRef.current) {
+      audioRef.current.volume = volume / 100;
+    }
+  }, [volume]);
+
   const togglePlay = () => {
-    setIsPlaying(!isPlaying);
-    appState.isPlaying = !isPlaying;
+    const newIsPlaying = !isPlaying;
+    setIsPlaying(newIsPlaying);
+    appState.isPlaying = newIsPlaying;
   };
   
   const nextTrack = () => {
-    const currentIndex = appState.queue.findIndex(t => t.id === currentTrack?.id);
-    const nextIndex = (currentIndex + 1) % appState.queue.length;
-    appState.currentTrack = appState.queue[nextIndex];
-    setCurrentTime(0);
+    handleNextTrack();
   };
   
   const prevTrack = () => {
     const currentIndex = appState.queue.findIndex(t => t.id === currentTrack?.id);
-    const prevIndex = (currentIndex - 1 + appState.queue.length) % appState.queue.length;
-    appState.currentTrack = appState.queue[prevIndex];
-    setCurrentTime(0);
+    if (currentIndex !== -1) {
+      const prevIndex = (currentIndex - 1 + appState.queue.length) % appState.queue.length;
+      const prevTrack = appState.queue[prevIndex];
+      appState.currentTrack = prevTrack;
+      setCurrentTrack(prevTrack);
+    }
   };
   
   const handleVolumeChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -339,8 +418,11 @@ const PlayerPage = () => {
     setVolume(newVolume);
   };
 
+  const trackDuration = currentTrack?.duration || 180; // default to 3 mins
+
   return (
     <div className="min-h-screen bg-gray-900 text-white p-8">
+      <audio ref={audioRef} />
       <div className="max-w-4xl mx-auto">
         <h1 className="text-3xl font-bold mb-8">🎧 Player</h1>
         
@@ -359,12 +441,12 @@ const PlayerPage = () => {
               <div className="h-1 bg-gray-700 rounded-full overflow-hidden mb-2">
                 <div 
                   className="h-full bg-blue-500" 
-                  style={{ width: `${(currentTime / 180) * 100}%` }}
+                  style={{ width: `${(currentTime / trackDuration) * 100}%` }}
                 ></div>
               </div>
               <div className="flex justify-between text-sm text-gray-400">
-                <span>0:{Math.floor(currentTime).toString().padStart(2, '0')}</span>
-                <span>3:00</span>
+                <span>{Math.floor(currentTime / 60)}:{Math.floor(currentTime % 60).toString().padStart(2, '0')}</span>
+                <span>{Math.floor(trackDuration / 60)}:{Math.floor(trackDuration % 60).toString().padStart(2, '0')}</span>
               </div>
             </div>
             

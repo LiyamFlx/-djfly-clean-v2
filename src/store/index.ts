@@ -1,5 +1,6 @@
 import { create } from 'zustand';
 import { immer } from 'zustand/middleware/immer';
+import { getAiPlaylist } from '@/services/api';
 import type { 
   Track, 
   AudioState, 
@@ -164,52 +165,28 @@ export const useDJflyStore = create<DJflyStore>()(
         state.ai.prompt = prompt;
         state.ai.error = null;
         state.ai.progress = 0;
+        state.ai.generatedTracks = [];
       });
 
-      try {
-        // Simulate AI generation with demo tracks
-        const demoTracks: Track[] = [
-          {
-            id: '1',
-            title: 'Electronic Vibes',
-            artist: 'AI Generated',
-            duration: 180,
-            image: 'https://via.placeholder.com/300x300/00D4FF/FFFFFF?text=Track+1',
-            source: 'demo',
-            bpm: 128,
-            energy: 0.8,
-            valence: 0.7,
-          },
-          {
-            id: '2',
-            title: 'Deep House Mix',
-            artist: 'AI Generated',
-            duration: 240,
-            image: 'https://via.placeholder.com/300x300/00FFCC/FFFFFF?text=Track+2',
-            source: 'demo',
-            bpm: 122,
-            energy: 0.6,
-            valence: 0.8,
-          },
-        ];
+      const onProgress = (progress: number) => {
+        set((state) => {
+          state.ai.progress = progress;
+        });
+      };
 
-        // Simulate progress
-        for (let i = 0; i <= 100; i += 10) {
-          await new Promise(resolve => setTimeout(resolve, 100));
-          set((state) => {
-            state.ai.progress = i;
-          });
-        }
+      try {
+        const tracks = await getAiPlaylist(prompt, onProgress);
 
         set((state) => {
-          state.ai.generatedTracks = demoTracks;
+          state.ai.generatedTracks = tracks;
           state.ai.isGenerating = false;
-          state.audio.queue = demoTracks;
+          state.ai.progress = 100;
         });
 
       } catch (_error) {
+        console.error("Error in generateSet store action:", _error);
         set((state) => {
-          state.ai.error = _error instanceof Error ? _error.message : 'Generation failed';
+          state.ai.error = _error instanceof Error ? _error.message : 'An unknown error occurred during set generation.';
           state.ai.isGenerating = false;
         });
       }
