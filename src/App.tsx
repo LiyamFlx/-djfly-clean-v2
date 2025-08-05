@@ -24,6 +24,10 @@ const appState = {
 
 const HomePage = () => (
   <div className="min-h-screen bg-gray-900 text-white p-8">
+    {/* Demo Banner */}
+    <div className="bg-yellow-600 text-black text-center py-2 mb-4 rounded">
+      🚀 DJfly v1.2.0 Demo - Live Testing Environment
+    </div>
     <div className="max-w-4xl mx-auto text-center">
       <h1 className="text-4xl font-bold text-blue-400 mb-8">DJfly</h1>
       <p className="text-xl mb-8">AI-powered DJ platform</p>
@@ -37,6 +41,10 @@ const HomePage = () => (
 
 const StudioPage = () => (
   <div className="min-h-screen bg-gray-900 text-white p-8">
+    {/* Demo Banner */}
+    <div className="bg-yellow-600 text-black text-center py-2 mb-4 rounded">
+      🚀 DJfly v1.2.0 Demo - Live Testing Environment
+    </div>
     <div className="max-w-4xl mx-auto text-center">
       <h1 className="text-3xl font-bold mb-8">Studio</h1>
       <div className="grid md:grid-cols-2 gap-8">
@@ -73,9 +81,9 @@ const MagicMatchPage = () => {
         // In a real app, you'd analyze the recorded audio data.
         // For now, we just generate a mock playlist as before.
         appState.queue = [
-          { id: 'match1', title: 'Vibe-Matched Track A', artist: 'Mic Analyzer', bpm: 125, key: 'Am', previewUrl: 'https://cdn.pixabay.com/audio/2022/08/04/audio_2bbe651082.mp3', duration: 30 },
-          { id: 'match2', title: 'Vibe-Matched Track B', artist: 'Mic Analyzer', bpm: 128, key: 'G', previewUrl: 'https://cdn.pixabay.com/audio/2024/02/08/audio_79071a44a2.mp3', duration: 30 },
-          { id: 'match3', title: 'Vibe-Matched Track C', artist: 'Mic Analyzer', bpm: 126, key: 'C', previewUrl: 'https://cdn.pixabay.com/audio/2023/09/14/audio_3702ff6b59.mp3', duration: 30 },
+          { id: 'match1', title: 'Vibe-Matched Track A', artist: 'Mic Analyzer', bpm: 125, key: 'Am', previewUrl: 'https://www.soundjay.com/misc/sounds/bell-ringing-05.wav', duration: 30 },
+          { id: 'match2', title: 'Vibe-Matched Track B', artist: 'Mic Analyzer', bpm: 128, key: 'G', previewUrl: 'https://www2.cs.uic.edu/~i101/SoundFiles/BabyElephantWalk60.wav', duration: 30 },
+          { id: 'match3', title: 'Vibe-Matched Track C', artist: 'Mic Analyzer', bpm: 126, key: 'C', previewUrl: 'https://www2.cs.uic.edu/~i101/SoundFiles/CantinaBand60.wav', duration: 30 },
         ];
 
       }, 5000); // Record for 5 seconds
@@ -173,11 +181,11 @@ const MagicSetPage = () => {
     // Simulate AI generation
     setTimeout(() => {
       const mockTracks: Track[] = [
-        { id: '1', title: 'Summer Vibes', artist: 'AI Generated', bpm: 120, key: 'C', genre: 'Electronic', previewUrl: 'https://cdn.pixabay.com/audio/2022/08/04/audio_2bbe651082.mp3', duration: 30 },
-        { id: '2', title: 'Deep House Flow', artist: 'AI Generated', bpm: 122, key: 'G', genre: 'House', previewUrl: 'https://cdn.pixabay.com/audio/2024/02/08/audio_79071a44a2.mp3', duration: 30 },
-        { id: '3', title: 'Energetic Beats', artist: 'AI Generated', bpm: 128, key: 'Am', genre: 'Techno', previewUrl: 'https://cdn.pixabay.com/audio/2023/09/14/audio_3702ff6b59.mp3', duration: 30 },
-        { id: '4', title: 'Chill Sunset', artist: 'AI Generated', bpm: 110, key: 'F', genre: 'Ambient', previewUrl: 'https://cdn.pixabay.com/audio/2022/08/04/audio_2bbe651082.mp3', duration: 30 },
-        { id: '5', title: 'Party Anthem', artist: 'AI Generated', bpm: 132, key: 'D', genre: 'Progressive', previewUrl: 'https://cdn.pixabay.com/audio/2024/02/08/audio_79071a44a2.mp3', duration: 30 },
+        { id: '1', title: 'Summer Vibes', artist: 'AI Generated', bpm: 120, key: 'C', genre: 'Electronic', previewUrl: 'https://www2.cs.uic.edu/~i101/SoundFiles/BabyElephantWalk60.wav', duration: 30 },
+        { id: '2', title: 'Deep House Flow', artist: 'AI Generated', bpm: 122, key: 'G', genre: 'House', previewUrl: 'https://www2.cs.uic.edu/~i101/SoundFiles/CantinaBand60.wav', duration: 30 },
+        { id: '3', title: 'Energetic Beats', artist: 'AI Generated', bpm: 128, key: 'Am', genre: 'Techno', previewUrl: 'https://www2.cs.uic.edu/~i101/SoundFiles/StarWars60.wav', duration: 30 },
+        { id: '4', title: 'Chill Sunset', artist: 'AI Generated', bpm: 110, key: 'F', genre: 'Ambient', previewUrl: 'https://www2.cs.uic.edu/~i101/SoundFiles/PinkPanther60.wav', duration: 30 },
+        { id: '5', title: 'Party Anthem', artist: 'AI Generated', bpm: 132, key: 'D', genre: 'Progressive', previewUrl: 'https://www2.cs.uic.edu/~i101/SoundFiles/ImperialMarch60.wav', duration: 30 },
       ];
       
       setGeneratedTracks(mockTracks);
@@ -378,7 +386,11 @@ const PlayerPage = () => {
         audio.src = currentTrack.previewUrl;
       }
       if (isPlaying) {
-        audio.play().catch(e => console.error("Audio play failed:", e));
+        audio.play().catch(e => {
+          console.error("Audio play failed:", e);
+          // Show user-friendly error message
+          alert("Demo Mode: Audio playback requires user interaction. Click play again after page loads.");
+        });
       } else {
         audio.pause();
       }

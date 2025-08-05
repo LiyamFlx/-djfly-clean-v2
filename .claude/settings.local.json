@@ -27,7 +27,8 @@
       "WebFetch(domain:github.com)",
       "Bash(git merge:*)",
       "Bash(git tag:*)",
-      "Bash(netlify deploy:*)"
+      "Bash(netlify deploy:*)",
+      "Bash(netlify init:*)"
     ],
     "deny": []
   }

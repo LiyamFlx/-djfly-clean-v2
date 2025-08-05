@@ -44,3 +44,6 @@ test-results
 *.tgz
 *.tar.gz
 .vercel
+
+# Local Netlify folder
+.netlify
