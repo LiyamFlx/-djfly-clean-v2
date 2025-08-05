@@ -77,11 +77,14 @@ const getNumberEnv = (key: string, defaultValue: number): number => {
 };
 
 // Create configuration object
+const environment = (getEnvVar('VITE_APP_ENVIRONMENT', 'development') as AppConfig['environment']) || 'development';
+const isProduction = environment === 'production';
+
 export const config: AppConfig = {
   // App Info
   appName: getEnvVar('VITE_APP_NAME', 'DJfly Clean') || 'DJfly Clean',
   appVersion: getEnvVar('VITE_APP_VERSION', '1.0.0') || '1.0.0',
-  environment: (getEnvVar('VITE_APP_ENVIRONMENT', 'development') as AppConfig['environment']) || 'development',
+  environment,
   
   // AI Services
   openai: {
@@ -119,11 +122,11 @@ export const config: AppConfig = {
   
   // Feature Flags
   features: {
-    magicMatchEnabled: getBooleanEnv('VITE_MAGIC_MATCH_ENABLED', true),
-    magicSetEnabled: getBooleanEnv('VITE_MAGIC_SET_ENABLED', true),
-    analyticsEnabled: getBooleanEnv('VITE_ANALYTICS_ENABLED', true),
-    devMode: getBooleanEnv('VITE_DEV_MODE', false),
-    mockAiResponses: getBooleanEnv('VITE_MOCK_AI_RESPONSES', false),
+    magicMatchEnabled: isProduction || getBooleanEnv('VITE_MAGIC_MATCH_ENABLED', true),
+    magicSetEnabled: isProduction || getBooleanEnv('VITE_MAGIC_SET_ENABLED', true),
+    analyticsEnabled: isProduction || getBooleanEnv('VITE_ANALYTICS_ENABLED', true),
+    devMode: !isProduction && getBooleanEnv('VITE_DEV_MODE', false),
+    mockAiResponses: !isProduction && getBooleanEnv('VITE_MOCK_AI_RESPONSES', false),
   },
   
   // Audio Configuration
