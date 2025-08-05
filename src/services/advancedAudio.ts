@@ -164,7 +164,7 @@ class AdvancedAudioService {
     return onsets;
   }
 
-  private calculateTempo(onsets: number[], sampleRate: number): number {
+  private calculateTempo(onsets: number[], _sampleRate: number): number {
     if (onsets.length < 2) return 120; // Default BPM
     
     // Calculate inter-onset intervals
