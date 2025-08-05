@@ -182,14 +182,14 @@ class AudioEffectsService {
       }
     }
     
-    return impulse;
+    return impulse as AudioBuffer;
   }
 
   private initializeDistortion() {
     if (!this.audioContext) return;
     
     this.distortionNode = this.audioContext.createWaveShaper();
-    this.distortionNode.curve = this.makeDistortionCurve(0);
+    (this.distortionNode as any).curve = this.makeDistortionCurve(0);
     this.distortionNode.oversample = '2x';
   }
 
@@ -203,7 +203,7 @@ class AudioEffectsService {
       curve[i] = ((3 + amount) * x * 20 * deg) / (Math.PI + amount * Math.abs(x));
     }
     
-    return curve;
+    return curve as Float32Array;
   }
 
   private initializeCompressor() {
@@ -346,7 +346,7 @@ class AudioEffectsService {
   setDistortion(params: DistortionParams) {
     if (!this.distortionNode) return;
 
-    this.distortionNode.curve = this.makeDistortionCurve(params.amount);
+    (this.distortionNode as any).curve = this.makeDistortionCurve(params.amount);
     this.distortionNode.oversample = params.oversample;
   }
 

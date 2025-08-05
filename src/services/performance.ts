@@ -49,8 +49,6 @@ class PerformanceService {
   // Track preloading and caching
   private audioBufferCache = new Map<string, AudioBuffer>();
   private imageCache = new Map<string, HTMLImageElement>();
-  private prefetchQueue: string[] = [];
-  private isPrefetching = false;
 
   // Worker for background processing
   private backgroundWorker: Worker | null = null;
@@ -382,10 +380,6 @@ class PerformanceService {
    * Memory cleanup
    */
   cleanupMemory() {
-    // Clear old cache entries
-    const maxAge = 10 * 60 * 1000; // 10 minutes
-    const now = Date.now();
-    
     // Clear image cache
     this.imageCache.clear();
     
