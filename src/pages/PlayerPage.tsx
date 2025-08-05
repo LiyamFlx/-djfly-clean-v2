@@ -1,13 +1,8 @@
 import { motion } from 'framer-motion';
-import { Play, Pause, SkipBack, SkipForward, Volume2, Shuffle, Repeat, LogOut } from 'lucide-react';
+import { Play, Pause, SkipBack, SkipForward, Volume2, Shuffle, Repeat } from 'lucide-react';
 import { useAudioState, useAudioActions, useCrowdState, useSessionState } from '@/store';
-import FinishSetModal from '@/components/player/FinishSetModal';
-import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
 
 const PlayerPage: React.FC = () => {
-  const [isFinishModalOpen, setFinishModalOpen] = useState(false);
-  const navigate = useNavigate();
   const audioState = useAudioState();
   const crowdState = useCrowdState();
   const sessionState = useSessionState();
@@ -33,36 +28,8 @@ const PlayerPage: React.FC = () => {
     );
   }
 
-  const handleConfirmFinish = () => {
-    setFinishModalOpen(false);
-    // Here you would typically dispatch an action to finalize the session
-    // e.g., useSessionActions().endSession();
-    navigate('/producer');
-  };
-
-  const sessionDurationMinutes = sessionState.startTime
-    ? Math.round((Date.now() - sessionState.startTime.getTime()) / 60000)
-    : 0;
-
   return (
     <div className="min-h-screen bg-club-gradient">
-      {/* End Set Button */}
-      <button
-        onClick={() => setFinishModalOpen(true)}
-        className="absolute top-6 right-6 glass-card p-3 rounded-full text-gray-300 hover:text-white hover:shadow-lg transition-all z-10"
-        aria-label="End Set"
-      >
-        <LogOut className="w-5 h-5" />
-      </button>
-
-      <FinishSetModal
-        isOpen={isFinishModalOpen}
-        onClose={() => setFinishModalOpen(false)}
-        onConfirm={handleConfirmFinish}
-        sessionTime={sessionDurationMinutes}
-        tracksPlayed={sessionState.totalTracks}
-      />
-
       {/* Main Player Interface */}
       <div className="flex flex-col min-h-screen">
         {/* Track Display */}
