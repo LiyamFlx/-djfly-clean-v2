@@ -9,21 +9,21 @@ import type { Track } from '@/types';
 const MagicSetPage: React.FC = () => {
   const navigate = useNavigate();
   const [prompt, setPrompt] = useState('');
-  
+
   const { generateSet } = useAIActions();
   const { setQueue, setCurrentTrack } = useAudioActions();
   const aiState = useAIState();
-  
+
   const handleGenerateSet = async () => {
     if (!prompt.trim()) return;
-    
+
     try {
       await generateSet(prompt);
     } catch (error) {
       console.error('Failed to generate set:', error);
     }
   };
-  
+
   const handlePlaySet = () => {
     if (aiState.generatedTracks.length > 0) {
       setQueue(aiState.generatedTracks);
@@ -31,12 +31,12 @@ const MagicSetPage: React.FC = () => {
       navigate(ROUTES.PLAYER);
     }
   };
-  
+
   const removeTrack = (trackId: string) => {
     // This would integrate with the store to remove from generated tracks
     console.log('Remove track:', trackId);
   };
-  
+
   return (
     <div className="py-8">
       <motion.div
@@ -51,14 +51,17 @@ const MagicSetPage: React.FC = () => {
             Magic Set Generator
           </h2>
           <p className="text-gray-300 max-w-2xl mx-auto">
-            Describe your vision and let AI create the perfect set. Fine-tune with 
-            manual adjustments and save for later.
+            Describe your vision and let AI create the perfect set. Fine-tune
+            with manual adjustments and save for later.
           </p>
         </div>
 
         {/* Prompt Input */}
         <div className="glass-card p-6 rounded-xl">
-          <label htmlFor="prompt" className="block text-sm font-medium text-gray-300 mb-2">
+          <label
+            htmlFor="prompt"
+            className="block text-sm font-medium text-gray-300 mb-2"
+          >
             Describe your ideal set
           </label>
           <div className="space-y-4">
@@ -70,7 +73,7 @@ const MagicSetPage: React.FC = () => {
               className="w-full px-4 py-3 bg-rich-black/50 border border-white/20 rounded-lg text-white placeholder-gray-400 focus:border-electric-blue focus:ring-1 focus:ring-electric-blue focus:outline-none resize-none"
               rows={4}
             />
-            
+
             {/* Quick Prompts */}
             <div className="flex flex-wrap gap-2">
               <span className="text-sm text-gray-400">Quick ideas:</span>
@@ -78,7 +81,7 @@ const MagicSetPage: React.FC = () => {
                 'Wedding reception mix',
                 'Workout energy boost',
                 'Chill study session',
-                'Dance floor heater'
+                'Dance floor heater',
               ].map((idea) => (
                 <button
                   key={idea}
@@ -89,7 +92,7 @@ const MagicSetPage: React.FC = () => {
                 </button>
               ))}
             </div>
-            
+
             <button
               onClick={handleGenerateSet}
               disabled={!prompt.trim() || aiState.isGenerating}
@@ -129,7 +132,7 @@ const MagicSetPage: React.FC = () => {
                 </button>
               </div>
             </div>
-            
+
             <div className="space-y-3">
               {aiState.generatedTracks.map((track: Track, index: number) => (
                 <motion.div
@@ -139,16 +142,14 @@ const MagicSetPage: React.FC = () => {
                   transition={{ delay: index * 0.1 }}
                   className="flex items-center gap-4 p-4 bg-rich-black/30 rounded-lg hover:bg-rich-black/50 transition-colors"
                 >
-                  <div className="text-sm text-gray-400 w-8">
-                    {index + 1}.
-                  </div>
-                  
+                  <div className="text-sm text-gray-400 w-8">{index + 1}.</div>
+
                   <img
                     src={track.image}
                     alt={track.title}
                     className="w-12 h-12 rounded-lg object-cover"
                   />
-                  
+
                   <div className="flex-1 min-w-0">
                     <h4 className="font-medium text-white truncate">
                       {track.title}
@@ -157,7 +158,7 @@ const MagicSetPage: React.FC = () => {
                       {track.artist}
                     </p>
                   </div>
-                  
+
                   <div className="flex items-center gap-2 text-xs text-gray-400">
                     {track.bpm && <span>{track.bpm} BPM</span>}
                     {track.energy && (
@@ -166,7 +167,7 @@ const MagicSetPage: React.FC = () => {
                       </span>
                     )}
                   </div>
-                  
+
                   <button
                     onClick={() => removeTrack(track.id)}
                     className="p-2 text-gray-400 hover:text-red-400 transition-colors"
@@ -176,7 +177,7 @@ const MagicSetPage: React.FC = () => {
                 </motion.div>
               ))}
             </div>
-            
+
             {/* Set Statistics */}
             <div className="mt-6 pt-6 border-t border-white/10">
               <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-center">
@@ -188,19 +189,37 @@ const MagicSetPage: React.FC = () => {
                 </div>
                 <div>
                   <div className="text-2xl font-bold text-bright-turquoise">
-                    {Math.round(aiState.generatedTracks.reduce((acc, t) => acc + (t.duration || 0), 0) / 60)}
+                    {Math.round(
+                      aiState.generatedTracks.reduce(
+                        (acc, t) => acc + (t.duration || 0),
+                        0
+                      ) / 60
+                    )}
                   </div>
                   <div className="text-sm text-gray-400">Minutes</div>
                 </div>
                 <div>
                   <div className="text-2xl font-bold text-laser-pink">
-                    {Math.round(aiState.generatedTracks.reduce((acc, t) => acc + (t.energy || 0), 0) / aiState.generatedTracks.length * 100)}%
+                    {Math.round(
+                      (aiState.generatedTracks.reduce(
+                        (acc, t) => acc + (t.energy || 0),
+                        0
+                      ) /
+                        aiState.generatedTracks.length) *
+                        100
+                    )}
+                    %
                   </div>
                   <div className="text-sm text-gray-400">Avg Energy</div>
                 </div>
                 <div>
                   <div className="text-2xl font-bold text-electric-blue">
-                    {Math.round(aiState.generatedTracks.reduce((acc, t) => acc + (t.bpm || 120), 0) / aiState.generatedTracks.length)}
+                    {Math.round(
+                      aiState.generatedTracks.reduce(
+                        (acc, t) => acc + (t.bpm || 120),
+                        0
+                      ) / aiState.generatedTracks.length
+                    )}
                   </div>
                   <div className="text-sm text-gray-400">Avg BPM</div>
                 </div>
@@ -215,7 +234,7 @@ const MagicSetPage: React.FC = () => {
           <p className="text-gray-400 text-sm mb-4">
             Search and add tracks manually, or upload your own music files
           </p>
-          
+
           <div className="flex gap-2">
             <input
               type="text"
@@ -235,9 +254,7 @@ const MagicSetPage: React.FC = () => {
             animate={{ opacity: 1, y: 0 }}
             className="glass-card p-4 rounded-xl border-red-500/50"
           >
-            <p className="text-red-400">
-              Error: {aiState.error}
-            </p>
+            <p className="text-red-400">Error: {aiState.error}</p>
           </motion.div>
         )}
       </motion.div>

@@ -15,9 +15,9 @@ const DocsPage = createPage(
 );
 
 export default DocsPage;
-`
+`,
   },
-  
+
   // Legal pages
   {
     path: 'src/pages/legal/PrivacyPage.tsx',
@@ -30,7 +30,7 @@ const PrivacyPage = createPage(
 );
 
 export default PrivacyPage;
-`
+`,
   },
   {
     path: 'src/pages/legal/TermsPage.tsx',
@@ -43,9 +43,9 @@ const TermsPage = createPage(
 );
 
 export default TermsPage;
-`
+`,
   },
-  
+
   // Support pages
   {
     path: 'src/pages/support/ContactPage.tsx',
@@ -77,7 +77,7 @@ const ContactPage = createPage(
 );
 
 export default ContactPage;
-`
+`,
   },
   {
     path: 'src/pages/support/HelpPage.tsx',
@@ -90,9 +90,9 @@ const HelpPage = createPage(
 );
 
 export default HelpPage;
-`
+`,
   },
-  
+
   // Auth pages
   {
     path: 'src/pages/auth/LoginPage.tsx',
@@ -106,7 +106,7 @@ const LoginPage = createPage(
 );
 
 export default LoginPage;
-`
+`,
   },
   {
     path: 'src/pages/auth/SignupPage.tsx',
@@ -120,7 +120,7 @@ const SignupPage = createPage(
 );
 
 export default SignupPage;
-`
+`,
   },
   {
     path: 'src/pages/auth/ForgotPasswordPage.tsx',
@@ -134,7 +134,7 @@ const ForgotPasswordPage = createPage(
 );
 
 export default ForgotPasswordPage;
-`
+`,
   },
   {
     path: 'src/pages/auth/ResetPasswordPage.tsx',
@@ -148,9 +148,9 @@ const ResetPasswordPage = createPage(
 );
 
 export default ResetPasswordPage;
-`
+`,
   },
-  
+
   // Error pages
   {
     path: 'src/pages/errors/NotFoundPage.tsx',
@@ -179,20 +179,20 @@ const NotFoundPage: React.FC = () => {
 };
 
 export default NotFoundPage;
-`
-  }
+`,
+  },
 ];
 
 // Create the files
 pages.forEach(({ path: filePath, content }) => {
   const fullPath = path.join(process.cwd(), filePath);
   const dir = path.dirname(fullPath);
-  
+
   // Create directory if it doesn't exist
   if (!fs.existsSync(dir)) {
     fs.mkdirSync(dir, { recursive: true });
   }
-  
+
   // Write file if it doesn't exist
   if (!fs.existsSync(fullPath)) {
     fs.writeFileSync(fullPath, content, 'utf8');

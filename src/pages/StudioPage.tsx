@@ -7,15 +7,15 @@ import { ROUTES } from '@/constants/routes';
 const StudioPage: React.FC = () => {
   const location = useLocation();
   const [showHelp, setShowHelp] = useState(false);
-  
+
   const isSetActive = location.pathname.includes('/set');
   const isMatchActive = location.pathname.includes('/match');
-  
+
   // If we're on the main studio route, redirect to match (most popular)
   if (location.pathname === ROUTES.STUDIO) {
     return <Navigate to={ROUTES.STUDIO_MATCH} replace />;
   }
-  
+
   return (
     <div className="min-h-screen bg-club-gradient">
       {/* Header */}
@@ -134,9 +134,9 @@ const StudioPage: React.FC = () => {
                   <div className="text-electric-blue font-semibold mb-2">
                     ✨ Most Popular Choice
                   </div>
-                  <strong className="text-gray-300">Perfect for:</strong>{' '}
-                  Live events, parties, reading crowd energy, adapting to the
-                  vibe. Just point your phone and get instant playlists.
+                  <strong className="text-gray-300">Perfect for:</strong> Live
+                  events, parties, reading crowd energy, adapting to the vibe.
+                  Just point your phone and get instant playlists.
                 </motion.div>
               )}
               {isSetActive && (
@@ -166,7 +166,7 @@ const StudioPage: React.FC = () => {
               <button className="p-2 text-gray-400 hover:text-white hover:bg-white/10 rounded-lg transition-all duration-200">
                 <Settings className="w-4 h-4" />
               </button>
-              <button 
+              <button
                 onClick={() => setShowHelp(!showHelp)}
                 className="p-2 text-gray-400 hover:text-white hover:bg-white/10 rounded-lg transition-all duration-200"
               >
@@ -209,12 +209,14 @@ const StudioPage: React.FC = () => {
             </h3>
             <div className="space-y-4 text-sm text-gray-300">
               <div>
-                <strong className="text-white">Magic Match:</strong> Point your device at the crowd, 
-                let AI analyze the energy, and get instant playlist recommendations.
+                <strong className="text-white">Magic Match:</strong> Point your
+                device at the crowd, let AI analyze the energy, and get instant
+                playlist recommendations.
               </div>
               <div>
-                <strong className="text-white">Magic Set:</strong> Create custom playlists with 
-                AI assistance, manual curation, and fine-tuning controls.
+                <strong className="text-white">Magic Set:</strong> Create custom
+                playlists with AI assistance, manual curation, and fine-tuning
+                controls.
               </div>
             </div>
             <button

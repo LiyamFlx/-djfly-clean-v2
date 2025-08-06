@@ -57,7 +57,7 @@ class AudioEffectsService {
   private audioContext: AudioContext | null = null;
   private masterGainNode: GainNode | null = null;
   private analyserNode: AnalyserNode | null = null;
-  
+
   // Effect nodes
   private filterNode: BiquadFilterNode | null = null;
   private delayNode: DelayNode | null = null;
@@ -67,11 +67,11 @@ class AudioEffectsService {
   private distortionNode: WaveShaperNode | null = null;
   private compressorNode: DynamicsCompressorNode | null = null;
   private eqNodes: BiquadFilterNode[] = [];
-  
+
   // LFO for modulation effects
   private lfoNode: OscillatorNode | null = null;
   private lfoGainNode: GainNode | null = null;
-  
+
   // Performance monitoring
   private performanceMetrics = {
     latency: 0,
@@ -87,8 +87,10 @@ class AudioEffectsService {
   private async initializeAudioContext() {
     if (typeof window !== 'undefined') {
       try {
-        this.audioContext = new (window.AudioContext || (window as { webkitAudioContext?: typeof AudioContext }).webkitAudioContext)();
-        
+        this.audioContext = new (window.AudioContext ||
+          (window as { webkitAudioContext?: typeof AudioContext })
+            .webkitAudioContext)();
+
         // Resume context if suspended
         if (this.audioContext.state === 'suspended') {
           await this.audioContext.resume();
@@ -107,7 +109,7 @@ class AudioEffectsService {
 
     // Create master gain node
     this.masterGainNode = this.audioContext.createGain();
-    
+
     // Create analyser for real-time analysis
     this.analyserNode = this.audioContext.createAnalyser();
     this.analyserNode.fftSize = config.audio.bufferSize;
@@ -129,7 +131,7 @@ class AudioEffectsService {
 
   private initializeFilter() {
     if (!this.audioContext) return;
-    
+
     this.filterNode = this.audioContext.createBiquadFilter();
     this.filterNode.type = 'lowpass';
     this.filterNode.frequency.value = 20000; // Full range initially
@@ -138,16 +140,16 @@ class AudioEffectsService {
 
   private initializeDelay() {
     if (!this.audioContext) return;
-    
+
     this.delayNode = this.audioContext.createDelay(1.0); // Max 1 second delay
     this.delayGainNode = this.audioContext.createGain();
     this.delayFeedbackNode = this.audioContext.createGain();
-    
+
     // Create delay feedback loop
     this.delayNode.connect(this.delayFeedbackNode);
     this.delayFeedbackNode.connect(this.delayNode);
     this.delayNode.connect(this.delayGainNode);
-    
+
     // Default values
     this.delayNode.delayTime.value = 0.25; // 250ms
     this.delayFeedbackNode.gain.value = 0.3;
@@ -156,11 +158,16 @@ class AudioEffectsService {
 
   private async initializeReverb() {
     if (!this.audioContext) return;
-    
+
     this.reverbNode = this.audioContext.createConvolver();
-    
+
     // Generate impulse response for reverb
-    const impulseResponse = await this.generateReverbIR(2, 3, false, this.audioContext);
+    const impulseResponse = await this.generateReverbIR(
+      2,
+      3,
+      false,
+      this.audioContext
+    );
     this.reverbNode.buffer = impulseResponse;
   }
 
@@ -173,21 +180,22 @@ class AudioEffectsService {
     const sampleRate = audioContext.sampleRate;
     const length = sampleRate * duration;
     const impulse = audioContext.createBuffer(2, length, sampleRate);
-    
+
     for (let channel = 0; channel < 2; channel++) {
       const channelData = impulse.getChannelData(channel);
       for (let i = 0; i < length; i++) {
         const n = reverse ? length - i : i;
-        channelData[i] = (Math.random() * 2 - 1) * Math.pow(1 - n / length, decay);
+        channelData[i] =
+          (Math.random() * 2 - 1) * Math.pow(1 - n / length, decay);
       }
     }
-    
+
     return impulse as AudioBuffer;
   }
 
   private initializeDistortion() {
     if (!this.audioContext) return;
-    
+
     this.distortionNode = this.audioContext.createWaveShaper();
     (this.distortionNode as any).curve = this.makeDistortionCurve(0);
     this.distortionNode.oversample = '2x';
@@ -197,18 +205,19 @@ class AudioEffectsService {
     const samples = 44100;
     const curve = new Float32Array(samples);
     const deg = Math.PI / 180;
-    
+
     for (let i = 0; i < samples; i++) {
       const x = (i * 2) / samples - 1;
-      curve[i] = ((3 + amount) * x * 20 * deg) / (Math.PI + amount * Math.abs(x));
+      curve[i] =
+        ((3 + amount) * x * 20 * deg) / (Math.PI + amount * Math.abs(x));
     }
-    
+
     return curve as Float32Array;
   }
 
   private initializeCompressor() {
     if (!this.audioContext) return;
-    
+
     this.compressorNode = this.audioContext.createDynamicsCompressor();
     this.compressorNode.threshold.value = -24;
     this.compressorNode.knee.value = 30;
@@ -219,11 +228,16 @@ class AudioEffectsService {
 
   private initializeEQ() {
     if (!this.audioContext) return;
-    
+
     // Create 4-band EQ
     const frequencies = [100, 500, 2000, 8000];
-    const types: BiquadFilterType[] = ['lowshelf', 'peaking', 'peaking', 'highshelf'];
-    
+    const types: BiquadFilterType[] = [
+      'lowshelf',
+      'peaking',
+      'peaking',
+      'highshelf',
+    ];
+
     this.eqNodes = frequencies.map((freq, index) => {
       const filter = this.audioContext!.createBiquadFilter();
       filter.type = types[index];
@@ -232,7 +246,7 @@ class AudioEffectsService {
       filter.gain.value = 0; // No boost/cut initially
       return filter;
     });
-    
+
     // Chain EQ nodes
     for (let i = 0; i < this.eqNodes.length - 1; i++) {
       this.eqNodes[i].connect(this.eqNodes[i + 1]);
@@ -241,14 +255,14 @@ class AudioEffectsService {
 
   private initializeLFO() {
     if (!this.audioContext) return;
-    
+
     this.lfoNode = this.audioContext.createOscillator();
     this.lfoGainNode = this.audioContext.createGain();
-    
+
     this.lfoNode.type = 'sine';
     this.lfoNode.frequency.value = 1; // 1 Hz
     this.lfoGainNode.gain.value = 0; // No modulation initially
-    
+
     this.lfoNode.connect(this.lfoGainNode);
     this.lfoNode.start();
   }
@@ -320,7 +334,7 @@ class AudioEffectsService {
     this.filterNode.type = params.type;
     this.filterNode.frequency.value = params.frequency;
     this.filterNode.Q.value = params.resonance;
-    
+
     // Smooth parameter changes to avoid clicks
     const now = this.audioContext?.currentTime || 0;
     this.filterNode.frequency.setTargetAtTime(params.frequency, now, 0.01);
@@ -331,10 +345,11 @@ class AudioEffectsService {
    * Apply delay effect
    */
   setDelay(params: DelayParams) {
-    if (!this.delayNode || !this.delayFeedbackNode || !this.delayGainNode) return;
+    if (!this.delayNode || !this.delayFeedbackNode || !this.delayGainNode)
+      return;
 
     const now = this.audioContext?.currentTime || 0;
-    
+
     this.delayNode.delayTime.setTargetAtTime(params.time, now, 0.01);
     this.delayFeedbackNode.gain.setTargetAtTime(params.feedback, now, 0.01);
     this.delayGainNode.gain.setTargetAtTime(params.wet, now, 0.01);
@@ -346,7 +361,9 @@ class AudioEffectsService {
   setDistortion(params: DistortionParams) {
     if (!this.distortionNode) return;
 
-    (this.distortionNode as any).curve = this.makeDistortionCurve(params.amount);
+    (this.distortionNode as any).curve = this.makeDistortionCurve(
+      params.amount
+    );
     this.distortionNode.oversample = params.oversample;
   }
 
@@ -358,7 +375,7 @@ class AudioEffectsService {
       if (this.eqNodes[index]) {
         const filter = this.eqNodes[index];
         const now = this.audioContext?.currentTime || 0;
-        
+
         filter.frequency.setTargetAtTime(band.frequency, now, 0.01);
         filter.gain.setTargetAtTime(band.gain, now, 0.01);
         filter.Q.setTargetAtTime(band.q, now, 0.01);
@@ -371,7 +388,7 @@ class AudioEffectsService {
    */
   setMasterVolume(volume: number) {
     if (!this.masterGainNode) return;
-    
+
     const now = this.audioContext?.currentTime || 0;
     this.masterGainNode.gain.setTargetAtTime(volume, now, 0.01);
   }
@@ -397,7 +414,7 @@ class AudioEffectsService {
     const bufferLength = this.analyserNode.frequencyBinCount;
     const frequencies = new Uint8Array(bufferLength);
     const waveform = new Uint8Array(bufferLength);
-    
+
     this.analyserNode.getByteFrequencyData(frequencies);
     this.analyserNode.getByteTimeDomainData(waveform);
 
@@ -418,7 +435,9 @@ class AudioEffectsService {
         maxIndex = i;
       }
     }
-    const peakFrequency = (maxIndex * (this.audioContext?.sampleRate || 44100)) / (2 * bufferLength);
+    const peakFrequency =
+      (maxIndex * (this.audioContext?.sampleRate || 44100)) /
+      (2 * bufferLength);
 
     return { frequencies, waveform, volume, peakFrequency };
   }
@@ -446,21 +465,25 @@ class AudioEffectsService {
    */
   savePreset(name: string): void {
     const preset = {
-      filter: this.filterNode ? {
-        type: this.filterNode.type,
-        frequency: this.filterNode.frequency.value,
-        Q: this.filterNode.Q.value,
-      } : null,
-      eq: this.eqNodes.map(node => ({
+      filter: this.filterNode
+        ? {
+            type: this.filterNode.type,
+            frequency: this.filterNode.frequency.value,
+            Q: this.filterNode.Q.value,
+          }
+        : null,
+      eq: this.eqNodes.map((node) => ({
         frequency: node.frequency.value,
         gain: node.gain.value,
         Q: node.Q.value,
       })),
-      delay: this.delayNode ? {
-        time: this.delayNode.delayTime.value,
-        feedback: this.delayFeedbackNode?.gain.value || 0,
-        wet: this.delayGainNode?.gain.value || 0,
-      } : null,
+      delay: this.delayNode
+        ? {
+            time: this.delayNode.delayTime.value,
+            feedback: this.delayFeedbackNode?.gain.value || 0,
+            wet: this.delayGainNode?.gain.value || 0,
+          }
+        : null,
     };
 
     localStorage.setItem(`djfly_preset_${name}`, JSON.stringify(preset));
@@ -472,7 +495,7 @@ class AudioEffectsService {
       if (!presetData) return false;
 
       const preset = JSON.parse(presetData);
-      
+
       // Apply filter settings
       if (preset.filter && this.filterNode) {
         this.filterNode.type = preset.filter.type;
@@ -494,8 +517,10 @@ class AudioEffectsService {
       // Apply delay settings
       if (preset.delay && this.delayNode) {
         this.delayNode.delayTime.value = preset.delay.time;
-        if (this.delayFeedbackNode) this.delayFeedbackNode.gain.value = preset.delay.feedback;
-        if (this.delayGainNode) this.delayGainNode.gain.value = preset.delay.wet;
+        if (this.delayFeedbackNode)
+          this.delayFeedbackNode.gain.value = preset.delay.feedback;
+        if (this.delayGainNode)
+          this.delayGainNode.gain.value = preset.delay.wet;
       }
 
       return true;

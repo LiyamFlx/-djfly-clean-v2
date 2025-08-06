@@ -12,7 +12,9 @@ export const ErrorFallback: React.FC<ErrorFallbackProps> = ({
 }) => (
   <div>
     <h2>Something went wrong</h2>
-    <p>{error instanceof Error ? error.message : 'An unknown error occurred'}</p>
+    <p>
+      {error instanceof Error ? error.message : 'An unknown error occurred'}
+    </p>
     <button onClick={resetError}>Try again</button>
   </div>
 );

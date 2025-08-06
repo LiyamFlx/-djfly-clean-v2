@@ -8,7 +8,7 @@ export interface Track {
   preview_url?: string;
   spotify_url?: string;
   source: 'spotify' | 'youtube' | 'demo';
-  
+
   // Audio features
   bpm?: number;
   key?: string;

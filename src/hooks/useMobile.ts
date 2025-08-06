@@ -30,12 +30,19 @@ export function useMobile(): MobileFeatures {
     const updateMobileFeatures = () => {
       const width = window.innerWidth;
       const height = window.innerHeight;
-      
+
       // Detect device type based on screen size and user agent
-      const isMobile = width <= 768 || /Android|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
-      const isTablet = width > 768 && width <= 1024 && /iPad|Android/i.test(navigator.userAgent);
+      const isMobile =
+        width <= 768 ||
+        /Android|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(
+          navigator.userAgent
+        );
+      const isTablet =
+        width > 768 &&
+        width <= 1024 &&
+        /iPad|Android/i.test(navigator.userAgent);
       const isTouch = 'ontouchstart' in window || navigator.maxTouchPoints > 0;
-      
+
       // Determine device type
       let deviceType: 'mobile' | 'tablet' | 'desktop' = 'desktop';
       if (isMobile && width <= 768) {
@@ -43,29 +50,28 @@ export function useMobile(): MobileFeatures {
       } else if (isTablet || (isMobile && width > 768)) {
         deviceType = 'tablet';
       }
-      
+
       // Detect orientation
       const orientation = width > height ? 'landscape' : 'portrait';
-      
+
       // Detect notch (simplified detection)
-      const hasNotch = (
+      const hasNotch =
         // iPhone X and newer
-        /iPhone/i.test(navigator.userAgent) &&
-        window.screen.height >= 812 &&
-        'CSS' in window &&
-        CSS.supports('padding-top: env(safe-area-inset-top)')
-      ) || (
+        (/iPhone/i.test(navigator.userAgent) &&
+          window.screen.height >= 812 &&
+          'CSS' in window &&
+          CSS.supports('padding-top: env(safe-area-inset-top)')) ||
         // Android devices with notch
-        /Android/i.test(navigator.userAgent) &&
-        height >= 800 &&
-        'CSS' in window &&
-        CSS.supports('padding-top: env(safe-area-inset-top)')
-      );
-      
+        (/Android/i.test(navigator.userAgent) &&
+          height >= 800 &&
+          'CSS' in window &&
+          CSS.supports('padding-top: env(safe-area-inset-top)'));
+
       // Detect PWA/standalone mode
-      const isStandalone = window.matchMedia('(display-mode: standalone)').matches ||
-                          (window.navigator as any).standalone ||
-                          document.referrer.includes('android-app://');
+      const isStandalone =
+        window.matchMedia('(display-mode: standalone)').matches ||
+        (window.navigator as any).standalone ||
+        document.referrer.includes('android-app://');
 
       setMobileFeatures({
         isMobile,
@@ -100,12 +106,14 @@ export function useMobile(): MobileFeatures {
 
 // Hook for responsive breakpoints
 export function useBreakpoint() {
-  const [breakpoint, setBreakpoint] = useState<'xs' | 'sm' | 'md' | 'lg' | 'xl' | '2xl'>('lg');
+  const [breakpoint, setBreakpoint] = useState<
+    'xs' | 'sm' | 'md' | 'lg' | 'xl' | '2xl'
+  >('lg');
 
   useEffect(() => {
     const updateBreakpoint = () => {
       const width = window.innerWidth;
-      
+
       if (width < 640) {
         setBreakpoint('xs');
       } else if (width < 768) {
@@ -159,7 +167,7 @@ export function useTouchGestures() {
     const handleStart = (e: TouchEvent) => {
       const touch = e.touches[0];
       startTime = Date.now();
-      
+
       setGestureState({
         isGesturing: true,
         startPoint: { x: touch.clientX, y: touch.clientY },
@@ -189,7 +197,7 @@ export function useTouchGestures() {
         direction = deltaY > 0 ? 'down' : 'up';
       }
 
-      setGestureState(prev => ({
+      setGestureState((prev) => ({
         ...prev,
         currentPoint: { x: touch.clientX, y: touch.clientY },
         direction,
@@ -198,7 +206,7 @@ export function useTouchGestures() {
 
     const handleEnd = () => {
       clearTimeout(longPressTimer);
-      
+
       const deltaX = gestureState.currentPoint.x - gestureState.startPoint.x;
       const deltaY = gestureState.currentPoint.y - gestureState.startPoint.y;
       const distance = Math.sqrt(deltaX * deltaX + deltaY * deltaY);
@@ -280,20 +288,40 @@ export function useSafeArea() {
   useEffect(() => {
     const updateSafeArea = () => {
       const computedStyle = getComputedStyle(document.documentElement);
-      
+
       setSafeArea({
-        top: parseInt(computedStyle.getPropertyValue('--safe-area-inset-top') || '0'),
-        right: parseInt(computedStyle.getPropertyValue('--safe-area-inset-right') || '0'),
-        bottom: parseInt(computedStyle.getPropertyValue('--safe-area-inset-bottom') || '0'),
-        left: parseInt(computedStyle.getPropertyValue('--safe-area-inset-left') || '0'),
+        top: parseInt(
+          computedStyle.getPropertyValue('--safe-area-inset-top') || '0'
+        ),
+        right: parseInt(
+          computedStyle.getPropertyValue('--safe-area-inset-right') || '0'
+        ),
+        bottom: parseInt(
+          computedStyle.getPropertyValue('--safe-area-inset-bottom') || '0'
+        ),
+        left: parseInt(
+          computedStyle.getPropertyValue('--safe-area-inset-left') || '0'
+        ),
       });
     };
 
     // Set CSS custom properties for safe area
-    document.documentElement.style.setProperty('--safe-area-inset-top', 'env(safe-area-inset-top)');
-    document.documentElement.style.setProperty('--safe-area-inset-right', 'env(safe-area-inset-right)');
-    document.documentElement.style.setProperty('--safe-area-inset-bottom', 'env(safe-area-inset-bottom)');
-    document.documentElement.style.setProperty('--safe-area-inset-left', 'env(safe-area-inset-left)');
+    document.documentElement.style.setProperty(
+      '--safe-area-inset-top',
+      'env(safe-area-inset-top)'
+    );
+    document.documentElement.style.setProperty(
+      '--safe-area-inset-right',
+      'env(safe-area-inset-right)'
+    );
+    document.documentElement.style.setProperty(
+      '--safe-area-inset-bottom',
+      'env(safe-area-inset-bottom)'
+    );
+    document.documentElement.style.setProperty(
+      '--safe-area-inset-left',
+      'env(safe-area-inset-left)'
+    );
 
     updateSafeArea();
     window.addEventListener('resize', updateSafeArea);

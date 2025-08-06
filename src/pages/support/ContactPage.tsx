@@ -17,9 +17,7 @@ const ContactPage = createPage(
           support@djfly.app
         </a>
       </p>
-      <p className="text-gray-400">
-        We typically respond within 24-48 hours.
-      </p>
+      <p className="text-gray-400">We typically respond within 24-48 hours.</p>
     </div>
   </div>
 );

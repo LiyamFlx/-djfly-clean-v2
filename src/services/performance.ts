@@ -112,7 +112,10 @@ class PerformanceService {
         const observer = new PerformanceObserver((list) => {
           const entries = list.getEntries();
           entries.forEach((entry) => {
-            if (entry.entryType === 'paint' && entry.name === 'first-contentful-paint') {
+            if (
+              entry.entryType === 'paint' &&
+              entry.name === 'first-contentful-paint'
+            ) {
               this.metrics.renderTime = entry.startTime;
             }
           });
@@ -125,7 +128,8 @@ class PerformanceService {
   }
 
   private initializeWorker() {
-    if (!this.settings.backgroundProcessing || typeof Worker === 'undefined') return;
+    if (!this.settings.backgroundProcessing || typeof Worker === 'undefined')
+      return;
 
     try {
       // Create worker for background audio processing
@@ -190,13 +194,13 @@ class PerformanceService {
 
       this.backgroundWorker.onmessage = (e) => {
         const { type, result, waveform } = e.data;
-        
+
         switch (type) {
           case 'audioAnalysisResult':
             // Handle background audio analysis result
             this.handleBackgroundAnalysis(result);
             break;
-            
+
           case 'waveformResult':
             // Handle waveform generation result
             this.handleWaveformResult(waveform);
@@ -211,12 +215,16 @@ class PerformanceService {
 
   private handleBackgroundAnalysis(result: any) {
     // Emit event or store result for components to use
-    window.dispatchEvent(new CustomEvent('audioAnalysisComplete', { detail: result }));
+    window.dispatchEvent(
+      new CustomEvent('audioAnalysisComplete', { detail: result })
+    );
   }
 
   private handleWaveformResult(waveform: number[]) {
     // Emit waveform data for visualization components
-    window.dispatchEvent(new CustomEvent('waveformGenerated', { detail: waveform }));
+    window.dispatchEvent(
+      new CustomEvent('waveformGenerated', { detail: waveform })
+    );
   }
 
   /**
@@ -224,7 +232,7 @@ class PerformanceService {
    */
   startMonitoring() {
     if (this.isMonitoring) return;
-    
+
     this.isMonitoring = true;
     this.monitorPerformance();
   }
@@ -241,25 +249,26 @@ class PerformanceService {
 
     const now = performance.now();
     const deltaTime = now - this.lastFrameTime;
-    
+
     // Calculate FPS
     if (deltaTime > 0) {
       const fps = 1000 / deltaTime;
       this.fpsHistory.push(fps);
-      
+
       // Keep only last 60 frames for averaging
       if (this.fpsHistory.length > 60) {
         this.fpsHistory.shift();
       }
-      
-      this.metrics.fps = this.fpsHistory.reduce((sum, f) => sum + f, 0) / this.fpsHistory.length;
+
+      this.metrics.fps =
+        this.fpsHistory.reduce((sum, f) => sum + f, 0) / this.fpsHistory.length;
     }
 
     // Monitor memory usage
     if ('memory' in performance) {
       const memory = (performance as any).memory;
       this.metrics.memoryUsage = memory.usedJSHeapSize / (1024 * 1024); // Convert to MB
-      
+
       this.memoryHistory.push(this.metrics.memoryUsage);
       if (this.memoryHistory.length > 100) {
         this.memoryHistory.shift();
@@ -293,20 +302,23 @@ class PerformanceService {
 
     try {
       const startTime = performance.now();
-      
+
       const response = await fetch(trackUrl);
       const arrayBuffer = await response.arrayBuffer();
-      
+
       // Use Web Audio API to decode
-      const audioContext = new (window.AudioContext || (window as any).webkitAudioContext)();
-      const audioBuffer = await audioContext.decodeAudioData(arrayBuffer.slice(0));
-      
+      const audioContext = new (window.AudioContext ||
+        (window as any).webkitAudioContext)();
+      const audioBuffer = await audioContext.decodeAudioData(
+        arrayBuffer.slice(0)
+      );
+
       // Cache the decoded buffer
       this.audioBufferCache.set(trackUrl, audioBuffer);
-      
+
       // Update network latency metric
       this.metrics.networkLatency = performance.now() - startTime;
-      
+
       return audioBuffer;
     } catch (error) {
       console.error('Failed to preload track:', error);
@@ -324,17 +336,17 @@ class PerformanceService {
 
     return new Promise((resolve) => {
       const img = new Image();
-      
+
       img.onload = () => {
         this.imageCache.set(imageUrl, img);
         resolve(img);
       };
-      
+
       img.onerror = () => {
         console.error('Failed to preload image:', imageUrl);
         resolve(null);
       };
-      
+
       img.src = imageUrl;
     });
   }
@@ -344,10 +356,10 @@ class PerformanceService {
    */
   analyzeAudioInBackground(audioData: Float32Array) {
     if (!this.backgroundWorker) return;
-    
+
     this.backgroundWorker.postMessage({
       type: 'analyzeAudio',
-      data: Array.from(audioData)
+      data: Array.from(audioData),
     });
   }
 
@@ -356,10 +368,10 @@ class PerformanceService {
    */
   generateWaveformInBackground(audioData: Float32Array) {
     if (!this.backgroundWorker) return;
-    
+
     this.backgroundWorker.postMessage({
       type: 'generateWaveform',
-      data: Array.from(audioData)
+      data: Array.from(audioData),
     });
   }
 
@@ -372,7 +384,7 @@ class PerformanceService {
       const heavyComponents = ['Waveform', 'Visualizer', 'SpectrumAnalyzer'];
       return !heavyComponents.includes(componentName);
     }
-    
+
     return true;
   }
 
@@ -382,13 +394,17 @@ class PerformanceService {
   cleanupMemory() {
     // Clear image cache
     this.imageCache.clear();
-    
+
     // Clear audio buffer cache if memory usage is high
-    if (this.metrics.memoryUsage > 100) { // 100MB threshold
-      const keysToDelete = Array.from(this.audioBufferCache.keys()).slice(0, 10);
-      keysToDelete.forEach(key => this.audioBufferCache.delete(key));
+    if (this.metrics.memoryUsage > 100) {
+      // 100MB threshold
+      const keysToDelete = Array.from(this.audioBufferCache.keys()).slice(
+        0,
+        10
+      );
+      keysToDelete.forEach((key) => this.audioBufferCache.delete(key));
     }
-    
+
     // Force garbage collection if available
     if ('gc' in window) {
       (window as any).gc();
@@ -400,8 +416,11 @@ class PerformanceService {
    */
   updateSettings(newSettings: Partial<OptimizationSettings>) {
     this.settings = { ...this.settings, ...newSettings };
-    localStorage.setItem('djfly_performance_settings', JSON.stringify(this.settings));
-    
+    localStorage.setItem(
+      'djfly_performance_settings',
+      JSON.stringify(this.settings)
+    );
+
     // Apply settings immediately
     this.applySettings();
   }
@@ -412,7 +431,7 @@ class PerformanceService {
       const firstKey = this.audioBufferCache.keys().next().value;
       if (firstKey) this.audioBufferCache.delete(firstKey);
     }
-    
+
     // Restart worker if background processing setting changed
     if (!this.settings.backgroundProcessing && this.backgroundWorker) {
       this.backgroundWorker.terminate();
@@ -449,7 +468,7 @@ class PerformanceService {
   isLowEndDevice(): boolean {
     const memory = (navigator as any).deviceMemory || 4;
     const cores = navigator.hardwareConcurrency || 4;
-    
+
     return memory < 4 || cores < 4 || this.metrics.fps < 30;
   }
 
@@ -458,12 +477,12 @@ class PerformanceService {
    */
   dispose() {
     this.stopMonitoring();
-    
+
     if (this.backgroundWorker) {
       this.backgroundWorker.terminate();
       this.backgroundWorker = null;
     }
-    
+
     this.audioBufferCache.clear();
     this.imageCache.clear();
     this.fpsHistory = [];

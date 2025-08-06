@@ -1,7 +1,6 @@
-
-import { motion } from "framer-motion";
-import { useNavigate } from "react-router-dom";
-import { Button } from "@/components/ui/button";
+import { motion } from 'framer-motion';
+import { useNavigate } from 'react-router-dom';
+import { Button } from '@/components/ui/button';
 // import { createSessionRecord } from "@/services/api";
 
 interface Props {
@@ -11,16 +10,20 @@ interface Props {
   sessionTime: number;
   tracksPlayed: number;
 }
-const FinishSetModal = ({ sessionTime: _sessionTime, tracksPlayed: _tracksPlayed, onClose }: Props) => {
+const FinishSetModal = ({
+  sessionTime: _sessionTime,
+  tracksPlayed: _tracksPlayed,
+  onClose,
+}: Props) => {
   const navigate = useNavigate();
 
   const handleSubmit = async () => {
     try {
       // await createSessionRecord({ sessionTime, tracksPlayed });
       onClose();
-      navigate("/studio");
+      navigate('/studio');
     } catch (error) {
-      console.error("Error finishing session:", error);
+      console.error('Error finishing session:', error);
     }
   };
 
@@ -34,7 +37,8 @@ const FinishSetModal = ({ sessionTime: _sessionTime, tracksPlayed: _tracksPlayed
       >
         <h2 className="text-2xl font-bold mb-4">Session Finished</h2>
         <p className="mb-6 text-muted-foreground">
-          Great job! Would you like to save your session results to your profile?
+          Great job! Would you like to save your session results to your
+          profile?
         </p>
         <div className="flex justify-center space-x-4">
           <Button onClick={onClose} variant="ghost">

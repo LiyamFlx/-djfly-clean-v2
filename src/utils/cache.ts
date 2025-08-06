@@ -14,15 +14,15 @@ class Cache {
    */
   get<T>(key: string): T | null {
     const item = this.cache.get(key);
-    
+
     if (!item) return null;
-    
+
     // Check if item has expired
     if (Date.now() > item.expiry) {
       this.cache.delete(key);
       return null;
     }
-    
+
     return item.data as T;
   }
 
@@ -40,10 +40,10 @@ class Cache {
         this.cache.delete(oldestKey);
       }
     }
-    
+
     this.cache.set(key, {
       data: value,
-      expiry: Date.now() + ttl
+      expiry: Date.now() + ttl,
     });
   }
 

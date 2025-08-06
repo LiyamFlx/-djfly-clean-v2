@@ -12,25 +12,25 @@ const IMMERSIVE_PAGES: string[] = [
 
 const AppLayout: React.FC = () => {
   const { pathname } = useLocation();
-  
+
   // Check if navigation should be hidden for the current route
   const shouldHideNavigation = React.useMemo(
-    () => IMMERSIVE_PAGES.some(route => pathname.startsWith(route)),
+    () => IMMERSIVE_PAGES.some((route) => pathname.startsWith(route)),
     [pathname]
   );
-  
+
   return (
     <div className="min-h-screen bg-club-gradient flex flex-col">
       {!shouldHideNavigation && <MainNav />}
-      
-      <main 
+
+      <main
         className={`flex-1 transition-all duration-300 ${
           !shouldHideNavigation ? 'pt-16' : ''
         }`}
       >
         <Outlet />
       </main>
-      
+
       {!shouldHideNavigation && <Footer />}
     </div>
   );

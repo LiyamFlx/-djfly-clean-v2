@@ -69,10 +69,10 @@ class CollaborationService {
 
   private initializeWebSocket() {
     const wsUrl = import.meta.env.VITE_WS_URL || 'ws://localhost:3001';
-    
+
     try {
       this.websocket = new WebSocket(wsUrl);
-      
+
       this.websocket.onopen = this.handleWebSocketOpen.bind(this);
       this.websocket.onmessage = this.handleWebSocketMessage.bind(this);
       this.websocket.onclose = this.handleWebSocketClose.bind(this);
@@ -112,7 +112,9 @@ class CollaborationService {
     if (this.reconnectAttempts < this.maxReconnectAttempts) {
       this.reconnectAttempts++;
       setTimeout(() => {
-        console.log(`Attempting to reconnect (${this.reconnectAttempts}/${this.maxReconnectAttempts})`);
+        console.log(
+          `Attempting to reconnect (${this.reconnectAttempts}/${this.maxReconnectAttempts})`
+        );
         this.initializeWebSocket();
       }, this.reconnectDelay * this.reconnectAttempts);
     }
@@ -124,35 +126,35 @@ class CollaborationService {
         this.currentSession = data.session;
         this.emit('sessionUpdated', data.session);
         break;
-      
+
       case 'participant_joined':
         this.emit('participantJoined', data.participant);
         break;
-      
+
       case 'participant_left':
         this.emit('participantLeft', data.participant);
         break;
-      
+
       case 'track_changed':
         this.emit('trackChanged', data.track);
         break;
-      
+
       case 'queue_updated':
         this.emit('queueUpdated', data.queue);
         break;
-      
+
       case 'chat_message':
         this.emit('chatMessage', data.message);
         break;
-      
+
       case 'vote_cast':
         this.emit('voteCast', data.vote);
         break;
-      
+
       case 'playback_state_changed':
         this.emit('playbackStateChanged', data.state);
         break;
-      
+
       default:
         console.log('Unknown message type:', data.type);
     }
@@ -161,7 +163,7 @@ class CollaborationService {
   private emit(event: string, data?: any) {
     const listeners = this.eventListeners.get(event);
     if (listeners) {
-      listeners.forEach(listener => listener(data));
+      listeners.forEach((listener) => listener(data));
     }
   }
 
@@ -244,7 +246,7 @@ class CollaborationService {
 
     // For demo purposes, return a mock session
     // In reality, this would wait for the server response
-    await new Promise(resolve => setTimeout(resolve, 500));
+    await new Promise((resolve) => setTimeout(resolve, 500));
 
     const mockSession: CollaborativeSession = {
       id: sessionId,
@@ -347,7 +349,9 @@ class CollaborationService {
   /**
    * Control playback (host/DJ only)
    */
-  async controlPlayback(action: 'play' | 'pause' | 'skip' | 'previous'): Promise<void> {
+  async controlPlayback(
+    action: 'play' | 'pause' | 'skip' | 'previous'
+  ): Promise<void> {
     if (!this.currentSession) {
       throw new Error('No active session');
     }
@@ -362,7 +366,9 @@ class CollaborationService {
   /**
    * Update session settings (host only)
    */
-  async updateSessionSettings(settings: Partial<CollaborativeSession['settings']>): Promise<void> {
+  async updateSessionSettings(
+    settings: Partial<CollaborativeSession['settings']>
+  ): Promise<void> {
     if (!this.currentSession) {
       throw new Error('No active session');
     }
@@ -462,8 +468,10 @@ class CollaborationService {
    */
   isDJ(): boolean {
     if (!this.currentSession) return false;
-    
-    const currentUser = this.currentSession.participants.find(p => p.id === 'current-user');
+
+    const currentUser = this.currentSession.participants.find(
+      (p) => p.id === 'current-user'
+    );
     return currentUser?.role === 'dj' || this.isHost();
   }
 
@@ -482,7 +490,9 @@ class CollaborationService {
    * Generate unique session ID
    */
   private generateSessionId(): string {
-    return 'session-' + Math.random().toString(36).substring(2) + '-' + Date.now();
+    return (
+      'session-' + Math.random().toString(36).substring(2) + '-' + Date.now()
+    );
   }
 
   /**

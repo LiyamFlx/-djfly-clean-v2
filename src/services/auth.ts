@@ -71,7 +71,9 @@ class AuthService {
   /**
    * Login with email and password
    */
-  async login(credentials: LoginCredentials): Promise<{ user: User; token: string }> {
+  async login(
+    credentials: LoginCredentials
+  ): Promise<{ user: User; token: string }> {
     try {
       const response = await fetch(`${this.baseUrl}/api/auth/login`, {
         method: 'POST',
@@ -88,10 +90,10 @@ class AuthService {
 
       const data = await response.json();
       this.saveTokenToStorage(data.token);
-      
+
       // Cache user data
       cache.set('user_data', data.user, 60 * 60 * 1000); // 1 hour
-      
+
       return data;
     } catch (error) {
       console.error('Login error:', error);
@@ -119,10 +121,10 @@ class AuthService {
 
       const data = await response.json();
       this.saveTokenToStorage(data.token);
-      
+
       // Cache user data
       cache.set('user_data', data.user, 60 * 60 * 1000); // 1 hour
-      
+
       return data;
     } catch (error) {
       console.error('Signup error:', error);
@@ -139,7 +141,7 @@ class AuthService {
         await fetch(`${this.baseUrl}/api/auth/logout`, {
           method: 'POST',
           headers: {
-            'Authorization': `Bearer ${this.token}`,
+            Authorization: `Bearer ${this.token}`,
           },
         });
       }
@@ -168,7 +170,7 @@ class AuthService {
     try {
       const response = await fetch(`${this.baseUrl}/api/auth/profile`, {
         headers: {
-          'Authorization': `Bearer ${this.token}`,
+          Authorization: `Bearer ${this.token}`,
         },
       });
 
@@ -183,7 +185,7 @@ class AuthService {
 
       const user = await response.json();
       cache.set('user_data', user, 60 * 60 * 1000); // 1 hour
-      
+
       return user;
     } catch (error) {
       console.error('Get user error:', error);
@@ -204,7 +206,7 @@ class AuthService {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': `Bearer ${this.token}`,
+          Authorization: `Bearer ${this.token}`,
         },
         body: JSON.stringify(updates),
       });
@@ -216,7 +218,7 @@ class AuthService {
 
       const user = await response.json();
       cache.set('user_data', user, 60 * 60 * 1000); // 1 hour
-      
+
       return user;
     } catch (error) {
       console.error('Update profile error:', error);
@@ -252,13 +254,16 @@ class AuthService {
    */
   async resetPassword(token: string, newPassword: string): Promise<void> {
     try {
-      const response = await fetch(`${this.baseUrl}/api/auth/reset-password/confirm`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ token, password: newPassword }),
-      });
+      const response = await fetch(
+        `${this.baseUrl}/api/auth/reset-password/confirm`,
+        {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ token, password: newPassword }),
+        }
+      );
 
       if (!response.ok) {
         const error = await response.json();
@@ -281,7 +286,10 @@ class AuthService {
   /**
    * Handle OAuth callback
    */
-  async handleOAuthCallback(code: string, state: string): Promise<{ user: User; token: string }> {
+  async handleOAuthCallback(
+    code: string,
+    state: string
+  ): Promise<{ user: User; token: string }> {
     try {
       const response = await fetch(`${this.baseUrl}/api/auth/oauth/callback`, {
         method: 'POST',
@@ -298,10 +306,10 @@ class AuthService {
 
       const data = await response.json();
       this.saveTokenToStorage(data.token);
-      
+
       // Cache user data
       cache.set('user_data', data.user, 60 * 60 * 1000); // 1 hour
-      
+
       return data;
     } catch (error) {
       console.error('OAuth callback error:', error);
@@ -327,14 +335,16 @@ class AuthService {
    * Make authenticated API request
    */
   async apiRequest<T>(endpoint: string, options: RequestInit = {}): Promise<T> {
-    const url = endpoint.startsWith('http') ? endpoint : `${this.baseUrl}${endpoint}`;
-    
+    const url = endpoint.startsWith('http')
+      ? endpoint
+      : `${this.baseUrl}${endpoint}`;
+
     const config: RequestInit = {
       ...options,
       headers: {
         'Content-Type': 'application/json',
         ...options.headers,
-        ...(this.token && { 'Authorization': `Bearer ${this.token}` }),
+        ...(this.token && { Authorization: `Bearer ${this.token}` }),
       },
     };
 
@@ -346,8 +356,10 @@ class AuthService {
         this.removeTokenFromStorage();
         throw new Error('Authentication required');
       }
-      
-      const error = await response.json().catch(() => ({ message: 'Request failed' }));
+
+      const error = await response
+        .json()
+        .catch(() => ({ message: 'Request failed' }));
       throw new Error(error.message || 'Request failed');
     }
 
@@ -357,7 +369,9 @@ class AuthService {
   /**
    * Supabase authentication methods
    */
-  async supabaseLogin(credentials: LoginCredentials): Promise<{ user: User; token: string }> {
+  async supabaseLogin(
+    credentials: LoginCredentials
+  ): Promise<{ user: User; token: string }> {
     try {
       const { data, error } = await supabase.auth.signInWithPassword({
         email: credentials.email,
@@ -369,7 +383,7 @@ class AuthService {
 
       // Get or create user profile
       const profile = await this.getOrCreateProfile(data.user);
-      
+
       const user: User = {
         id: data.user.id,
         email: data.user.email || '',
@@ -391,7 +405,7 @@ class AuthService {
 
       this.saveTokenToStorage(data.session.access_token);
       cache.set('user_data', user, 60 * 60 * 1000);
-      
+
       return { user, token: data.session.access_token };
     } catch (error) {
       console.error('Supabase login error:', error);
@@ -399,7 +413,9 @@ class AuthService {
     }
   }
 
-  async supabaseSignup(userData: SignupData): Promise<{ user: User; token: string }> {
+  async supabaseSignup(
+    userData: SignupData
+  ): Promise<{ user: User; token: string }> {
     try {
       const { data, error } = await supabase.auth.signUp({
         email: userData.email,
@@ -415,12 +431,10 @@ class AuthService {
       if (!data.user) throw new Error('Signup failed');
 
       // Create user profile
-      const { error: profileError } = await supabase
-        .from('profiles')
-        .insert({
-          id: data.user.id,
-          username: userData.name,
-        });
+      const { error: profileError } = await supabase.from('profiles').insert({
+        id: data.user.id,
+        username: userData.name,
+      });
 
       if (profileError) {
         console.error('Profile creation error:', profileError);
@@ -447,7 +461,7 @@ class AuthService {
 
         this.saveTokenToStorage(data.session.access_token);
         cache.set('user_data', user, 60 * 60 * 1000);
-        
+
         return { user, token: data.session.access_token };
       }
 
@@ -472,11 +486,13 @@ class AuthService {
 
   async getCurrentSupabaseUser(): Promise<User | null> {
     try {
-      const { data: { user } } = await supabase.auth.getUser();
+      const {
+        data: { user },
+      } = await supabase.auth.getUser();
       if (!user) return null;
 
       const profile = await this.getOrCreateProfile(user);
-      
+
       return {
         id: user.id,
         email: user.email || '',
@@ -514,7 +530,8 @@ class AuthService {
         .from('profiles')
         .insert({
           id: user.id,
-          username: user.user_metadata?.username || user.email?.split('@')[0] || 'User',
+          username:
+            user.user_metadata?.username || user.email?.split('@')[0] || 'User',
           avatar_url: user.user_metadata?.avatar_url,
         })
         .select()
@@ -532,7 +549,9 @@ class AuthService {
   /**
    * OAuth with Supabase (Google, GitHub, etc.)
    */
-  async supabaseOAuthLogin(provider: 'google' | 'github' | 'discord'): Promise<void> {
+  async supabaseOAuthLogin(
+    provider: 'google' | 'github' | 'discord'
+  ): Promise<void> {
     try {
       const { error } = await supabase.auth.signInWithOAuth({
         provider,
@@ -619,10 +638,10 @@ class AuthService {
     };
 
     const mockToken = 'mock-jwt-token-' + Date.now();
-    
+
     this.saveTokenToStorage(mockToken);
     cache.set('user_data', mockUser, 60 * 60 * 1000);
-    
+
     return { user: mockUser, token: mockToken };
   }
 }

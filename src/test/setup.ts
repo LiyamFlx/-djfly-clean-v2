@@ -28,9 +28,11 @@ Object.defineProperty(navigator, 'mediaDevices', {
   writable: true,
   value: {
     getUserMedia: vi.fn().mockResolvedValue({
-      getTracks: vi.fn().mockReturnValue([{
-        stop: vi.fn(),
-      }]),
+      getTracks: vi.fn().mockReturnValue([
+        {
+          stop: vi.fn(),
+        },
+      ]),
     }),
   },
 });
@@ -38,15 +40,20 @@ Object.defineProperty(navigator, 'mediaDevices', {
 // Mock MediaRecorder
 global.MediaRecorder = class MockMediaRecorder {
   static isTypeSupported = vi.fn().mockReturnValue(true);
-  
+
   start = vi.fn();
   stop = vi.fn();
   ondataavailable: ((event: BlobEvent) => void) | null = null;
   onstop: (() => void) | null = null;
   state = 'inactive';
-  
+
   constructor(stream: MediaStream, options?: MediaRecorderOptions) {
-    console.log('Mock MediaRecorder created with stream:', stream, 'options:', options);
+    console.log(
+      'Mock MediaRecorder created with stream:',
+      stream,
+      'options:',
+      options
+    );
   }
 };
 

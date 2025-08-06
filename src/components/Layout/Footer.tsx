@@ -8,40 +8,40 @@ const currentYear = new Date().getFullYear();
 const Footer: React.FC = () => {
   const socialLinks = [
     {
-      name: 'GitHub', 
+      name: 'GitHub',
       href: 'https://github.com/your-org/djfly',
       icon: Github,
-      label: 'Visit our GitHub repository'
+      label: 'Visit our GitHub repository',
     },
     {
       name: 'Twitter',
       href: 'https://twitter.com/djfly',
       icon: Twitter,
-      label: 'Follow us on Twitter'
+      label: 'Follow us on Twitter',
     },
     {
       name: 'Instagram',
       href: 'https://instagram.com/djfly',
       icon: Instagram,
-      label: 'Follow us on Instagram'
+      label: 'Follow us on Instagram',
     },
     {
       name: 'Contact',
       href: 'mailto:contact@djfly.app',
       icon: Mail,
-      label: 'Send us an email'
-    }
+      label: 'Send us an email',
+    },
   ];
 
   const footerLinks = [
     { name: 'Privacy Policy', href: ROUTES.PRIVACY },
     { name: 'Terms of Service', href: ROUTES.TERMS },
     { name: 'Contact Us', href: ROUTES.CONTACT },
-    { name: 'Help Center', href: ROUTES.HELP }
+    { name: 'Help Center', href: ROUTES.HELP },
   ];
 
   return (
-    <footer 
+    <footer
       className="bg-rich-black/90 backdrop-blur-sm border-t border-white/10 py-12"
       aria-labelledby="footer-heading"
     >
@@ -49,13 +49,16 @@ const Footer: React.FC = () => {
         <div className="pb-8 md:flex md:items-center md:justify-between">
           <div className="flex justify-center md:justify-start mb-8 md:mb-0">
             <Link to={ROUTES.HOME} className="flex items-center">
-              <Music className="h-8 w-8 text-electric-blue" aria-hidden="true" />
+              <Music
+                className="h-8 w-8 text-electric-blue"
+                aria-hidden="true"
+              />
               <span className="ml-2 text-2xl font-bold bg-gradient-to-r from-electric-blue to-bright-turquoise bg-clip-text text-transparent">
                 DJfly
               </span>
             </Link>
           </div>
-          
+
           <div className="flex justify-center space-x-6 md:order-2">
             {socialLinks.map((item) => (
               <a
@@ -72,7 +75,7 @@ const Footer: React.FC = () => {
             ))}
           </div>
         </div>
-        
+
         <div className="mt-8 border-t border-gray-800 pt-8 md:flex md:items-center md:justify-between">
           <div className="flex space-x-6 md:order-2">
             {footerLinks.map((item) => (

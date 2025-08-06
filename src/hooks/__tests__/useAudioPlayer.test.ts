@@ -10,7 +10,7 @@ const mockAudio = {
   removeEventListener: vi.fn(),
   duration: 180,
   currentTime: 0,
-  src: ''
+  src: '',
 };
 
 global.Audio = vi.fn().mockImplementation(() => mockAudio);

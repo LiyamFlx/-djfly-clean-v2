@@ -35,7 +35,9 @@ const ProducerPage: React.FC = () => {
                 <BarChart className="w-6 h-6 text-electric-blue" />
               </div>
               <div>
-                <div className="text-2xl font-bold">{sessionState.totalTracks}</div>
+                <div className="text-2xl font-bold">
+                  {sessionState.totalTracks}
+                </div>
                 <div className="text-sm text-gray-400">Tracks Played</div>
               </div>
             </div>
@@ -90,8 +92,11 @@ const ProducerPage: React.FC = () => {
               <div>
                 <div className="text-2xl font-bold">
                   {sessionState.startTime
-                    ? Math.round((Date.now() - sessionState.startTime.getTime()) / 60000)
-                    : 0}m
+                    ? Math.round(
+                        (Date.now() - sessionState.startTime.getTime()) / 60000
+                      )
+                    : 0}
+                  m
                 </div>
                 <div className="text-sm text-gray-400">Session Time</div>
               </div>
@@ -114,7 +119,9 @@ const ProducerPage: React.FC = () => {
               <div className="text-center text-gray-400">
                 <BarChart className="w-16 h-16 mx-auto mb-4 opacity-50" />
                 <p>Performance chart would display here</p>
-                <p className="text-sm">Track energy, crowd response over time</p>
+                <p className="text-sm">
+                  Track energy, crowd response over time
+                </p>
               </div>
             </div>
           </motion.div>
@@ -160,12 +167,17 @@ const ProducerPage: React.FC = () => {
 
               <div className="flex justify-between items-center">
                 <span className="text-gray-300">Energy Trend</span>
-                <span className={`px-3 py-1 rounded-full text-sm capitalize ${
-                  crowdState.energyTrend === 'rising' ? 'bg-green-500/20 text-green-400' :
-                  crowdState.energyTrend === 'falling' ? 'bg-red-500/20 text-red-400' :
-                  'bg-yellow-500/20 text-yellow-400'
-                }`}>
-                  {crowdState.energyTrend} {crowdState.energyTrend === 'rising' && '📈'}
+                <span
+                  className={`px-3 py-1 rounded-full text-sm capitalize ${
+                    crowdState.energyTrend === 'rising'
+                      ? 'bg-green-500/20 text-green-400'
+                      : crowdState.energyTrend === 'falling'
+                        ? 'bg-red-500/20 text-red-400'
+                        : 'bg-yellow-500/20 text-yellow-400'
+                  }`}
+                >
+                  {crowdState.energyTrend}{' '}
+                  {crowdState.energyTrend === 'rising' && '📈'}
                 </span>
               </div>
 
@@ -209,51 +221,55 @@ const ProducerPage: React.FC = () => {
 
           <div className="grid md:grid-cols-2 gap-4">
             <div className="bg-rich-black/30 rounded-lg p-4">
-              <h4 className="font-semibold mb-2 text-bright-turquoise">Energy Management</h4>
+              <h4 className="font-semibold mb-2 text-bright-turquoise">
+                Energy Management
+              </h4>
               <p className="text-sm text-gray-300">
                 {crowdState.currentEnergy > 0.8
-                  ? "Crowd energy is very high. Consider maintaining this level with consistent BPM tracks."
+                  ? 'Crowd energy is very high. Consider maintaining this level with consistent BPM tracks.'
                   : crowdState.currentEnergy < 0.3
-                  ? "Energy is low. Try introducing some crowd favorites to re-engage the audience."
-                  : "Good energy balance. You can experiment with building or cooling down based on the vibe."
-                }
+                    ? 'Energy is low. Try introducing some crowd favorites to re-engage the audience.'
+                    : 'Good energy balance. You can experiment with building or cooling down based on the vibe.'}
               </p>
             </div>
 
             <div className="bg-rich-black/30 rounded-lg p-4">
-              <h4 className="font-semibold mb-2 text-laser-pink">Track Selection</h4>
+              <h4 className="font-semibold mb-2 text-laser-pink">
+                Track Selection
+              </h4>
               <p className="text-sm text-gray-300">
                 {sessionState.setFlow === 'buildup'
                   ? "You're in buildup mode. Gradually increase energy and BPM for maximum impact."
                   : sessionState.setFlow === 'maintain'
-                  ? "Maintaining energy well. Keep the flow consistent with similar energy tracks."
-                  : "In cooldown phase. Perfect time for deeper tracks and smooth transitions."
-                }
+                    ? 'Maintaining energy well. Keep the flow consistent with similar energy tracks.'
+                    : 'In cooldown phase. Perfect time for deeper tracks and smooth transitions.'}
               </p>
             </div>
 
             <div className="bg-rich-black/30 rounded-lg p-4">
-              <h4 className="font-semibold mb-2 text-electric-blue">Crowd Engagement</h4>
+              <h4 className="font-semibold mb-2 text-electric-blue">
+                Crowd Engagement
+              </h4>
               <p className="text-sm text-gray-300">
-                Based on {crowdState.engagementLevel} engagement, {
-                  crowdState.engagementLevel === 'high'
-                    ? "the crowd is very responsive. This is a great time to take creative risks."
-                    : crowdState.engagementLevel === 'low'
-                    ? "try playing more recognizable tracks to increase participation."
-                    : "engagement is steady. You can maintain the current style or experiment slightly."
-                }
+                Based on {crowdState.engagementLevel} engagement,{' '}
+                {crowdState.engagementLevel === 'high'
+                  ? 'the crowd is very responsive. This is a great time to take creative risks.'
+                  : crowdState.engagementLevel === 'low'
+                    ? 'try playing more recognizable tracks to increase participation.'
+                    : 'engagement is steady. You can maintain the current style or experiment slightly.'}
               </p>
             </div>
 
             <div className="bg-rich-black/30 rounded-lg p-4">
-              <h4 className="font-semibold mb-2 text-bright-turquoise">Next Steps</h4>
+              <h4 className="font-semibold mb-2 text-bright-turquoise">
+                Next Steps
+              </h4>
               <p className="text-sm text-gray-300">
                 {crowdState.energyTrend === 'rising'
-                  ? "Energy is building! Perfect time to drop a peak-time track and maximize the moment."
+                  ? 'Energy is building! Perfect time to drop a peak-time track and maximize the moment.'
                   : crowdState.energyTrend === 'falling'
-                  ? "Energy is declining. Consider a strategic energy boost or transition to a different vibe."
-                  : "Energy is stable. You have flexibility to maintain or shift direction based on your goals."
-                }
+                    ? 'Energy is declining. Consider a strategic energy boost or transition to a different vibe.'
+                    : 'Energy is stable. You have flexibility to maintain or shift direction based on your goals.'}
               </p>
             </div>
           </div>

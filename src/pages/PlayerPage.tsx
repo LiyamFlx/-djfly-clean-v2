@@ -1,6 +1,20 @@
 import { motion } from 'framer-motion';
-import { Play, Pause, SkipBack, SkipForward, Volume2, Shuffle, Repeat, LogOut } from 'lucide-react';
-import { useAudioState, useAudioActions, useCrowdState, useSessionState } from '@/store';
+import {
+  Play,
+  Pause,
+  SkipBack,
+  SkipForward,
+  Volume2,
+  Shuffle,
+  Repeat,
+  LogOut,
+} from 'lucide-react';
+import {
+  useAudioState,
+  useAudioActions,
+  useCrowdState,
+  useSessionState,
+} from '@/store';
 import FinishSetModal from '@/components/player/FinishSetModal';
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
@@ -14,7 +28,10 @@ const PlayerPage: React.FC = () => {
   const { togglePlayback, setVolume } = useAudioActions();
 
   const currentTrack = audioState.currentTrack;
-  const progress = audioState.duration > 0 ? (audioState.currentTime / audioState.duration) * 100 : 0;
+  const progress =
+    audioState.duration > 0
+      ? (audioState.currentTime / audioState.duration) * 100
+      : 0;
 
   const formatTime = (seconds: number) => {
     const mins = Math.floor(seconds / 60);
@@ -27,7 +44,9 @@ const PlayerPage: React.FC = () => {
       <div className="min-h-screen bg-club-gradient flex items-center justify-center">
         <div className="text-center">
           <h2 className="text-2xl font-bold mb-4">No track selected</h2>
-          <p className="text-gray-400 mb-8">Generate a set in Magic Studio to start playing</p>
+          <p className="text-gray-400 mb-8">
+            Generate a set in Magic Studio to start playing
+          </p>
         </div>
       </div>
     );
@@ -76,7 +95,7 @@ const PlayerPage: React.FC = () => {
             <motion.div
               className="relative mb-8"
               animate={{ rotate: audioState.isPlaying ? 360 : 0 }}
-              transition={{ duration: 20, repeat: Infinity, ease: "linear" }}
+              transition={{ duration: 20, repeat: Infinity, ease: 'linear' }}
             >
               <img
                 src={currentTrack.image}
@@ -200,7 +219,7 @@ const PlayerPage: React.FC = () => {
             </motion.div>
           </motion.div>
         </div>
-        
+
         {/* Live Analytics Panel */}
         {crowdState.lastUpdated && (
           <motion.div
@@ -209,8 +228,10 @@ const PlayerPage: React.FC = () => {
             transition={{ delay: 0.6 }}
             className="glass-card mx-4 mb-4 p-4 rounded-xl"
           >
-            <h3 className="text-lg font-semibold mb-4 text-center">Live Analytics</h3>
-            
+            <h3 className="text-lg font-semibold mb-4 text-center">
+              Live Analytics
+            </h3>
+
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-center">
               <div>
                 <div className="text-2xl font-bold text-electric-blue">
@@ -218,21 +239,21 @@ const PlayerPage: React.FC = () => {
                 </div>
                 <div className="text-xs text-gray-400">Crowd Energy</div>
               </div>
-              
+
               <div>
                 <div className="text-2xl font-bold text-bright-turquoise capitalize">
                   {crowdState.mood}
                 </div>
                 <div className="text-xs text-gray-400">Mood</div>
               </div>
-              
+
               <div>
                 <div className="text-2xl font-bold text-laser-pink capitalize">
                   {crowdState.engagementLevel}
                 </div>
                 <div className="text-xs text-gray-400">Engagement</div>
               </div>
-              
+
               <div>
                 <div className="text-2xl font-bold text-electric-blue">
                   {sessionState.totalTracks}
@@ -242,7 +263,7 @@ const PlayerPage: React.FC = () => {
             </div>
           </motion.div>
         )}
-        
+
         {/* Queue Preview */}
         {audioState.queue.length > 1 && (
           <motion.div
@@ -252,22 +273,33 @@ const PlayerPage: React.FC = () => {
             className="glass-card mx-4 mb-4 p-4 rounded-xl"
           >
             <h3 className="text-lg font-semibold mb-4">Up Next</h3>
-            
+
             <div className="space-y-2">
               {audioState.queue.slice(1, 4).map((track, index) => (
-                <div key={track.id} className="flex items-center gap-3 p-2 rounded-lg hover:bg-white/5 transition-colors">
+                <div
+                  key={track.id}
+                  className="flex items-center gap-3 p-2 rounded-lg hover:bg-white/5 transition-colors"
+                >
                   <div className="text-sm text-gray-400 w-6">{index + 2}.</div>
-                  <img src={track.image} alt={track.title} className="w-10 h-10 rounded" />
+                  <img
+                    src={track.image}
+                    alt={track.title}
+                    className="w-10 h-10 rounded"
+                  />
                   <div className="flex-1 min-w-0">
-                    <div className="text-sm font-medium text-white truncate">{track.title}</div>
-                    <div className="text-xs text-gray-400 truncate">{track.artist}</div>
+                    <div className="text-sm font-medium text-white truncate">
+                      {track.title}
+                    </div>
+                    <div className="text-xs text-gray-400 truncate">
+                      {track.artist}
+                    </div>
                   </div>
                   <div className="text-xs text-gray-400">
                     {formatTime(track.duration)}
                   </div>
                 </div>
               ))}
-              
+
               {audioState.queue.length > 4 && (
                 <div className="text-center text-sm text-gray-400 py-2">
                   +{audioState.queue.length - 4} more tracks
@@ -277,7 +309,7 @@ const PlayerPage: React.FC = () => {
           </motion.div>
         )}
       </div>
-      
+
       <style>{`
         .slider::-webkit-slider-thumb {
           appearance: none;

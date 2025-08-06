@@ -15,7 +15,7 @@ export const ROUTES = {
   TERMS: '/terms',
   CONTACT: '/contact',
   HELP: '/help',
-  
+
   // Auth
   LOGIN: '/login',
   SIGNUP: '/signup',
@@ -24,4 +24,4 @@ export const ROUTES = {
 } as const;
 
 export type RouteKey = keyof typeof ROUTES;
-export type RoutePath = typeof ROUTES[RouteKey];
+export type RoutePath = (typeof ROUTES)[RouteKey];

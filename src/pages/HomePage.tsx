@@ -21,7 +21,7 @@ const HomePage: React.FC = () => {
             className="mb-8"
             initial={{ scale: 0, rotate: -180 }}
             animate={{ scale: 1, rotate: 0 }}
-            transition={{ duration: 0.8, type: "spring" }}
+            transition={{ duration: 0.8, type: 'spring' }}
           >
             <div className="text-6xl mb-4 animate-bounce-subtle">🎵</div>
           </motion.div>
@@ -46,8 +46,8 @@ const HomePage: React.FC = () => {
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, delay: 0.4 }}
           >
-            Point your phone at any crowd, get the perfect playlist in 5 seconds.
-            Professional DJ tools included.
+            Point your phone at any crowd, get the perfect playlist in 5
+            seconds. Professional DJ tools included.
           </motion.p>
 
           {/* Value Proposition Steps */}
@@ -106,7 +106,7 @@ const HomePage: React.FC = () => {
               <Sparkles className="w-5 h-5" />
               Enter Magic Studio
             </Link>
-            
+
             <Link
               to={ROUTES.PLAYER}
               className="glass-card px-8 py-4 text-white font-semibold text-lg inline-flex items-center justify-center gap-3 hover:bg-white/20 transition-all duration-200"
@@ -127,7 +127,8 @@ const HomePage: React.FC = () => {
               <Mic className="w-12 h-12 text-electric-blue mx-auto mb-4" />
               <h3 className="text-xl font-semibold mb-2">Magic Match</h3>
               <p className="text-gray-300 text-sm">
-                AI reads crowd energy and generates perfect playlists in real-time
+                AI reads crowd energy and generates perfect playlists in
+                real-time
               </p>
             </div>
 

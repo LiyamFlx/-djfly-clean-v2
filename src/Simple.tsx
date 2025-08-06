@@ -1,5 +1,11 @@
 import { useState, useRef, useEffect } from 'react';
-import { BrowserRouter, Routes, Route, Link, useNavigate } from 'react-router-dom';
+import {
+  BrowserRouter,
+  Routes,
+  Route,
+  Link,
+  useNavigate,
+} from 'react-router-dom';
 
 interface Track {
   id: string;
@@ -13,14 +19,14 @@ const TRACKS: Track[] = [
     id: '1',
     title: 'Sample Track 1',
     artist: 'Test Artist',
-    url: 'data:audio/wav;base64,UklGRjIAAABXQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YQ4AAAAAAAABAAAAAAAAAA=='
+    url: 'data:audio/wav;base64,UklGRjIAAABXQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YQ4AAAAAAAABAAAAAAAAAA==',
   },
   {
     id: '2',
     title: 'Sample Track 2',
     artist: 'Test Artist 2',
-    url: 'data:audio/wav;base64,UklGRjIAAABXQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YQ4AAAAAAAABAAAAAAAAAA=='
-  }
+    url: 'data:audio/wav;base64,UklGRjIAAABXQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YQ4AAAAAAAABAAAAAAAAAA==',
+  },
 ];
 
 let globalCurrentTrack: Track | null = null;
@@ -32,8 +38,18 @@ const HomePage = () => (
       <h1 className="text-4xl font-bold text-blue-400 mb-8">DJfly - WORKING</h1>
       <p className="mb-8">This version actually works!</p>
       <div className="space-x-4">
-        <Link to="/studio" className="bg-blue-600 px-6 py-3 rounded hover:bg-blue-700">Studio</Link>
-        <Link to="/player" className="bg-purple-600 px-6 py-3 rounded hover:bg-purple-700">Player</Link>
+        <Link
+          to="/studio"
+          className="bg-blue-600 px-6 py-3 rounded hover:bg-blue-700"
+        >
+          Studio
+        </Link>
+        <Link
+          to="/player"
+          className="bg-purple-600 px-6 py-3 rounded hover:bg-purple-700"
+        >
+          Player
+        </Link>
       </div>
     </div>
   </div>
@@ -44,11 +60,17 @@ const StudioPage = () => (
     <div className="max-w-4xl mx-auto text-center">
       <h1 className="text-3xl font-bold mb-8">Studio</h1>
       <div className="grid md:grid-cols-2 gap-8">
-        <Link to="/studio/match" className="bg-blue-600 p-8 rounded-xl hover:bg-blue-700">
+        <Link
+          to="/studio/match"
+          className="bg-blue-600 p-8 rounded-xl hover:bg-blue-700"
+        >
           <h2 className="text-xl font-bold mb-4">🎯 Magic Match</h2>
           <p>Record and generate playlist</p>
         </Link>
-        <Link to="/studio/set" className="bg-purple-600 p-8 rounded-xl hover:bg-purple-700">
+        <Link
+          to="/studio/set"
+          className="bg-purple-600 p-8 rounded-xl hover:bg-purple-700"
+        >
           <h2 className="text-xl font-bold mb-4">🎵 Magic Set</h2>
           <p>Create custom playlist</p>
         </Link>
@@ -81,17 +103,26 @@ const MagicMatchPage = () => {
     <div className="min-h-screen bg-gray-900 text-white p-8">
       <div className="max-w-2xl mx-auto text-center">
         <h1 className="text-3xl font-bold mb-8">Magic Match</h1>
-        
-        <div className={`w-32 h-32 mx-auto mb-8 rounded-full flex items-center justify-center cursor-pointer border-4 ${
-          isRecording ? 'bg-red-600 border-red-400 animate-pulse' : 'bg-blue-600 border-blue-400 hover:bg-blue-500'
-        }`} onClick={handleRecord}>
+
+        <div
+          className={`w-32 h-32 mx-auto mb-8 rounded-full flex items-center justify-center cursor-pointer border-4 ${
+            isRecording
+              ? 'bg-red-600 border-red-400 animate-pulse'
+              : 'bg-blue-600 border-blue-400 hover:bg-blue-500'
+          }`}
+          onClick={handleRecord}
+        >
           <span className="text-4xl">{isRecording ? '🔴' : '🎤'}</span>
         </div>
-        
+
         <h2 className="text-xl mb-4">
-          {isRecording ? 'Recording crowd...' : hasAnalyzed ? 'Analysis Complete!' : 'Tap to Record Crowd'}
+          {isRecording
+            ? 'Recording crowd...'
+            : hasAnalyzed
+              ? 'Analysis Complete!'
+              : 'Tap to Record Crowd'}
         </h2>
-        
+
         {hasAnalyzed && (
           <div className="bg-gray-800 p-6 rounded-xl mt-8">
             <h3 className="text-lg font-bold mb-4">Crowd Analysis Results</h3>
@@ -105,7 +136,7 @@ const MagicMatchPage = () => {
                 <div className="text-sm">Engagement</div>
               </div>
             </div>
-            <button 
+            <button
               onClick={generatePlaylist}
               className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 px-8 py-4 rounded-lg font-bold"
             >
@@ -147,16 +178,16 @@ const MagicSetPage = () => {
     <div className="min-h-screen bg-gray-900 text-white p-8">
       <div className="max-w-2xl mx-auto">
         <h1 className="text-3xl font-bold text-center mb-8">Magic Set</h1>
-        
+
         <div className="bg-gray-800 p-6 rounded-xl mb-8">
           <h2 className="text-xl mb-4">Describe Your Set</h2>
-          <textarea 
+          <textarea
             value={prompt}
             onChange={(e) => setPrompt(e.target.value)}
             placeholder="e.g., High energy dance music for a wedding party"
             className="w-full bg-gray-700 p-4 rounded text-white h-24 resize-none border border-gray-600 focus:border-purple-500 focus:outline-none"
           />
-          <button 
+          <button
             onClick={generateSet}
             disabled={isGenerating}
             className="bg-purple-600 hover:bg-purple-700 px-6 py-3 rounded mt-4 w-full disabled:opacity-50"
@@ -164,21 +195,28 @@ const MagicSetPage = () => {
             {isGenerating ? '🎵 Generating...' : '🎨 Generate Custom Set'}
           </button>
         </div>
-        
+
         {isGenerating && (
           <div className="text-center py-8">
             <div className="animate-spin w-16 h-16 border-4 border-purple-500 border-t-transparent rounded-full mx-auto mb-4"></div>
             <p>AI is creating your perfect playlist...</p>
           </div>
         )}
-        
+
         {hasGenerated && !isGenerating && (
           <div className="bg-gray-800 p-6 rounded-xl">
-            <h3 className="text-xl font-bold mb-4">Generated Set Based on: "{prompt}"</h3>
+            <h3 className="text-xl font-bold mb-4">
+              Generated Set Based on: "{prompt}"
+            </h3>
             <div className="space-y-3 mb-6">
               {TRACKS.map((track, index) => (
-                <div key={track.id} className="flex items-center space-x-4 bg-gray-700 p-3 rounded">
-                  <span className="text-lg font-bold text-purple-400 w-8">{index + 1}</span>
+                <div
+                  key={track.id}
+                  className="flex items-center space-x-4 bg-gray-700 p-3 rounded"
+                >
+                  <span className="text-lg font-bold text-purple-400 w-8">
+                    {index + 1}
+                  </span>
                   <div className="flex-1">
                     <div className="font-semibold">{track.title}</div>
                     <div className="text-gray-400 text-sm">{track.artist}</div>
@@ -186,7 +224,7 @@ const MagicSetPage = () => {
                 </div>
               ))}
             </div>
-            <button 
+            <button
               onClick={playSet}
               className="bg-green-600 hover:bg-green-700 px-8 py-4 rounded font-bold w-full"
             >
@@ -200,7 +238,9 @@ const MagicSetPage = () => {
 };
 
 const PlayerPage = () => {
-  const [currentTrack, setCurrentTrack] = useState<Track | null>(globalCurrentTrack);
+  const [currentTrack, setCurrentTrack] = useState<Track | null>(
+    globalCurrentTrack
+  );
   const [isPlaying, setIsPlaying] = useState(false);
   const audioRef = useRef<HTMLAudioElement>(null);
 
@@ -229,7 +269,9 @@ const PlayerPage = () => {
 
   const nextTrack = () => {
     if (globalQueue.length === 0) return;
-    const currentIndex = globalQueue.findIndex(t => t.id === currentTrack?.id);
+    const currentIndex = globalQueue.findIndex(
+      (t) => t.id === currentTrack?.id
+    );
     const nextIndex = (currentIndex + 1) % globalQueue.length;
     const nextTrack = globalQueue[nextIndex];
     setCurrentTrack(nextTrack);
@@ -244,8 +286,15 @@ const PlayerPage = () => {
           <div className="bg-gray-800 p-8 rounded-xl">
             <div className="text-6xl mb-4">🎵</div>
             <h2 className="text-xl mb-4">No Track Loaded</h2>
-            <p className="text-gray-400 mb-8">Generate a playlist in Studio first</p>
-            <Link to="/studio" className="bg-blue-600 hover:bg-blue-700 px-6 py-3 rounded">Go to Studio</Link>
+            <p className="text-gray-400 mb-8">
+              Generate a playlist in Studio first
+            </p>
+            <Link
+              to="/studio"
+              className="bg-blue-600 hover:bg-blue-700 px-6 py-3 rounded"
+            >
+              Go to Studio
+            </Link>
           </div>
         </div>
       </div>
@@ -256,34 +305,37 @@ const PlayerPage = () => {
     <div className="min-h-screen bg-gray-900 text-white p-8">
       <div className="max-w-2xl mx-auto text-center">
         <h1 className="text-3xl font-bold mb-8">🎧 Now Playing</h1>
-        
+
         <div className="bg-gray-800 p-8 rounded-xl mb-8">
-          <div className={`w-48 h-48 mx-auto mb-6 bg-gradient-to-br from-blue-600 to-purple-600 rounded-full flex items-center justify-center ${
-            isPlaying ? 'animate-spin' : ''
-          }`} style={{ animationDuration: '4s' }}>
+          <div
+            className={`w-48 h-48 mx-auto mb-6 bg-gradient-to-br from-blue-600 to-purple-600 rounded-full flex items-center justify-center ${
+              isPlaying ? 'animate-spin' : ''
+            }`}
+            style={{ animationDuration: '4s' }}
+          >
             <span className="text-6xl">🎵</span>
           </div>
-          
+
           <h2 className="text-2xl font-bold mb-2">{currentTrack.title}</h2>
           <p className="text-gray-400 mb-6">{currentTrack.artist}</p>
-          
+
           <div className="flex items-center justify-center space-x-6 mb-6">
-            <button 
+            <button
               onClick={nextTrack}
               disabled={globalQueue.length <= 1}
               className="bg-gray-700 hover:bg-gray-600 disabled:opacity-50 p-3 rounded-full text-xl"
             >
               ⏮
             </button>
-            
-            <button 
+
+            <button
               onClick={togglePlay}
               className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 p-6 rounded-full text-3xl transform hover:scale-105 transition-transform"
             >
               {isPlaying ? '⏸' : '▶️'}
             </button>
-            
-            <button 
+
+            <button
               onClick={nextTrack}
               disabled={globalQueue.length <= 1}
               className="bg-gray-700 hover:bg-gray-600 disabled:opacity-50 p-3 rounded-full text-xl"
@@ -291,26 +343,30 @@ const PlayerPage = () => {
               ⏭
             </button>
           </div>
-          
+
           <div className="text-center">
-            <span className={`px-4 py-2 rounded-full text-sm font-bold ${
-              isPlaying ? 'bg-green-600' : 'bg-gray-600'
-            }`}>
+            <span
+              className={`px-4 py-2 rounded-full text-sm font-bold ${
+                isPlaying ? 'bg-green-600' : 'bg-gray-600'
+              }`}
+            >
               {isPlaying ? '🔴 PLAYING' : '⏸ PAUSED'}
             </span>
           </div>
         </div>
-        
+
         {globalQueue.length > 0 && (
           <div className="bg-gray-800 p-6 rounded-xl">
-            <h3 className="text-lg font-bold mb-4">Queue ({globalQueue.length} tracks)</h3>
+            <h3 className="text-lg font-bold mb-4">
+              Queue ({globalQueue.length} tracks)
+            </h3>
             <div className="space-y-2">
               {globalQueue.map((track, index) => (
-                <div 
-                  key={track.id} 
+                <div
+                  key={track.id}
                   className={`flex items-center space-x-3 p-3 rounded cursor-pointer transition-colors ${
-                    track.id === currentTrack?.id 
-                      ? 'bg-blue-600' 
+                    track.id === currentTrack?.id
+                      ? 'bg-blue-600'
                       : 'bg-gray-700 hover:bg-gray-600'
                   }`}
                   onClick={() => {
@@ -332,7 +388,7 @@ const PlayerPage = () => {
             </div>
           </div>
         )}
-        
+
         <audio
           ref={audioRef}
           onEnded={() => {
@@ -352,9 +408,24 @@ const Navigation = () => (
         DJfly ✅
       </Link>
       <div className="space-x-6">
-        <Link to="/" className="text-gray-300 hover:text-white transition-colors">Home</Link>
-        <Link to="/studio" className="text-gray-300 hover:text-white transition-colors">Studio</Link>
-        <Link to="/player" className="text-gray-300 hover:text-white transition-colors">Player</Link>
+        <Link
+          to="/"
+          className="text-gray-300 hover:text-white transition-colors"
+        >
+          Home
+        </Link>
+        <Link
+          to="/studio"
+          className="text-gray-300 hover:text-white transition-colors"
+        >
+          Studio
+        </Link>
+        <Link
+          to="/player"
+          className="text-gray-300 hover:text-white transition-colors"
+        >
+          Player
+        </Link>
       </div>
     </div>
   </nav>
@@ -370,14 +441,19 @@ const App = () => (
         <Route path="/studio/match" element={<MagicMatchPage />} />
         <Route path="/studio/set" element={<MagicSetPage />} />
         <Route path="/player" element={<PlayerPage />} />
-        <Route path="*" element={
-          <div className="min-h-screen bg-gray-900 text-white flex items-center justify-center">
-            <div className="text-center">
-              <h1 className="text-4xl font-bold mb-4">404 - Not Found</h1>
-              <Link to="/" className="text-blue-400 hover:text-blue-300">Go Home</Link>
+        <Route
+          path="*"
+          element={
+            <div className="min-h-screen bg-gray-900 text-white flex items-center justify-center">
+              <div className="text-center">
+                <h1 className="text-4xl font-bold mb-4">404 - Not Found</h1>
+                <Link to="/" className="text-blue-400 hover:text-blue-300">
+                  Go Home
+                </Link>
+              </div>
             </div>
-          </div>
-        } />
+          }
+        />
       </Routes>
     </div>
   </BrowserRouter>

@@ -28,7 +28,8 @@
       "Bash(git merge:*)",
       "Bash(git tag:*)",
       "Bash(netlify deploy:*)",
-      "Bash(netlify init:*)"
+      "Bash(netlify init:*)",
+      "WebFetch(domain:djfly-clean-v2-4xabzzynp-liyams-projects.vercel.app)"
     ],
     "deny": []
   }

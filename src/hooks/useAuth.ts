@@ -1,5 +1,10 @@
 import { useState, useEffect, useCallback } from 'react';
-import { authService, type User, type LoginCredentials, type SignupData } from '@/services/auth';
+import {
+  authService,
+  type User,
+  type LoginCredentials,
+  type SignupData,
+} from '@/services/auth';
 
 export interface UseAuthReturn {
   user: User | null;
@@ -39,14 +44,14 @@ export function useAuth(): UseAuthReturn {
   const login = useCallback(async (credentials: LoginCredentials) => {
     setIsLoading(true);
     setError(null);
-    
+
     try {
       // Use mock login for development if no backend is available
       const isDevelopment = import.meta.env.DEV;
-      const result = isDevelopment 
+      const result = isDevelopment
         ? await authService.mockLogin(credentials.email)
         : await authService.login(credentials);
-      
+
       setUser(result.user);
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : 'Login failed';
@@ -60,14 +65,14 @@ export function useAuth(): UseAuthReturn {
   const signup = useCallback(async (userData: SignupData) => {
     setIsLoading(true);
     setError(null);
-    
+
     try {
       // Use mock login for development if no backend is available
       const isDevelopment = import.meta.env.DEV;
-      const result = isDevelopment 
+      const result = isDevelopment
         ? await authService.mockLogin(userData.email)
         : await authService.signup(userData);
-      
+
       setUser(result.user);
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : 'Signup failed';
@@ -81,7 +86,7 @@ export function useAuth(): UseAuthReturn {
   const logout = useCallback(async () => {
     setIsLoading(true);
     setError(null);
-    
+
     try {
       await authService.logout();
       setUser(null);
@@ -93,34 +98,39 @@ export function useAuth(): UseAuthReturn {
     }
   }, []);
 
-  const updateProfile = useCallback(async (updates: Partial<User>) => {
-    if (!user) {
-      throw new Error('No user logged in');
-    }
+  const updateProfile = useCallback(
+    async (updates: Partial<User>) => {
+      if (!user) {
+        throw new Error('No user logged in');
+      }
 
-    setIsLoading(true);
-    setError(null);
-    
-    try {
-      const updatedUser = await authService.updateProfile(updates);
-      setUser(updatedUser);
-    } catch (err) {
-      const errorMessage = err instanceof Error ? err.message : 'Profile update failed';
-      setError(errorMessage);
-      throw err;
-    } finally {
-      setIsLoading(false);
-    }
-  }, [user]);
+      setIsLoading(true);
+      setError(null);
+
+      try {
+        const updatedUser = await authService.updateProfile(updates);
+        setUser(updatedUser);
+      } catch (err) {
+        const errorMessage =
+          err instanceof Error ? err.message : 'Profile update failed';
+        setError(errorMessage);
+        throw err;
+      } finally {
+        setIsLoading(false);
+      }
+    },
+    [user]
+  );
 
   const requestPasswordReset = useCallback(async (email: string) => {
     setIsLoading(true);
     setError(null);
-    
+
     try {
       await authService.requestPasswordReset(email);
     } catch (err) {
-      const errorMessage = err instanceof Error ? err.message : 'Password reset request failed';
+      const errorMessage =
+        err instanceof Error ? err.message : 'Password reset request failed';
       setError(errorMessage);
       throw err;
     } finally {
@@ -128,20 +138,24 @@ export function useAuth(): UseAuthReturn {
     }
   }, []);
 
-  const resetPassword = useCallback(async (token: string, newPassword: string) => {
-    setIsLoading(true);
-    setError(null);
-    
-    try {
-      await authService.resetPassword(token, newPassword);
-    } catch (err) {
-      const errorMessage = err instanceof Error ? err.message : 'Password reset failed';
-      setError(errorMessage);
-      throw err;
-    } finally {
-      setIsLoading(false);
-    }
-  }, []);
+  const resetPassword = useCallback(
+    async (token: string, newPassword: string) => {
+      setIsLoading(true);
+      setError(null);
+
+      try {
+        await authService.resetPassword(token, newPassword);
+      } catch (err) {
+        const errorMessage =
+          err instanceof Error ? err.message : 'Password reset failed';
+        setError(errorMessage);
+        throw err;
+      } finally {
+        setIsLoading(false);
+      }
+    },
+    []
+  );
 
   const clearError = useCallback(() => {
     setError(null);

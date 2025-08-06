@@ -14,19 +14,19 @@ export default defineConfig({
   plugins: [react()],
   resolve: {
     alias: {
-      '@': path.resolve(__dirname, 'src')
-    }
+      '@': path.resolve(__dirname, 'src'),
+    },
   },
   server: {
     port: 5173,
     host: true,
-    open: true
+    open: true,
   },
   test: {
     globals: true,
     environment: 'jsdom',
     setupFiles: './src/test/setup.ts',
-    css: true
+    css: true,
   },
   build: {
     outDir: 'dist',
@@ -35,10 +35,10 @@ export default defineConfig({
       output: {
         manualChunks: {
           'react-vendor': ['react', 'react-dom', 'react-router-dom'],
-          'animation': ['framer-motion'],
-          'audio': ['howler']
-        }
-      }
-    }
-  }
-})
+          animation: ['framer-motion'],
+          audio: ['howler'],
+        },
+      },
+    },
+  },
+});

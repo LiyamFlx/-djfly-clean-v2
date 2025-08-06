@@ -4,7 +4,7 @@ export type Json =
   | boolean
   | null
   | { [key: string]: Json | undefined }
-  | Json[]
+  | Json[];
 
 export interface Database {
   public: {
@@ -119,7 +119,9 @@ export interface Database {
           venue_name?: string | null;
           crowd_size?: number | null;
         };
-        Update: Partial<Database['public']['Tables']['magic_match_sessions']['Insert']>;
+        Update: Partial<
+          Database['public']['Tables']['magic_match_sessions']['Insert']
+        >;
       };
       ai_generations: {
         Row: {
@@ -142,7 +144,9 @@ export interface Database {
           generated_tracks?: string[] | null;
           model_used?: string | null;
         };
-        Update: Partial<Database['public']['Tables']['ai_generations']['Insert']>;
+        Update: Partial<
+          Database['public']['Tables']['ai_generations']['Insert']
+        >;
       };
     };
     Views: {
