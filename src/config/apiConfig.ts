@@ -118,10 +118,14 @@ export const serviceStatus = ServiceStatus.getInstance();
 export const validateApiConfig = () => {
   // Check for placeholder/demo credentials
   const isPlaceholderSpotifyId = API_CONFIG.spotify.clientId?.match(
-    /^(abc123|e5050e55f5a94ca2)/
+    /^(abc123|e5050e55f5a94ca2|demo_client_id)/
   );
   const isPlaceholderSpotifySecret = API_CONFIG.spotify.clientSecret?.match(
-    /^(xyz456|7e76b6a7c1434b1a)/
+    /^(xyz456|7e76b6a7c1434b1a|demo_client_secret)/
+  );
+  
+  const isPlaceholderOpenAI = API_CONFIG.openai.apiKey?.match(
+    /^(demo_openai_key)/
   );
 
   const validations = {
@@ -149,7 +153,9 @@ export const validateApiConfig = () => {
       apiKey:
         !API_CONFIG.openai.apiKey ||
         (API_CONFIG.openai.apiKey.startsWith('sk-') &&
-          API_CONFIG.openai.apiKey.length > 40),
+          API_CONFIG.openai.apiKey.length > 40) ||
+        isPlaceholderOpenAI,
+      isPlaceholder: !!isPlaceholderOpenAI,
     },
     youtube: {
       apiKey:
