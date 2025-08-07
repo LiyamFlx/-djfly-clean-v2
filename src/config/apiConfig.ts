@@ -24,9 +24,9 @@ const getEnvVar = (
 export const API_CONFIG = {
   // Spotify Configuration
   spotify: {
-    clientId: getEnvVar('VITE_SPOTIFY_CLIENT_ID'),
-    clientSecret: getEnvVar('VITE_SPOTIFY_CLIENT_SECRET'),
-    redirectUri: getEnvVar('VITE_SPOTIFY_REDIRECT_URI'),
+    clientId: getEnvVar('VITE_SPOTIFY_CLIENT_ID') || 'demo_client_id',
+    clientSecret: getEnvVar('VITE_SPOTIFY_CLIENT_SECRET') || 'demo_client_secret',
+    redirectUri: getEnvVar('VITE_SPOTIFY_REDIRECT_URI') || 'http://localhost:5173/auth/spotify/callback',
     scopes: [
       'user-read-private',
       'user-read-email',
@@ -42,13 +42,13 @@ export const API_CONFIG = {
 
   // Supabase Configuration
   supabase: {
-    url: getEnvVar('VITE_SUPABASE_URL'),
-    anonKey: getEnvVar('VITE_SUPABASE_ANON_KEY'),
+    url: getEnvVar('VITE_SUPABASE_URL') || 'https://demo.supabase.co',
+    anonKey: getEnvVar('VITE_SUPABASE_ANON_KEY') || 'demo_anon_key',
   },
 
   // OpenAI Configuration
   openai: {
-    apiKey: getEnvVar('VITE_OPENAI_API_KEY', false),
+    apiKey: getEnvVar('VITE_OPENAI_API_KEY', false) || 'demo_openai_key',
     baseUrl: 'https://api.openai.com/v1',
   },
 
