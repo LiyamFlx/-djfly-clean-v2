@@ -71,6 +71,15 @@ class SpotifyService {
    * Get access token using Client Credentials flow
    */
   private async getAccessToken(): Promise<string> {
+    // Check if we're using demo credentials
+    if (
+      this.clientId === 'demo_client_id' ||
+      this.clientSecret === 'demo_client_secret'
+    ) {
+      console.info('🎵 Spotify: Using demo mode, returning mock token');
+      return 'demo_access_token';
+    }
+
     // Check if we have a valid cached token
     if (this.accessToken && Date.now() < this.tokenExpiry) {
       return this.accessToken;
@@ -130,6 +139,12 @@ class SpotifyService {
     try {
       const token = await this.getAccessToken();
 
+      // Return demo tracks for demo mode
+      if (token === 'demo_access_token') {
+        console.info('🎵 Spotify: Returning demo search results for:', query);
+        return this.getDemoTracks(query, limit);
+      }
+
       const response = await fetch(
         `https://api.spotify.com/v1/search?q=${encodeURIComponent(query)}&type=track&limit=${limit}`,
         {
@@ -148,7 +163,9 @@ class SpotifyService {
       return data.tracks.items.map(this.convertSpotifyTrackToTrack);
     } catch (error) {
       console.error('Spotify search error:', error);
-      throw error;
+      // Return demo tracks as fallback
+      console.info('🎵 Spotify: Falling back to demo tracks');
+      return this.getDemoTracks(query, limit);
     }
   }
 
@@ -417,6 +434,92 @@ class SpotifyService {
       console.error('Failed to enhance tracks with features:', error);
       return tracks;
     }
+  }
+
+  /**
+   * Get demo tracks for fallback mode
+   */
+  private getDemoTracks(query: string, limit: number = 20): Track[] {
+    const demoTracks: Track[] = [
+      {
+        id: 'demo_1',
+        title: 'Epic House Beat',
+        artist: 'DJ Demo',
+        duration: 240,
+        image: '/default-album-art.png',
+        source: 'demo',
+        bpm: 128,
+        genre: 'House',
+        energy: 0.8,
+        popularity: 85,
+      },
+      {
+        id: 'demo_2',
+        title: 'Electronic Vibes',
+        artist: 'Virtual Artist',
+        duration: 195,
+        image: '/default-album-art.png',
+        source: 'demo',
+        bpm: 120,
+        genre: 'Electronic',
+        energy: 0.7,
+        popularity: 78,
+      },
+      {
+        id: 'demo_3',
+        title: 'Dance Floor Anthem',
+        artist: 'Sample Producer',
+        duration: 210,
+        image: '/default-album-art.png',
+        source: 'demo',
+        bpm: 132,
+        genre: 'Dance',
+        energy: 0.9,
+        popularity: 92,
+      },
+      {
+        id: 'demo_4',
+        title: 'Progressive Journey',
+        artist: 'Demo Master',
+        duration: 320,
+        image: '/default-album-art.png',
+        source: 'demo',
+        bpm: 126,
+        genre: 'Progressive House',
+        energy: 0.6,
+        popularity: 73,
+      },
+      {
+        id: 'demo_5',
+        title: 'Tech House Flow',
+        artist: 'Mock DJ',
+        duration: 270,
+        image: '/default-album-art.png',
+        source: 'demo',
+        bpm: 124,
+        genre: 'Tech House',
+        energy: 0.8,
+        popularity: 81,
+      },
+    ];
+
+    // Filter demo tracks based on query if provided
+    if (query && query.trim()) {
+      const searchQuery = query.toLowerCase();
+      const filteredTracks = demoTracks.filter(
+        (track) =>
+          track.title.toLowerCase().includes(searchQuery) ||
+          track.artist.toLowerCase().includes(searchQuery) ||
+          (track.genre && track.genre.toLowerCase().includes(searchQuery))
+      );
+
+      if (filteredTracks.length > 0) {
+        return filteredTracks.slice(0, limit);
+      }
+    }
+
+    // Return all demo tracks if no query or no matches found
+    return demoTracks.slice(0, limit);
   }
 
   /**

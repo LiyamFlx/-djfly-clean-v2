@@ -21,10 +21,12 @@ class OpenAIService {
   constructor() {
     this.apiKey = import.meta.env.VITE_OPENAI_API_KEY || '';
 
-    if (!this.apiKey) {
+    if (!this.apiKey || this.apiKey === 'demo_openai_key') {
       console.warn(
-        'OpenAI API key not configured. Add VITE_OPENAI_API_KEY to your .env file'
+        '🤖 OpenAI API not configured. Using demo mode for AI features.'
       );
+    } else {
+      console.log('🤖 OpenAI service initialized');
     }
   }
 
@@ -137,8 +139,9 @@ class OpenAIService {
     },
     onProgress: (progress: number) => void
   ): Promise<Track[]> {
-    if (!this.apiKey) {
-      throw new Error('OpenAI API key not configured');
+    if (!this.apiKey || this.apiKey === 'demo_openai_key') {
+      console.warn('🤖 OpenAI not available, returning demo crowd suggestions');
+      return this.getDemoCrowdSuggestions(crowdData, onProgress);
     }
 
     onProgress(10);
@@ -234,8 +237,8 @@ class OpenAIService {
     crossfadePoint?: number;
     effects?: string[];
   }> {
-    if (!this.apiKey) {
-      throw new Error('OpenAI API key not configured');
+    if (!this.apiKey || this.apiKey === 'demo_openai_key') {
+      return this.getDemoTransitionSuggestion(currentTrack, nextTrack);
     }
 
     const messages: OpenAIMessage[] = [
@@ -295,11 +298,8 @@ class OpenAIService {
     suggestions: string[];
     reorderedTracks?: Track[];
   }> {
-    if (!this.apiKey || tracks.length < 3) {
-      return {
-        score: 0.8,
-        suggestions: ['Add more tracks for better analysis'],
-      };
+    if (!this.apiKey || this.apiKey === 'demo_openai_key' || tracks.length < 3) {
+      return this.getDemoPlaylistAnalysis(tracks);
     }
 
     const trackList = tracks
@@ -394,6 +394,83 @@ class OpenAIService {
     onProgress(100);
     console.info('🎵 Using demo playlist for prompt:', prompt);
     return demoTracks;
+  }
+
+  /**
+   * Get demo crowd suggestions when OpenAI is not available
+   */
+  private async getDemoCrowdSuggestions(
+    crowdData: { energy: number; mood: string; engagement: string },
+    onProgress: (progress: number) => void
+  ): Promise<Track[]> {
+    onProgress(30);
+    await new Promise(resolve => setTimeout(resolve, 800));
+    
+    // Return demo tracks based on crowd energy
+    const tracks = await spotifyService.searchTracks('demo electronic house', 5);
+    onProgress(100);
+    
+    console.info('🎵 Demo crowd suggestions based on:', crowdData);
+    return tracks;
+  }
+
+  /**
+   * Get demo transition suggestion when OpenAI is not available
+   */
+  private getDemoTransitionSuggestion(currentTrack: Track, nextTrack: Track): {
+    suggestion: string;
+    bpmAdjustment?: number;
+    crossfadePoint?: number;
+    effects?: string[];
+  } {
+    const currentBpm = currentTrack.bpm || 128;
+    const nextBpm = nextTrack.bpm || 128;
+    const bpmDiff = Math.abs(currentBpm - nextBpm);
+    
+    console.info('🎵 Demo transition suggestion between tracks:', currentTrack.title, '→', nextTrack.title);
+    
+    return {
+      suggestion: bpmDiff > 10 
+        ? 'Use pitch adjustment to match BPMs, then apply a smooth crossfade' 
+        : 'Perfect BPM match! Use a standard crossfade transition',
+      bpmAdjustment: bpmDiff > 10 ? (nextBpm - currentBpm) / currentBpm : 0,
+      crossfadePoint: 32,
+      effects: bpmDiff > 5 ? ['reverb', 'filter'] : ['filter']
+    };
+  }
+
+  /**
+   * Get demo playlist analysis when OpenAI is not available
+   */
+  private getDemoPlaylistAnalysis(tracks: Track[]): {
+    score: number;
+    suggestions: string[];
+    reorderedTracks?: Track[];
+  } {
+    if (tracks.length < 3) {
+      return {
+        score: 0.6,
+        suggestions: ['Add more tracks for better flow analysis', 'Consider BPM progression']
+      };
+    }
+
+    // Basic analysis based on BPM progression
+    const bpms = tracks.map(t => t.bpm || 128);
+    const avgBpm = bpms.reduce((a, b) => a + b, 0) / bpms.length;
+    const bpmVariance = bpms.reduce((sum, bpm) => sum + Math.pow(bpm - avgBpm, 2), 0) / bpms.length;
+    
+    const score = Math.max(0.5, Math.min(0.95, 1 - (bpmVariance / 1000)));
+    
+    console.info('🎵 Demo playlist analysis for', tracks.length, 'tracks, score:', score);
+    
+    return {
+      score,
+      suggestions: [
+        score < 0.7 ? 'Consider smoother BPM transitions between tracks' : 'Good BPM flow!',
+        'Try grouping tracks by key for harmonic mixing',
+        'Consider the energy curve throughout the set'
+      ]
+    };
   }
 
   /**

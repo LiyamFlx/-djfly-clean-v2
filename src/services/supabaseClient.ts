@@ -96,9 +96,24 @@ class SupabaseService {
   }
 
   private initialize() {
-    if (!API_CONFIG.supabase.url || !API_CONFIG.supabase.anonKey) {
-      console.warn('⚠️ Supabase not configured. Database features disabled.');
+    const isDemoMode =
+      API_CONFIG.supabase.url === 'https://demo.supabase.co' ||
+      API_CONFIG.supabase.anonKey === 'demo_anon_key';
+
+    if (
+      !API_CONFIG.supabase.url ||
+      !API_CONFIG.supabase.anonKey ||
+      isDemoMode
+    ) {
+      if (isDemoMode) {
+        console.warn(
+          '🗄️ Supabase demo mode: Using local storage for data persistence'
+        );
+      } else {
+        console.warn('⚠️ Supabase not configured. Database features disabled.');
+      }
       serviceStatus.setServiceStatus('supabase', false);
+      this.isConnected = false;
       return;
     }
 
@@ -108,8 +123,6 @@ class SupabaseService {
         API_CONFIG.supabase.anonKey
       );
 
-      this.isConnected = true;
-      serviceStatus.setServiceStatus('supabase', true);
       console.log('🗄️ Supabase client initialized');
 
       // Test connection
@@ -117,6 +130,7 @@ class SupabaseService {
     } catch (error) {
       console.error('Failed to initialize Supabase client:', error);
       serviceStatus.setServiceStatus('supabase', false);
+      this.isConnected = false;
     }
   }
 
@@ -134,9 +148,14 @@ class SupabaseService {
         throw error;
       }
 
+      this.isConnected = true;
+      serviceStatus.setServiceStatus('supabase', true);
       console.log('✅ Supabase connection successful');
     } catch (error) {
-      console.warn('⚠️ Supabase connection test failed:', error);
+      console.warn(
+        '⚠️ Supabase connection test failed, using local storage fallback:',
+        error
+      );
       this.isConnected = false;
       serviceStatus.setServiceStatus('supabase', false);
     }

@@ -29,7 +29,9 @@
       "Bash(git tag:*)",
       "Bash(netlify deploy:*)",
       "Bash(netlify init:*)",
-      "WebFetch(domain:djfly-clean-v2-4xabzzynp-liyams-projects.vercel.app)"
+      "WebFetch(domain:djfly-clean-v2-4xabzzynp-liyams-projects.vercel.app)",
+      "Bash(npx tsc:*)",
+      "WebFetch(domain:djfly-clean-v2-jxqr2z67q-liyams-projects.vercel.app)"
     ],
     "deny": []
   }

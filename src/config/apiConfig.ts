@@ -10,7 +10,7 @@ const getEnvVar = (
 ): string | undefined => {
   const value = import.meta.env[key];
   const isDev = import.meta.env.DEV || import.meta.env.VITE_DEV_MODE === 'true';
-  
+
   if (!value) {
     if (required && !isDev) {
       console.warn(`⚠️ Missing required environment variable: ${key}`);
@@ -25,8 +25,11 @@ export const API_CONFIG = {
   // Spotify Configuration
   spotify: {
     clientId: getEnvVar('VITE_SPOTIFY_CLIENT_ID') || 'demo_client_id',
-    clientSecret: getEnvVar('VITE_SPOTIFY_CLIENT_SECRET') || 'demo_client_secret',
-    redirectUri: getEnvVar('VITE_SPOTIFY_REDIRECT_URI') || 'http://localhost:5173/auth/spotify/callback',
+    clientSecret:
+      getEnvVar('VITE_SPOTIFY_CLIENT_SECRET') || 'demo_client_secret',
+    redirectUri:
+      getEnvVar('VITE_SPOTIFY_REDIRECT_URI') ||
+      'http://localhost:5173/auth/spotify/callback',
     scopes: [
       'user-read-private',
       'user-read-email',
@@ -123,10 +126,9 @@ export const validateApiConfig = () => {
   const isPlaceholderSpotifySecret = API_CONFIG.spotify.clientSecret?.match(
     /^(xyz456|7e76b6a7c1434b1a|demo_client_secret)/
   );
-  
-  const isPlaceholderOpenAI = API_CONFIG.openai.apiKey?.match(
-    /^(demo_openai_key)/
-  );
+
+  const isPlaceholderOpenAI =
+    API_CONFIG.openai.apiKey?.match(/^(demo_openai_key)/);
 
   const validations = {
     spotify: {
