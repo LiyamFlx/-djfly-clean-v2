@@ -1,3 +1,4 @@
+import React from 'react';
 import { motion } from 'framer-motion';
 import { BarChart, TrendingUp, Users, Clock, Award } from 'lucide-react';
 import { useSessionState, useCrowdState } from '@/store';

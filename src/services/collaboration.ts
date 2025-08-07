@@ -61,7 +61,7 @@ class CollaborationService {
   private maxReconnectAttempts = 5;
   private reconnectDelay = 1000;
   private currentSession: CollaborativeSession | null = null;
-  private eventListeners: Map<string, Function[]> = new Map();
+  private eventListeners: Map<string, ((data?: unknown) => void)[]> = new Map();
 
   constructor() {
     this.initializeWebSocket();
@@ -170,7 +170,7 @@ class CollaborationService {
   /**
    * Add event listener
    */
-  on(event: string, listener: Function) {
+  on(event: string, listener: (data?: unknown) => void) {
     if (!this.eventListeners.has(event)) {
       this.eventListeners.set(event, []);
     }
@@ -180,7 +180,7 @@ class CollaborationService {
   /**
    * Remove event listener
    */
-  off(event: string, listener: Function) {
+  off(event: string, listener: (data?: unknown) => void) {
     const listeners = this.eventListeners.get(event);
     if (listeners) {
       const index = listeners.indexOf(listener);

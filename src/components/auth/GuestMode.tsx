@@ -3,6 +3,7 @@
  * Enables frictionless demo experience without user registration
  */
 
+import React from 'react';
 import { motion } from 'framer-motion';
 import { Play, Music, Zap, Share } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
@@ -26,32 +27,32 @@ const GuestMode: React.FC<GuestModeProps> = ({ onStartDemo, onSignUp }) => {
   const demoFeatures = [
     {
       icon: Music,
-      title: "Mix Demo Tracks",
-      description: "12 curated professional DJ tracks ready to mix"
+      title: 'Mix Demo Tracks',
+      description: '12 curated professional DJ tracks ready to mix',
     },
     {
       icon: Zap,
-      title: "Real-time Effects",
-      description: "Professional EQ, filters, reverb, and delay"
+      title: 'Real-time Effects',
+      description: 'Professional EQ, filters, reverb, and delay',
     },
     {
       icon: Share,
-      title: "Share Your Sets",
-      description: "Create shareable links with 'Made with DJfly' branding"
-    }
+      title: 'Share Your Sets',
+      description: "Create shareable links with 'Made with DJfly' branding",
+    },
   ];
 
   const limitations = [
-    "10-minute session limit",
-    "Demo track library only", 
-    "Sets include DJfly watermark",
-    "Can't save sets permanently"
+    '10-minute session limit',
+    'Demo track library only',
+    'Sets include DJfly watermark',
+    "Can't save sets permanently",
   ];
 
   return (
     <div className="max-w-2xl mx-auto p-6 space-y-8">
       {/* Hero Section */}
-      <motion.div 
+      <motion.div
         className="text-center space-y-4"
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
@@ -66,14 +67,17 @@ const GuestMode: React.FC<GuestModeProps> = ({ onStartDemo, onSignUp }) => {
       </motion.div>
 
       {/* Demo Features */}
-      <motion.div 
+      <motion.div
         className="grid gap-4 md:grid-cols-3"
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.6, delay: 0.2 }}
       >
         {demoFeatures.map((feature, index) => (
-          <div key={index} className="bg-gray-800/50 rounded-lg p-4 text-center">
+          <div
+            key={index}
+            className="bg-gray-800/50 rounded-lg p-4 text-center"
+          >
             <feature.icon className="w-8 h-8 mx-auto mb-2 text-blue-400" />
             <h3 className="font-semibold text-white mb-1">{feature.title}</h3>
             <p className="text-sm text-gray-400">{feature.description}</p>
@@ -82,7 +86,7 @@ const GuestMode: React.FC<GuestModeProps> = ({ onStartDemo, onSignUp }) => {
       </motion.div>
 
       {/* CTA Buttons */}
-      <motion.div 
+      <motion.div
         className="flex flex-col sm:flex-row gap-4"
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
@@ -95,7 +99,7 @@ const GuestMode: React.FC<GuestModeProps> = ({ onStartDemo, onSignUp }) => {
           <Play className="w-5 h-5" />
           Start Demo (No Signup)
         </button>
-        
+
         <button
           onClick={onSignUp}
           className="flex-1 bg-gray-700 hover:bg-gray-600 text-white font-semibold py-4 px-6 rounded-lg transition-all duration-200"
@@ -105,7 +109,7 @@ const GuestMode: React.FC<GuestModeProps> = ({ onStartDemo, onSignUp }) => {
       </motion.div>
 
       {/* Demo Limitations */}
-      <motion.div 
+      <motion.div
         className="bg-amber-900/20 border border-amber-600/30 rounded-lg p-4"
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
@@ -125,7 +129,7 @@ const GuestMode: React.FC<GuestModeProps> = ({ onStartDemo, onSignUp }) => {
       </motion.div>
 
       {/* Upgrade Benefits Preview */}
-      <motion.div 
+      <motion.div
         className="bg-gradient-to-r from-green-900/20 to-blue-900/20 border border-green-600/30 rounded-lg p-4"
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
@@ -155,7 +159,7 @@ const GuestMode: React.FC<GuestModeProps> = ({ onStartDemo, onSignUp }) => {
       </motion.div>
 
       {/* Quick Demo Video/Preview */}
-      <motion.div 
+      <motion.div
         className="text-center"
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}

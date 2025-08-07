@@ -107,11 +107,11 @@ class SupabaseService {
         API_CONFIG.supabase.url,
         API_CONFIG.supabase.anonKey
       );
-      
+
       this.isConnected = true;
       serviceStatus.setServiceStatus('supabase', true);
       console.log('🗄️ Supabase client initialized');
-      
+
       // Test connection
       this.testConnection();
     } catch (error) {
@@ -128,11 +128,12 @@ class SupabaseService {
         .from('users')
         .select('count')
         .limit(1);
-      
-      if (error && error.code !== 'PGRST116') { // PGRST116 is "not found" which is ok
+
+      if (error && error.code !== 'PGRST116') {
+        // PGRST116 is "not found" which is ok
         throw error;
       }
-      
+
       console.log('✅ Supabase connection successful');
     } catch (error) {
       console.warn('⚠️ Supabase connection test failed:', error);
@@ -144,7 +145,12 @@ class SupabaseService {
   /**
    * Save DJ session data
    */
-  async saveDJSession(userId: string, sessionId: string, sessionData: SetMetrics, insights?: SetInsights): Promise<boolean> {
+  async saveDJSession(
+    userId: string,
+    sessionId: string,
+    sessionData: SetMetrics,
+    insights?: SetInsights
+  ): Promise<boolean> {
     if (!this.client || !this.isConnected) {
       console.warn('Supabase not available, saving session locally');
       this.saveSessionLocally(sessionId, sessionData, insights);
@@ -152,15 +158,13 @@ class SupabaseService {
     }
 
     try {
-      const { error } = await this.client
-        .from('dj_sessions')
-        .insert({
-          user_id: userId,
-          session_id: sessionId,
-          session_data: sessionData,
-          insights_data: insights,
-          performance_score: insights?.performanceScore || 0
-        });
+      const { error } = await this.client.from('dj_sessions').insert({
+        user_id: userId,
+        session_id: sessionId,
+        session_data: sessionData,
+        insights_data: insights,
+        performance_score: insights?.performanceScore || 0,
+      });
 
       if (error) throw error;
 
@@ -202,24 +206,28 @@ class SupabaseService {
   /**
    * Save user preferences
    */
-  async saveUserPreferences(userId: string, preferences: {
-    favorite_genres?: string[];
-    preferred_bpm_range?: { min: number; max: number };
-    settings?: Record<string, any>;
-  }): Promise<boolean> {
+  async saveUserPreferences(
+    userId: string,
+    preferences: {
+      favorite_genres?: string[];
+      preferred_bpm_range?: { min: number; max: number };
+      settings?: Record<string, any>;
+    }
+  ): Promise<boolean> {
     if (!this.client || !this.isConnected) {
-      localStorage.setItem(`djfly_preferences_${userId}`, JSON.stringify(preferences));
+      localStorage.setItem(
+        `djfly_preferences_${userId}`,
+        JSON.stringify(preferences)
+      );
       return false;
     }
 
     try {
-      const { error } = await this.client
-        .from('user_preferences')
-        .upsert({
-          user_id: userId,
-          ...preferences,
-          updated_at: new Date().toISOString()
-        });
+      const { error } = await this.client.from('user_preferences').upsert({
+        user_id: userId,
+        ...preferences,
+        updated_at: new Date().toISOString(),
+      });
 
       if (error) throw error;
 
@@ -227,7 +235,10 @@ class SupabaseService {
       return true;
     } catch (error) {
       console.error('Failed to save user preferences:', error);
-      localStorage.setItem(`djfly_preferences_${userId}`, JSON.stringify(preferences));
+      localStorage.setItem(
+        `djfly_preferences_${userId}`,
+        JSON.stringify(preferences)
+      );
       return false;
     }
   }
@@ -261,13 +272,20 @@ class SupabaseService {
   /**
    * Fallback: Save session locally
    */
-  private saveSessionLocally(sessionId: string, sessionData: SetMetrics, insights?: SetInsights) {
+  private saveSessionLocally(
+    sessionId: string,
+    sessionData: SetMetrics,
+    insights?: SetInsights
+  ) {
     try {
-      localStorage.setItem(`djfly_session_${sessionId}`, JSON.stringify({
-        sessionData,
-        insights,
-        timestamp: Date.now()
-      }));
+      localStorage.setItem(
+        `djfly_session_${sessionId}`,
+        JSON.stringify({
+          sessionData,
+          insights,
+          timestamp: Date.now(),
+        })
+      );
 
       // Update sessions list
       const sessions = this.getLocalSessions();
@@ -276,7 +294,7 @@ class SupabaseService {
         created_at: new Date().toISOString(),
         session_data: sessionData,
         insights_data: insights,
-        performance_score: insights?.performanceScore || 0
+        performance_score: insights?.performanceScore || 0,
       });
 
       // Keep only last 20

@@ -35,8 +35,9 @@ class OpenAIService {
     prompt: string,
     onProgress: (progress: number) => void
   ): Promise<Track[]> {
-    if (!this.apiKey) {
-      throw new Error('OpenAI API key not configured');
+    if (!this.apiKey || this.apiKey === 'demo_openai_key') {
+      console.warn('🤖 OpenAI API not available, returning demo playlist');
+      return this.getDemoPlaylist(prompt, onProgress);
     }
 
     onProgress(10);
@@ -351,10 +352,55 @@ class OpenAIService {
   }
 
   /**
+   * Get demo playlist when OpenAI is not available
+   */
+  private async getDemoPlaylist(prompt: string, onProgress: (progress: number) => void): Promise<Track[]> {
+    onProgress(20);
+    
+    // Simulate API delay
+    await new Promise(resolve => setTimeout(resolve, 1000));
+    onProgress(50);
+    
+    // Demo tracks based on prompt keywords
+    const demoTracks: Track[] = [
+      {
+        id: 'demo1',
+        title: 'Electronic Dreams',
+        artist: 'Demo Artist',
+        duration: 180,
+        image: 'https://via.placeholder.com/300x300/6366f1/ffffff?text=🎵',
+        source: 'demo' as const,
+        genre: 'Electronic',
+        bpm: 128,
+        key: 'A minor',
+        energy: 0.8,
+        preview_url: '/demo-track-1.mp3'
+      },
+      {
+        id: 'demo2', 
+        title: 'Future Bass Flow',
+        artist: 'AI Generated',
+        duration: 200,
+        image: 'https://via.placeholder.com/300x300/8b5cf6/ffffff?text=🎶',
+        source: 'demo' as const,
+        genre: 'Future Bass',
+        bpm: 140,
+        key: 'C major',
+        energy: 0.9,
+        preview_url: '/demo-track-1.mp3'
+      }
+    ];
+    
+    onProgress(100);
+    console.info('🎵 Using demo playlist for prompt:', prompt);
+    return demoTracks;
+  }
+
+  /**
    * Check if OpenAI is properly configured
    */
   isConfigured(): boolean {
-    return !!this.apiKey;
+    return !!this.apiKey && this.apiKey !== 'demo_openai_key';
   }
 }
 

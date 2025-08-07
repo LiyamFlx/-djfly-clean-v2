@@ -13,6 +13,7 @@ const mockAudio = {
   src: '',
 };
 
+// eslint-disable-next-line no-undef
 global.Audio = vi.fn().mockImplementation(() => mockAudio);
 
 describe('useAudioPlayer', () => {

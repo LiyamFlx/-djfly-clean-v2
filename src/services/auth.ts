@@ -334,11 +334,13 @@ class AuthService {
   /**
    * Make authenticated API request
    */
+  // eslint-disable-next-line no-undef
   async apiRequest<T>(endpoint: string, options: RequestInit = {}): Promise<T> {
     const url = endpoint.startsWith('http')
       ? endpoint
       : `${this.baseUrl}${endpoint}`;
 
+    // eslint-disable-next-line no-undef
     const config: RequestInit = {
       ...options,
       headers: {

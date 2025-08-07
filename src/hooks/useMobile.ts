@@ -70,7 +70,7 @@ export function useMobile(): MobileFeatures {
       // Detect PWA/standalone mode
       const isStandalone =
         window.matchMedia('(display-mode: standalone)').matches ||
-        (window.navigator as any).standalone ||
+        (window.navigator as { standalone?: boolean }).standalone ||
         document.referrer.includes('android-app://');
 
       setMobileFeatures({
@@ -159,7 +159,7 @@ export function useTouchGestures() {
     }
   ) => {
     let startTime = 0;
-    let longPressTimer: NodeJS.Timeout;
+    let longPressTimer: number;
     const minSwipeDistance = 50;
     const maxTapDistance = 10;
     const longPressDelay = 500;
@@ -178,7 +178,7 @@ export function useTouchGestures() {
       // Start long press timer
       longPressTimer = setTimeout(() => {
         callbacks.onLongPress?.();
-      }, longPressDelay);
+      }, longPressDelay) as unknown as number;
     };
 
     let lastMoveTime = 0;
@@ -247,6 +247,7 @@ export function useTouchGestures() {
     };
 
     // Use passive listeners for better performance
+    // eslint-disable-next-line no-undef
     const options: AddEventListenerOptions = { passive: true };
     element.addEventListener('touchstart', handleStart, options);
     element.addEventListener('touchmove', handleMove, options);

@@ -47,7 +47,7 @@ global.MediaRecorder = class MockMediaRecorder {
   onstop: (() => void) | null = null;
   state = 'inactive';
 
-  constructor(stream: MediaStream, options?: MediaRecorderOptions) {
+  constructor(stream: MediaStream, options?: Record<string, unknown>) {
     console.log(
       'Mock MediaRecorder created with stream:',
       stream,

@@ -75,28 +75,29 @@ class AnalyticsEngine {
    */
   private calculateCrowdResponse(track: any): number {
     let score = 7; // Base score
-    
+
     // BPM influence (sweet spot around 120-130)
     const bpm = track.bpm || 120;
     if (bpm >= 120 && bpm <= 130) score += 1;
     else if (bpm >= 110 && bpm <= 140) score += 0.5;
-    
+
     // Genre influence
     const popularGenres = ['House', 'Electronic', 'Techno'];
-    if (popularGenres.some(genre => track.genre?.includes(genre))) score += 0.5;
-    
+    if (popularGenres.some((genre) => track.genre?.includes(genre)))
+      score += 0.5;
+
     // Energy level influence
     if (track.energy === 'high') score += 0.5;
     else if (track.energy === 'low') score -= 0.5;
-    
+
     // Add some controlled randomness for realism
     score += (Math.random() - 0.5) * 2;
-    
+
     return Math.max(1, Math.min(10, Number(score.toFixed(1))));
   }
   private currentSession: SetMetrics | null = null;
   private isTracking = false;
-  private trackingInterval: NodeJS.Timeout | null = null;
+  private trackingInterval: number | null = null;
   private currentTrackStart: Date | null = null;
   private sessionMetrics: TrackMetrics[] = [];
   private energyHistory: number[] = [];
@@ -142,7 +143,7 @@ class AnalyticsEngine {
     // Start real-time monitoring
     this.trackingInterval = setInterval(() => {
       this.collectRealTimeMetrics();
-    }, 1000);
+    }, 1000) as unknown as number;
 
     console.log(`📊 Analytics session started: ${sessionId}`);
     return sessionId;
@@ -639,7 +640,7 @@ class AnalyticsEngine {
       // Generate insights for storage
       const insights = await this.generateInsights();
       const userId = this.getCurrentUserId();
-      
+
       // Try to save to Supabase first
       const savedToSupabase = await supabaseService.saveDJSession(
         userId,
@@ -658,7 +659,6 @@ class AnalyticsEngine {
       // Also maintain local backup
       const storageKey = `djfly_session_${this.currentSession.sessionId}`;
       localStorage.setItem(storageKey, JSON.stringify(this.currentSession));
-
     } catch (error) {
       console.error('❌ Failed to store session data:', error);
     }
@@ -684,12 +684,12 @@ class AnalyticsEngine {
     try {
       const userId = this.getCurrentUserId();
       const sessions = await supabaseService.getUserSessions(userId);
-      
+
       if (sessions.length > 0) {
         console.log(`📊 Retrieved ${sessions.length} sessions from database`);
         return sessions;
       }
-      
+
       // Fallback to local storage
       return JSON.parse(localStorage.getItem('djfly_all_sessions') || '[]');
     } catch (error) {

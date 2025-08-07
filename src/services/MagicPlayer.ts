@@ -1,7 +1,7 @@
 /**
  * MagicPlayer: Universal Bulletproof Audio Engine
  * Seamless, error-free, and policy-compliant audio for every user and device
- * 
+ *
  * Features:
  * - Universal format support (MP3, WAV, OGG, AAC, M4A)
  * - Audio policy compliance and gesture requirements
@@ -42,8 +42,22 @@ export interface AudioAnalytics {
   error?: string;
 }
 
-type AudioState = 'idle' | 'loading' | 'loaded' | 'playing' | 'paused' | 'ended' | 'error';
-type PlaybackEvent = 'play' | 'pause' | 'ended' | 'error' | 'loaded' | 'progress' | 'buffer';
+type AudioState =
+  | 'idle'
+  | 'loading'
+  | 'loaded'
+  | 'playing'
+  | 'paused'
+  | 'ended'
+  | 'error';
+type PlaybackEvent =
+  | 'play'
+  | 'pause'
+  | 'ended'
+  | 'error'
+  | 'loaded'
+  | 'progress'
+  | 'buffer';
 
 class MagicPlayer {
   private audioContext: AudioContext | null = null;
@@ -51,19 +65,19 @@ class MagicPlayer {
   private gainNode: GainNode | null = null;
   private analyserNode: AnalyserNode | null = null;
   private sourceNode: MediaElementAudioSourceNode | null = null;
-  
+
   private state: AudioState = 'idle';
   private currentSource: AudioSource | null = null;
   private playbackOptions: PlaybackOptions = {};
-  
+
   private eventListeners = new Map<PlaybackEvent, ((data: any) => void)[]>();
   private fadeInterval: number | null = null;
   private retryCount = 0;
   private maxRetries = 3;
-  
+
   private isUserGestureReceived = false;
   private pendingPlay = false;
-  
+
   // Memory management
   private audioCache = new Map<string, HTMLAudioElement>();
   private maxCacheSize = 10;
@@ -99,19 +113,21 @@ class MagicPlayer {
         // Create audio nodes
         this.gainNode = this.audioContext.createGain();
         this.analyserNode = this.audioContext.createAnalyser();
-        
+
         // Configure analyser
         this.analyserNode.fftSize = 2048;
         this.analyserNode.smoothingTimeConstant = 0.8;
-        
+
         // Connect nodes: source -> gain -> analyser -> destination
         this.gainNode.connect(this.analyserNode);
         this.analyserNode.connect(this.audioContext.destination);
 
         console.log('🎵 MagicPlayer: Audio context initialized');
       }
-    } catch (error) {
-      console.warn('⚠️ MagicPlayer: Web Audio API not available, using HTML5 Audio fallback');
+    } catch {
+      console.warn(
+        '⚠️ MagicPlayer: Web Audio API not available, using HTML5 Audio fallback'
+      );
       // HTML5 Audio fallback will be used
     }
   }
@@ -126,7 +142,7 @@ class MagicPlayer {
       if (this.audioContext.state === 'suspended') {
         await this.audioContext.resume();
         console.log('🎵 Audio context resumed after user gesture');
-        
+
         if (this.pendingPlay) {
           this.pendingPlay = false;
           this.play();
@@ -151,8 +167,11 @@ class MagicPlayer {
     };
 
     // Multiple interaction types for broader compatibility
-    ['click', 'touchstart', 'keydown', 'touchend'].forEach(eventType => {
-      document.addEventListener(eventType, enableAudio, { once: true, passive: true });
+    ['click', 'touchstart', 'keydown', 'touchend'].forEach((eventType) => {
+      document.addEventListener(eventType, enableAudio, {
+        once: true,
+        passive: true,
+      });
     });
 
     // Handle page visibility changes
@@ -188,17 +207,20 @@ class MagicPlayer {
   /**
    * Load audio source with format detection and fallbacks
    */
-  async load(source: AudioSource, options: PlaybackOptions = {}): Promise<void> {
+  async load(
+    source: AudioSource,
+    options: PlaybackOptions = {}
+  ): Promise<void> {
     try {
       this.setState('loading');
       this.currentSource = source;
       this.playbackOptions = { ...options };
-      
+
       console.log(`🎵 Loading: ${source.title} by ${source.artist}`);
 
       // Check cache first
       let audio = this.audioCache.get(source.id);
-      
+
       if (!audio) {
         audio = await this.createOptimizedAudioElement(source);
         this.cacheAudio(source.id, audio);
@@ -206,29 +228,29 @@ class MagicPlayer {
 
       this.currentAudio = audio;
       await this.setupAudioNodes();
-      
+
       // Configure audio element
       if (options.volume !== undefined) {
         this.setVolume(options.volume);
       }
-      
+
       if (options.loop) {
         audio.loop = true;
       }
-      
+
       if (options.startTime) {
         audio.currentTime = options.startTime;
       }
 
       this.setState('loaded');
       this.emit('loaded', { source, duration: audio.duration });
-      
     } catch (error) {
       console.error('🚨 MagicPlayer load error:', error);
       this.setState('error');
-      const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+      const errorMessage =
+        error instanceof Error ? error.message : 'Unknown error';
       this.emit('error', { error: errorMessage, source });
-      
+
       // Try fallback sources
       await this.tryFallbackSources(source);
     }
@@ -237,28 +259,38 @@ class MagicPlayer {
   /**
    * Create optimized audio element with format detection
    */
-  private async createOptimizedAudioElement(source: AudioSource): Promise<HTMLAudioElement> {
+  private async createOptimizedAudioElement(
+    source: AudioSource
+  ): Promise<HTMLAudioElement> {
     const audio = new Audio();
-    
+
     // Configure for optimal performance
     audio.preload = this.playbackOptions.preload ? 'auto' : 'metadata';
     audio.crossOrigin = 'anonymous';
-    
+
     // Set up error handling
     return new Promise((resolve, reject) => {
       const timeout = setTimeout(() => {
         reject(new Error('Audio load timeout'));
       }, 15000); // 15 second timeout
 
-      audio.addEventListener('canplaythrough', () => {
-        clearTimeout(timeout);
-        resolve(audio);
-      }, { once: true });
+      audio.addEventListener(
+        'canplaythrough',
+        () => {
+          clearTimeout(timeout);
+          resolve(audio);
+        },
+        { once: true }
+      );
 
-      audio.addEventListener('error', () => {
-        clearTimeout(timeout);
-        reject(new Error(`Audio load failed: ${audio.error?.message}`));
-      }, { once: true });
+      audio.addEventListener(
+        'error',
+        () => {
+          clearTimeout(timeout);
+          reject(new Error(`Audio load failed: ${audio.error?.message}`));
+        },
+        { once: true }
+      );
 
       // Try to load the audio
       audio.src = source.url;
@@ -279,12 +311,17 @@ class MagicPlayer {
       }
 
       // Create new media element source
-      this.sourceNode = this.audioContext.createMediaElementSource(this.currentAudio);
+      this.sourceNode = this.audioContext.createMediaElementSource(
+        this.currentAudio
+      );
       this.sourceNode.connect(this.gainNode);
 
       console.log('🔗 Audio nodes connected');
     } catch (error) {
-      console.warn('Audio node setup failed, using HTML5 Audio fallback:', error);
+      console.warn(
+        'Audio node setup failed, using HTML5 Audio fallback:',
+        error
+      );
       // Continue without Web Audio API features
     }
   }
@@ -316,7 +353,7 @@ class MagicPlayer {
 
       // Attempt to play
       const playPromise = this.currentAudio.play();
-      
+
       if (playPromise) {
         await playPromise;
       }
@@ -324,24 +361,28 @@ class MagicPlayer {
       this.setState('playing');
       this.emit('play', this.getAnalytics());
       this.retryCount = 0; // Reset retry count on successful play
-      
+
       console.log(`▶️ Playing: ${this.currentSource?.title}`);
-      
     } catch (error) {
       console.error('🚨 Play error:', error);
-      
+
       if (error instanceof Error && error.name === 'NotAllowedError') {
-        console.log('⏳ Play blocked by browser policy, waiting for user interaction...');
+        console.log(
+          '⏳ Play blocked by browser policy, waiting for user interaction...'
+        );
         this.pendingPlay = true;
       } else {
         this.setState('error');
-        const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+        const errorMessage =
+          error instanceof Error ? error.message : 'Unknown error';
         this.emit('error', { error: errorMessage });
-        
+
         // Retry logic
         if (this.retryCount < this.maxRetries) {
           this.retryCount++;
-          console.log(`🔄 Retrying playback (${this.retryCount}/${this.maxRetries})`);
+          console.log(
+            `🔄 Retrying playback (${this.retryCount}/${this.maxRetries})`
+          );
           setTimeout(() => this.play(), 1000 * this.retryCount);
         }
       }
@@ -362,9 +403,8 @@ class MagicPlayer {
       this.currentAudio.pause();
       this.setState('paused');
       this.emit('pause', this.getAnalytics());
-      
+
       console.log(`⏸️ Paused: ${this.currentSource?.title}`);
-      
     } catch (error) {
       console.error('Pause error:', error);
     }
@@ -380,14 +420,13 @@ class MagicPlayer {
       this.currentAudio.pause();
       this.currentAudio.currentTime = 0;
       this.setState('idle');
-      
+
       if (this.fadeInterval) {
         clearInterval(this.fadeInterval);
         this.fadeInterval = null;
       }
-      
+
       console.log(`⏹️ Stopped: ${this.currentSource?.title}`);
-      
     } catch (error) {
       console.error('Stop error:', error);
     }
@@ -398,9 +437,12 @@ class MagicPlayer {
    */
   setVolume(volume: number): void {
     const clampedVolume = Math.max(0, Math.min(1, volume));
-    
+
     if (this.gainNode) {
-      this.gainNode.gain.setValueAtTime(clampedVolume, this.audioContext!.currentTime);
+      this.gainNode.gain.setValueAtTime(
+        clampedVolume,
+        this.audioContext!.currentTime
+      );
     } else if (this.currentAudio) {
       this.currentAudio.volume = clampedVolume;
     }
@@ -413,7 +455,10 @@ class MagicPlayer {
     if (!this.currentAudio) return;
 
     try {
-      const clampedTime = Math.max(0, Math.min(this.currentAudio.duration || 0, time));
+      const clampedTime = Math.max(
+        0,
+        Math.min(this.currentAudio.duration || 0, time)
+      );
       this.currentAudio.currentTime = clampedTime;
       console.log(`⏩ Seeked to ${clampedTime}s`);
     } catch (error) {
@@ -445,7 +490,7 @@ class MagicPlayer {
       const startTime = this.audioContext.currentTime;
       this.gainNode.gain.setValueAtTime(1, startTime);
       this.gainNode.gain.linearRampToValueAtTime(0, startTime + duration);
-      
+
       setTimeout(resolve, duration * 1000);
     });
   }
@@ -455,27 +500,29 @@ class MagicPlayer {
    */
   private async tryFallbackSources(originalSource: AudioSource): Promise<void> {
     const fallbackFormats = ['mp3', 'ogg', 'wav'];
-    
+
     for (const format of fallbackFormats) {
       if (format === originalSource.format) continue;
-      
+
       try {
-        const fallbackUrl = originalSource.url.replace(/\.[^.]+$/, `.${format}`);
+        const fallbackUrl = originalSource.url.replace(
+          /\.[^.]+$/,
+          `.${format}`
+        );
         const fallbackSource: AudioSource = {
           ...originalSource,
           url: fallbackUrl,
-          format: format as any
+          format: format as any,
         };
-        
+
         console.log(`🔄 Trying fallback format: ${format}`);
         await this.load(fallbackSource, this.playbackOptions);
         return;
-        
       } catch (error) {
         console.warn(`Fallback ${format} failed:`, error);
       }
     }
-    
+
     console.error('🚨 All fallback sources failed');
   }
 
@@ -485,8 +532,10 @@ class MagicPlayer {
   private async retryPlayback(): Promise<void> {
     if (this.currentSource && this.retryCount < this.maxRetries) {
       this.retryCount++;
-      console.log(`🔄 Retrying playback (${this.retryCount}/${this.maxRetries})`);
-      
+      console.log(
+        `🔄 Retrying playback (${this.retryCount}/${this.maxRetries})`
+      );
+
       try {
         await this.load(this.currentSource, this.playbackOptions);
         if (this.state === 'loaded') {
@@ -514,7 +563,7 @@ class MagicPlayer {
         this.audioCache.delete(firstKey);
       }
     }
-    
+
     this.audioCache.set(id, audio);
   }
 
@@ -524,7 +573,11 @@ class MagicPlayer {
   private cleanupMemory(): void {
     // Clean up unused cached audio
     for (const [id, audio] of this.audioCache.entries()) {
-      if (audio !== this.currentAudio && audio.paused && audio.currentTime === 0) {
+      if (
+        audio !== this.currentAudio &&
+        audio.paused &&
+        audio.currentTime === 0
+      ) {
         audio.src = '';
         audio.load();
         this.audioCache.delete(id);
@@ -534,7 +587,9 @@ class MagicPlayer {
     // Log memory status
     if ((performance as any).memory) {
       const memory = (performance as any).memory;
-      console.log(`🧠 Memory: ${(memory.usedJSHeapSize / 1048576).toFixed(1)}MB used`);
+      console.log(
+        `🧠 Memory: ${(memory.usedJSHeapSize / 1048576).toFixed(1)}MB used`
+      );
     }
   }
 
@@ -543,7 +598,7 @@ class MagicPlayer {
    */
   getAnalytics(): AudioAnalytics {
     const audio = this.currentAudio;
-    
+
     return {
       currentTime: audio?.currentTime || 0,
       duration: audio?.duration || 0,
@@ -552,7 +607,7 @@ class MagicPlayer {
       isLoading: this.state === 'loading',
       bufferProgress: this.getBufferProgress(),
       playbackRate: audio?.playbackRate || 1,
-      error: this.state === 'error' ? 'Playback error occurred' : undefined
+      error: this.state === 'error' ? 'Playback error occurred' : undefined,
     };
   }
 
@@ -561,16 +616,18 @@ class MagicPlayer {
    */
   private getBufferProgress(): number {
     if (!this.currentAudio) return 0;
-    
+
     try {
       const buffered = this.currentAudio.buffered;
       if (buffered.length > 0) {
-        return (buffered.end(buffered.length - 1) / this.currentAudio.duration) * 100;
+        return (
+          (buffered.end(buffered.length - 1) / this.currentAudio.duration) * 100
+        );
       }
-    } catch (error) {
+    } catch {
       // Ignore buffered access errors
     }
-    
+
     return 0;
   }
 
@@ -579,7 +636,7 @@ class MagicPlayer {
    */
   getFrequencyData(): Uint8Array {
     if (!this.analyserNode) return new Uint8Array(0);
-    
+
     const dataArray = new Uint8Array(this.analyserNode.frequencyBinCount);
     this.analyserNode.getByteFrequencyData(dataArray);
     return dataArray;
@@ -590,7 +647,7 @@ class MagicPlayer {
    */
   getTimeDomainData(): Uint8Array {
     if (!this.analyserNode) return new Uint8Array(0);
-    
+
     const dataArray = new Uint8Array(this.analyserNode.frequencyBinCount);
     this.analyserNode.getByteTimeDomainData(dataArray);
     return dataArray;
@@ -635,7 +692,7 @@ class MagicPlayer {
   private emit(event: PlaybackEvent, data: any): void {
     const listeners = this.eventListeners.get(event);
     if (listeners) {
-      listeners.forEach(callback => {
+      listeners.forEach((callback) => {
         try {
           callback(data);
         } catch (error) {
@@ -665,35 +722,35 @@ class MagicPlayer {
   dispose(): void {
     // Stop playback
     this.stop();
-    
+
     // Clear intervals
     if (this.fadeInterval) {
       clearInterval(this.fadeInterval);
     }
-    
+
     if (this.resourceCleanupInterval) {
       clearInterval(this.resourceCleanupInterval);
     }
-    
+
     // Cleanup audio cache
     for (const audio of this.audioCache.values()) {
       audio.src = '';
       audio.load();
     }
     this.audioCache.clear();
-    
+
     // Cleanup audio context
     if (this.sourceNode) {
       this.sourceNode.disconnect();
     }
-    
+
     if (this.audioContext?.state !== 'closed') {
       this.audioContext?.close();
     }
-    
+
     // Clear event listeners
     this.eventListeners.clear();
-    
+
     console.log('🧹 MagicPlayer disposed');
   }
 }

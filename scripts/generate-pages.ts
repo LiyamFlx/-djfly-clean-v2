@@ -185,6 +185,7 @@ export default NotFoundPage;
 
 // Create the files
 pages.forEach(({ path: filePath, content }) => {
+  // eslint-disable-next-line no-undef
   const fullPath = path.join(process.cwd(), filePath);
   const dir = path.dirname(fullPath);
 

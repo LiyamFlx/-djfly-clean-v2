@@ -29,12 +29,12 @@ interface AuthState {
   user: User | null;
   isAuthenticated: boolean;
   isLoading: boolean;
-  
+
   // Guest state
   isGuestMode: boolean;
   guestSession: GuestSession | null;
   guestTimeRemaining: number;
-  
+
   // Actions
   login: (user: User) => void;
   logout: () => void;
@@ -42,7 +42,7 @@ interface AuthState {
   exitGuestMode: () => void;
   updateGuestTime: () => void;
   extendGuestSession: () => void;
-  
+
   // Permissions
   canAccessFeature: (feature: string) => boolean;
   getFeatureLimitations: () => string[];
@@ -68,7 +68,7 @@ export const useAuthStore = create<AuthState>()(
           isAuthenticated: true,
           isGuestMode: false,
           guestSession: null,
-          guestTimeRemaining: 0
+          guestTimeRemaining: 0,
         });
       },
 
@@ -78,7 +78,7 @@ export const useAuthStore = create<AuthState>()(
           isAuthenticated: false,
           isGuestMode: false,
           guestSession: null,
-          guestTimeRemaining: 0
+          guestTimeRemaining: 0,
         });
       },
 
@@ -95,7 +95,7 @@ export const useAuthStore = create<AuthState>()(
             'basic-mixing',
             'effects',
             'sharing',
-            'analytics-basic'
+            'analytics-basic',
           ],
           limitations: [
             '10-minute session limit',
@@ -103,8 +103,8 @@ export const useAuthStore = create<AuthState>()(
             'Watermarked sharing',
             'Cannot save sets',
             'No AI recommendations',
-            'No Spotify integration'
-          ]
+            'No Spotify integration',
+          ],
         };
 
         set({
@@ -112,7 +112,7 @@ export const useAuthStore = create<AuthState>()(
           guestSession,
           guestTimeRemaining: GUEST_MAX_DURATION,
           isAuthenticated: false,
-          user: null
+          user: null,
         });
 
         // Start countdown timer
@@ -123,7 +123,9 @@ export const useAuthStore = create<AuthState>()(
             return;
           }
 
-          const elapsed = Math.floor((Date.now() - state.guestSession.startTime) / 1000);
+          const elapsed = Math.floor(
+            (Date.now() - state.guestSession.startTime) / 1000
+          );
           const remaining = Math.max(0, GUEST_MAX_DURATION - elapsed);
 
           if (remaining <= 0) {
@@ -133,12 +135,12 @@ export const useAuthStore = create<AuthState>()(
             return;
           }
 
-          set({ 
+          set({
             guestTimeRemaining: remaining,
             guestSession: {
               ...state.guestSession,
-              duration: elapsed
-            }
+              duration: elapsed,
+            },
           });
         }, 1000);
       },
@@ -147,7 +149,7 @@ export const useAuthStore = create<AuthState>()(
         set({
           isGuestMode: false,
           guestSession: null,
-          guestTimeRemaining: 0
+          guestTimeRemaining: 0,
         });
       },
 
@@ -155,15 +157,17 @@ export const useAuthStore = create<AuthState>()(
         const state = get();
         if (!state.guestSession) return;
 
-        const elapsed = Math.floor((Date.now() - state.guestSession.startTime) / 1000);
+        const elapsed = Math.floor(
+          (Date.now() - state.guestSession.startTime) / 1000
+        );
         const remaining = Math.max(0, GUEST_MAX_DURATION - elapsed);
 
-        set({ 
+        set({
           guestTimeRemaining: remaining,
           guestSession: {
             ...state.guestSession,
-            duration: elapsed
-          }
+            duration: elapsed,
+          },
         });
       },
 
@@ -172,7 +176,7 @@ export const useAuthStore = create<AuthState>()(
         if (!state.guestSession) return;
 
         // Extend by another 5 minutes (one time only)
-        const newMaxDuration = state.guestSession.maxDuration + (5 * 60);
+        const newMaxDuration = state.guestSession.maxDuration + 5 * 60;
         const elapsed = state.guestSession.duration;
         const remaining = Math.max(0, newMaxDuration - elapsed);
 
@@ -180,42 +184,42 @@ export const useAuthStore = create<AuthState>()(
           guestTimeRemaining: remaining,
           guestSession: {
             ...state.guestSession,
-            maxDuration: newMaxDuration
-          }
+            maxDuration: newMaxDuration,
+          },
         });
       },
 
       // Permission system
       canAccessFeature: (feature: string) => {
         const state = get();
-        
+
         // Authenticated users have full access
         if (state.isAuthenticated && state.user) {
           return true;
         }
-        
+
         // Guest users have limited access
         if (state.isGuestMode && state.guestSession) {
           return state.guestSession.features.includes(feature);
         }
-        
+
         // No access for unauthenticated users
         return false;
       },
 
       getFeatureLimitations: () => {
         const state = get();
-        
+
         if (state.isAuthenticated && state.user) {
           return []; // No limitations for authenticated users
         }
-        
+
         if (state.isGuestMode && state.guestSession) {
           return state.guestSession.limitations;
         }
-        
+
         return ['Please sign in to access features'];
-      }
+      },
     }),
     {
       name: 'djfly-auth-storage',
@@ -224,7 +228,7 @@ export const useAuthStore = create<AuthState>()(
         user: state.user,
         isAuthenticated: state.isAuthenticated,
         // Exclude guest mode state from persistence
-      })
+      }),
     }
   )
 );
@@ -236,24 +240,24 @@ export const useAuth = () => {
 };
 
 export const useGuestSession = () => {
-  const { 
-    isGuestMode, 
-    guestSession, 
-    guestTimeRemaining, 
+  const {
+    isGuestMode,
+    guestSession,
+    guestTimeRemaining,
     exitGuestMode,
-    extendGuestSession 
+    extendGuestSession,
   } = useAuthStore();
-  
-  return { 
-    isGuestMode, 
-    guestSession, 
-    guestTimeRemaining, 
+
+  return {
+    isGuestMode,
+    guestSession,
+    guestTimeRemaining,
     exitGuestMode,
     extendGuestSession,
     // Helper computed values
     timeRemainingFormatted: formatTime(guestTimeRemaining),
     isTimeRunningLow: guestTimeRemaining < 120, // Less than 2 minutes
-    canExtendSession: guestSession?.maxDuration === GUEST_MAX_DURATION
+    canExtendSession: guestSession?.maxDuration === GUEST_MAX_DURATION,
   };
 };
 

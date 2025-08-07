@@ -3,11 +3,11 @@
  * Uses AI to simulate realistic crowd reactions and provide DJ guidance
  */
 
-import { useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Users, TrendingUp, TrendingDown, Minus, Zap } from 'lucide-react';
 import { aiMusicEngine } from '@/services/aiMusicEngine';
-import type { Track } from '@/services/musicLibrary';
+import type { Track } from '@/types';
 
 interface CrowdResponseProps {
   currentTrack?: Track;
@@ -27,9 +27,11 @@ const CrowdResponseSimulator: React.FC<CrowdResponseProps> = ({
   currentTrack,
   previousTracks = [],
   venue = 'club',
-  onEnergyChange
+  onEnergyChange,
 }) => {
-  const [crowdResponse, setCrowdResponse] = useState<CrowdResponse | null>(null);
+  const [crowdResponse, setCrowdResponse] = useState<CrowdResponse | null>(
+    null
+  );
   const [isAnalyzing, setIsAnalyzing] = useState(false);
   const [energyHistory, setEnergyHistory] = useState<number[]>([]);
 
@@ -39,23 +41,22 @@ const CrowdResponseSimulator: React.FC<CrowdResponseProps> = ({
 
     const simulateResponse = async () => {
       setIsAnalyzing(true);
-      
+
       try {
         const response = await aiMusicEngine.simulateCrowdResponse(
           currentTrack,
           previousTracks,
           venue
         );
-        
+
         const crowdData: CrowdResponse = {
           ...response,
-          timestamp: Date.now()
+          timestamp: Date.now(),
         };
-        
+
         setCrowdResponse(crowdData);
-        setEnergyHistory(prev => [...prev.slice(-9), response.energy]); // Keep last 10
+        setEnergyHistory((prev) => [...prev.slice(-9), response.energy]); // Keep last 10
         onEnergyChange?.(response.energy);
-        
       } catch (error) {
         console.warn('Crowd simulation failed:', error);
       } finally {
@@ -80,9 +81,12 @@ const CrowdResponseSimulator: React.FC<CrowdResponseProps> = ({
 
   // Get energy color and icon
   const getEnergyDisplay = (energy: number) => {
-    if (energy >= 80) return { color: 'text-green-400', bg: 'bg-green-900/30', icon: Zap };
-    if (energy >= 60) return { color: 'text-blue-400', bg: 'bg-blue-900/30', icon: TrendingUp };
-    if (energy >= 40) return { color: 'text-yellow-400', bg: 'bg-yellow-900/30', icon: Minus };
+    if (energy >= 80)
+      return { color: 'text-green-400', bg: 'bg-green-900/30', icon: Zap };
+    if (energy >= 60)
+      return { color: 'text-blue-400', bg: 'bg-blue-900/30', icon: TrendingUp };
+    if (energy >= 40)
+      return { color: 'text-yellow-400', bg: 'bg-yellow-900/30', icon: Minus };
     return { color: 'text-red-400', bg: 'bg-red-900/30', icon: TrendingDown };
   };
 
@@ -145,37 +149,52 @@ const CrowdResponseSimulator: React.FC<CrowdResponseProps> = ({
                 <div className="flex items-center gap-2">
                   {(() => {
                     const TrendIcon = getTrendIcon();
-                    const trendColor = getEnergyTrend() === 'rising' ? 'text-green-400' : 
-                                     getEnergyTrend() === 'falling' ? 'text-red-400' : 'text-gray-400';
+                    const trendColor =
+                      getEnergyTrend() === 'rising'
+                        ? 'text-green-400'
+                        : getEnergyTrend() === 'falling'
+                          ? 'text-red-400'
+                          : 'text-gray-400';
                     return <TrendIcon className={`w-4 h-4 ${trendColor}`} />;
                   })()}
-                  <span className={getEnergyDisplay(crowdResponse.energy).color}>
+                  <span
+                    className={getEnergyDisplay(crowdResponse.energy).color}
+                  >
                     {crowdResponse.energy}/100
                   </span>
                 </div>
               </div>
-              
+
               <div className="w-full bg-gray-700 rounded-full h-3 overflow-hidden">
                 <motion.div
                   className={`h-full rounded-full ${
-                    crowdResponse.energy >= 80 ? 'bg-gradient-to-r from-green-500 to-green-400' :
-                    crowdResponse.energy >= 60 ? 'bg-gradient-to-r from-blue-500 to-blue-400' :
-                    crowdResponse.energy >= 40 ? 'bg-gradient-to-r from-yellow-500 to-yellow-400' :
-                    'bg-gradient-to-r from-red-500 to-red-400'
+                    crowdResponse.energy >= 80
+                      ? 'bg-gradient-to-r from-green-500 to-green-400'
+                      : crowdResponse.energy >= 60
+                        ? 'bg-gradient-to-r from-blue-500 to-blue-400'
+                        : crowdResponse.energy >= 40
+                          ? 'bg-gradient-to-r from-yellow-500 to-yellow-400'
+                          : 'bg-gradient-to-r from-red-500 to-red-400'
                   }`}
                   initial={{ width: 0 }}
                   animate={{ width: `${crowdResponse.energy}%` }}
-                  transition={{ duration: 1, ease: "easeOut" }}
+                  transition={{ duration: 1, ease: 'easeOut' }}
                 />
               </div>
             </div>
 
             {/* Crowd Response */}
-            <div className={`${getEnergyDisplay(crowdResponse.energy).bg} border-l-4 ${
-              crowdResponse.energy >= 80 ? 'border-green-400' :
-              crowdResponse.energy >= 60 ? 'border-blue-400' :
-              crowdResponse.energy >= 40 ? 'border-yellow-400' : 'border-red-400'
-            } p-3 rounded-r-lg`}>
+            <div
+              className={`${getEnergyDisplay(crowdResponse.energy).bg} border-l-4 ${
+                crowdResponse.energy >= 80
+                  ? 'border-green-400'
+                  : crowdResponse.energy >= 60
+                    ? 'border-blue-400'
+                    : crowdResponse.energy >= 40
+                      ? 'border-yellow-400'
+                      : 'border-red-400'
+              } p-3 rounded-r-lg`}
+            >
               <p className="text-sm text-white font-medium">
                 {crowdResponse.response}
               </p>
@@ -215,9 +234,13 @@ const CrowdResponseSimulator: React.FC<CrowdResponseProps> = ({
                     <motion.div
                       key={index}
                       className={`w-2 rounded-t ${
-                        energy >= 80 ? 'bg-green-400' :
-                        energy >= 60 ? 'bg-blue-400' :
-                        energy >= 40 ? 'bg-yellow-400' : 'bg-red-400'
+                        energy >= 80
+                          ? 'bg-green-400'
+                          : energy >= 60
+                            ? 'bg-blue-400'
+                            : energy >= 40
+                              ? 'bg-yellow-400'
+                              : 'bg-red-400'
                       }`}
                       initial={{ height: 0 }}
                       animate={{ height: `${(energy / 100) * 100}%` }}

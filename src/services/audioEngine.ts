@@ -219,7 +219,7 @@ export class AudioEngine {
     if (wetness > 0) {
       try {
         this.convolver.connect(this.audioContext.destination);
-      } catch (e) {
+      } catch {
         // Already connected
       }
     } else {

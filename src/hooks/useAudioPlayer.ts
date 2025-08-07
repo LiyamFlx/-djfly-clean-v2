@@ -9,7 +9,10 @@ export interface UseAudioPlayerOptions {
   fadeOutDuration?: number;
 }
 
-export function useAudioPlayer(src: string, options: UseAudioPlayerOptions = {}) {
+export function useAudioPlayer(
+  src: string,
+  options: UseAudioPlayerOptions = {}
+) {
   const [isPlaying, setIsPlaying] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [duration, setDuration] = useState(0);
@@ -17,7 +20,7 @@ export function useAudioPlayer(src: string, options: UseAudioPlayerOptions = {})
   const [volume, setVolumeState] = useState(options.volume || 1);
   const [error, setError] = useState<string | null>(null);
   const [bufferProgress, setBufferProgress] = useState(0);
-  
+
   const currentSourceRef = useRef<AudioSource | null>(null);
   const progressIntervalRef = useRef<number | null>(null);
 
@@ -26,13 +29,13 @@ export function useAudioPlayer(src: string, options: UseAudioPlayerOptions = {})
     const urlObj = new URL(url, window.location.origin);
     const filename = urlObj.pathname.split('/').pop() || 'unknown';
     const extension = filename.split('.').pop()?.toLowerCase() as any;
-    
+
     return {
       id: url,
       url,
-      title: filename.replace(/\.[^/.]+$/, ""), // Remove extension
+      title: filename.replace(/\.[^/.]+$/, ''), // Remove extension
       artist: 'Unknown Artist',
-      format: extension || 'mp3'
+      format: extension || 'mp3',
     };
   }, []);
 
@@ -87,24 +90,26 @@ export function useAudioPlayer(src: string, options: UseAudioPlayerOptions = {})
   useEffect(() => {
     if (src) {
       const audioSource = createAudioSource(src);
-      
+
       // Only load if it's a different source
       if (!currentSourceRef.current || currentSourceRef.current.url !== src) {
         setIsLoading(true);
         setError(null);
         currentSourceRef.current = audioSource;
-        
-        magicPlayer.load(audioSource, {
-          volume: options.volume,
-          loop: options.loop,
-          preload: true,
-          fadeInDuration: options.fadeInDuration,
-          fadeOutDuration: options.fadeOutDuration
-        }).catch((error) => {
-          console.error('Failed to load audio source:', error);
-          setError(error.message);
-          setIsLoading(false);
-        });
+
+        magicPlayer
+          .load(audioSource, {
+            volume: options.volume,
+            loop: options.loop,
+            preload: true,
+            fadeInDuration: options.fadeInDuration,
+            fadeOutDuration: options.fadeOutDuration,
+          })
+          .catch((error) => {
+            console.error('Failed to load audio source:', error);
+            setError(error.message);
+            setIsLoading(false);
+          });
       }
     }
   }, [src, createAudioSource, options]);
@@ -135,10 +140,12 @@ export function useAudioPlayer(src: string, options: UseAudioPlayerOptions = {})
     try {
       setError(null);
       await magicPlayer.play();
-      
+
       // Auto-play may require user interaction
       if (!magicPlayer.isPlaying()) {
-        console.log('⏳ Waiting for user interaction to enable audio playback...');
+        console.log(
+          '⏳ Waiting for user interaction to enable audio playback...'
+        );
       }
     } catch (error: any) {
       console.error('Play failed:', error);
@@ -194,24 +201,24 @@ export function useAudioPlayer(src: string, options: UseAudioPlayerOptions = {})
     volume,
     error,
     bufferProgress,
-    
+
     // Actions
     play,
     pause,
     stop,
     seek,
     setVolume,
-    
+
     // Analytics
     getFrequencyData,
     getTimeDomainData,
-    
+
     // Utilities
     progress: duration > 0 ? (currentTime / duration) * 100 : 0,
     formatTime: (seconds: number) => {
       const mins = Math.floor(seconds / 60);
       const secs = Math.floor(seconds % 60);
       return `${mins}:${secs.toString().padStart(2, '0')}`;
-    }
+    },
   };
 }

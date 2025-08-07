@@ -9,7 +9,7 @@ import {
 import { motion } from 'framer-motion';
 import { PlaylistGenerator } from '@/services/musicLibrary';
 import ApiStatusIndicator from '@/components/ApiStatusIndicator';
-import type { Track } from '@/services/musicLibrary';
+import type { Track } from '@/types';
 
 // Lazy load heavy components for better performance
 const LoginPage = lazy(() => import('@/pages/auth/LoginPage'));
@@ -18,7 +18,7 @@ const PlayerPage = lazy(() => import('@/pages/PlayerPage'));
 const GuestMode = lazy(() => import('@/components/auth/GuestMode'));
 
 // Loading component for Suspense fallback
-const LoadingSpinner = ({ message = "Loading..." }: { message?: string }) => (
+const LoadingSpinner = ({ message = 'Loading...' }: { message?: string }) => (
   <div className="min-h-screen bg-club-gradient flex items-center justify-center">
     <div className="text-center">
       <div className="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-blue-400 mb-4"></div>
@@ -275,7 +275,7 @@ const appState = {
 };
 
 // Initialize with tracks asynchronously
-PlaylistGenerator.generateByVibe('mixed').then(tracks => {
+PlaylistGenerator.generateByVibe('mixed').then((tracks) => {
   if (tracks.length > 0) {
     appState.queue = tracks;
     console.log('🎵 Initial playlist loaded:', tracks.length, 'tracks');
@@ -290,11 +290,15 @@ const HomePage = () => (
     </div>
     <div className="max-w-4xl mx-auto text-center">
       <h1 className="text-4xl font-bold text-blue-400 mb-4">DJfly</h1>
-      <p className="text-xl mb-8">AI-powered DJ platform that reads any room instantly</p>
-      
+      <p className="text-xl mb-8">
+        AI-powered DJ platform that reads any room instantly
+      </p>
+
       {/* Quick Demo Access */}
       <div className="bg-gradient-to-r from-blue-900/30 to-purple-900/30 border border-blue-600/30 rounded-xl p-6 mb-8">
-        <h2 className="text-2xl font-bold mb-3">🎵 Try DJfly Now - No Signup Required</h2>
+        <h2 className="text-2xl font-bold mb-3">
+          🎵 Try DJfly Now - No Signup Required
+        </h2>
         <p className="text-gray-300 mb-4">
           Experience AI-powered music discovery with our 10-minute demo
         </p>
@@ -317,19 +321,26 @@ const HomePage = () => (
       {/* Feature Highlights */}
       <div className="grid md:grid-cols-3 gap-6 mb-8">
         <div className="bg-gray-800 p-4 rounded-lg">
-          <h3 className="text-lg font-semibold mb-2 text-blue-400">🤖 AI Music Discovery</h3>
+          <h3 className="text-lg font-semibold mb-2 text-blue-400">
+            🤖 AI Music Discovery
+          </h3>
           <p className="text-sm text-gray-300">
-            Our AI analyzes crowd energy and generates perfect playlists instantly
+            Our AI analyzes crowd energy and generates perfect playlists
+            instantly
           </p>
         </div>
         <div className="bg-gray-800 p-4 rounded-lg">
-          <h3 className="text-lg font-semibold mb-2 text-purple-400">🎯 Smart Matching</h3>
+          <h3 className="text-lg font-semibold mb-2 text-purple-400">
+            🎯 Smart Matching
+          </h3>
           <p className="text-sm text-gray-300">
             Record crowd noise to get AI-powered track recommendations
           </p>
         </div>
         <div className="bg-gray-800 p-4 rounded-lg">
-          <h3 className="text-lg font-semibold mb-2 text-green-400">🎧 Professional Tools</h3>
+          <h3 className="text-lg font-semibold mb-2 text-green-400">
+            🎧 Professional Tools
+          </h3>
           <p className="text-sm text-gray-300">
             Real-time effects, BPM matching, and seamless mixing
           </p>
@@ -394,30 +405,37 @@ const MagicMatchPage = () => {
 
         // AI-powered crowd analysis and playlist generation
         setStatus('complete');
-        
+
         try {
           const { aiMusicEngine } = await import('@/services/aiMusicEngine');
-          
+
           // Simulate crowd energy detection (in real app this would analyze audio)
           const crowdEnergy = Math.floor(Math.random() * 40) + 60; // 60-100 for demo
-          const timeOfDay = new Date().getHours() > 18 ? 'evening' : 'afternoon';
-          
+          const timeOfDay =
+            new Date().getHours() > 18 ? 'evening' : 'afternoon';
+
           // Generate AI-powered recommendations
-          const recommendation = await aiMusicEngine.generateIntelligentPlaylist({
-            prompt: `Crowd energy detected: ${crowdEnergy}/100. Generate playlist for current vibe and energy level.`,
-            mood: crowdEnergy > 80 ? 'energetic' : crowdEnergy > 60 ? 'progressive' : 'mixed',
-            crowdEnergy,
-            timeOfDay: timeOfDay as any,
-            venue: 'club',
-            duration: 45
-          });
-          
+          const recommendation =
+            await aiMusicEngine.generateIntelligentPlaylist({
+              prompt: `Crowd energy detected: ${crowdEnergy}/100. Generate playlist for current vibe and energy level.`,
+              mood:
+                crowdEnergy > 80
+                  ? 'energetic'
+                  : crowdEnergy > 60
+                    ? 'progressive'
+                    : 'mixed',
+              crowdEnergy,
+              timeOfDay: timeOfDay as any,
+              venue: 'club',
+              duration: 45,
+            });
+
           setAiAnalysis({
             crowdEnergy,
             timeOfDay,
-            recommendation
+            recommendation,
           });
-          
+
           appState.queue = recommendation.tracks;
         } catch (error) {
           console.warn('AI analysis failed, using fallback:', error);
@@ -471,14 +489,20 @@ const MagicMatchPage = () => {
         {status === 'complete' && (
           <div className="text-center">
             <div className="bg-green-900 bg-opacity-30 p-6 rounded-lg mb-8">
-              <h2 className="text-2xl font-bold mb-2">🤖 AI Analysis Complete!</h2>
+              <h2 className="text-2xl font-bold mb-2">
+                🤖 AI Analysis Complete!
+              </h2>
               {aiAnalysis && (
                 <div className="mb-4 space-y-2">
                   <p className="text-green-300">
-                    Crowd Energy: <span className="font-bold">{aiAnalysis.crowdEnergy}/100</span>
+                    Crowd Energy:{' '}
+                    <span className="font-bold">
+                      {aiAnalysis.crowdEnergy}/100
+                    </span>
                   </p>
                   <p className="text-green-300">
-                    Time: <span className="capitalize">{aiAnalysis.timeOfDay}</span>
+                    Time:{' '}
+                    <span className="capitalize">{aiAnalysis.timeOfDay}</span>
                   </p>
                   {aiAnalysis.recommendation && (
                     <p className="text-sm text-green-200">
@@ -542,15 +566,15 @@ const MagicSetPage = () => {
     try {
       // Import AI engine dynamically
       const { aiMusicEngine } = await import('@/services/aiMusicEngine');
-      
+
       // Generate AI-powered playlist
       const recommendation = await aiMusicEngine.generateIntelligentPlaylist({
         prompt,
         mood: detectMoodFromPrompt(prompt),
         duration: 60, // 1 hour default
-        venue: detectVenueFromPrompt(prompt)
+        venue: detectVenueFromPrompt(prompt),
       });
-      
+
       setAiRecommendation(recommendation);
       setGeneratedTracks(recommendation.tracks);
       setStatus('complete');
@@ -566,20 +590,39 @@ const MagicSetPage = () => {
   };
 
   // Helper functions to detect mood and venue from prompt
-  const detectMoodFromPrompt = (prompt: string): 'energetic' | 'chill' | 'progressive' | 'mixed' => {
+  const detectMoodFromPrompt = (
+    prompt: string
+  ): 'energetic' | 'chill' | 'progressive' | 'mixed' => {
     const lowerPrompt = prompt.toLowerCase();
-    if (lowerPrompt.includes('energetic') || lowerPrompt.includes('party') || lowerPrompt.includes('dance')) return 'energetic';
-    if (lowerPrompt.includes('chill') || lowerPrompt.includes('relax') || lowerPrompt.includes('lounge')) return 'chill';
-    if (lowerPrompt.includes('progressive') || lowerPrompt.includes('build')) return 'progressive';
+    if (
+      lowerPrompt.includes('energetic') ||
+      lowerPrompt.includes('party') ||
+      lowerPrompt.includes('dance')
+    )
+      return 'energetic';
+    if (
+      lowerPrompt.includes('chill') ||
+      lowerPrompt.includes('relax') ||
+      lowerPrompt.includes('lounge')
+    )
+      return 'chill';
+    if (lowerPrompt.includes('progressive') || lowerPrompt.includes('build'))
+      return 'progressive';
     return 'mixed';
   };
 
-  const detectVenueFromPrompt = (prompt: string): 'club' | 'lounge' | 'festival' | 'radio' | 'workout' => {
+  const detectVenueFromPrompt = (
+    prompt: string
+  ): 'club' | 'lounge' | 'festival' | 'radio' | 'workout' => {
     const lowerPrompt = prompt.toLowerCase();
-    if (lowerPrompt.includes('club') || lowerPrompt.includes('nightclub')) return 'club';
-    if (lowerPrompt.includes('lounge') || lowerPrompt.includes('cocktail')) return 'lounge';
-    if (lowerPrompt.includes('festival') || lowerPrompt.includes('outdoor')) return 'festival';
-    if (lowerPrompt.includes('workout') || lowerPrompt.includes('gym')) return 'workout';
+    if (lowerPrompt.includes('club') || lowerPrompt.includes('nightclub'))
+      return 'club';
+    if (lowerPrompt.includes('lounge') || lowerPrompt.includes('cocktail'))
+      return 'lounge';
+    if (lowerPrompt.includes('festival') || lowerPrompt.includes('outdoor'))
+      return 'festival';
+    if (lowerPrompt.includes('workout') || lowerPrompt.includes('gym'))
+      return 'workout';
     return 'club';
   };
 
@@ -757,14 +800,18 @@ const MagicSetPage = () => {
             {/* AI Mixing Tips */}
             {aiRecommendation?.mixingTips && (
               <div className="bg-blue-900 bg-opacity-30 p-4 rounded-xl mb-6">
-                <h3 className="text-lg font-semibold mb-2 text-blue-300">🎧 AI Mixing Tips</h3>
+                <h3 className="text-lg font-semibold mb-2 text-blue-300">
+                  🎧 AI Mixing Tips
+                </h3>
                 <ul className="space-y-1 text-sm text-blue-200">
-                  {aiRecommendation.mixingTips.map((tip: string, index: number) => (
-                    <li key={index} className="flex items-start gap-2">
-                      <span className="text-blue-400">•</span>
-                      {tip}
-                    </li>
-                  ))}
+                  {aiRecommendation.mixingTips.map(
+                    (tip: string, index: number) => (
+                      <li key={index} className="flex items-start gap-2">
+                        <span className="text-blue-400">•</span>
+                        {tip}
+                      </li>
+                    )
+                  )}
                 </ul>
               </div>
             )}
@@ -945,42 +992,50 @@ function App() {
           <Route path="/studio" element={<StudioPage />} />
           <Route path="/studio/match" element={<MagicMatchPage />} />
           <Route path="/studio/set" element={<MagicSetPage />} />
-          <Route 
-            path="/player" 
+          <Route
+            path="/player"
             element={
-              <Suspense fallback={<LoadingSpinner message="Loading DJ Player..." />}>
+              <Suspense
+                fallback={<LoadingSpinner message="Loading DJ Player..." />}
+              >
                 <PlayerPage />
               </Suspense>
-            } 
+            }
           />
           <Route path="/profile" element={<ProfilePage />} />
 
           {/* Guest Mode Route */}
-          <Route 
-            path="/guest" 
+          <Route
+            path="/guest"
             element={
-              <Suspense fallback={<LoadingSpinner message="Setting up demo..." />}>
+              <Suspense
+                fallback={<LoadingSpinner message="Setting up demo..." />}
+              >
                 <GuestMode onStartDemo={() => {}} onSignUp={() => {}} />
               </Suspense>
-            } 
+            }
           />
 
           {/* Authentication Routes */}
-          <Route 
-            path="/auth/login" 
+          <Route
+            path="/auth/login"
             element={
-              <Suspense fallback={<LoadingSpinner message="Loading login..." />}>
+              <Suspense
+                fallback={<LoadingSpinner message="Loading login..." />}
+              >
                 <LoginPage />
               </Suspense>
-            } 
+            }
           />
-          <Route 
-            path="/auth/signup" 
+          <Route
+            path="/auth/signup"
             element={
-              <Suspense fallback={<LoadingSpinner message="Loading signup..." />}>
+              <Suspense
+                fallback={<LoadingSpinner message="Loading signup..." />}
+              >
                 <SignupPage />
               </Suspense>
-            } 
+            }
           />
           <Route
             path="/auth/forgot-password"

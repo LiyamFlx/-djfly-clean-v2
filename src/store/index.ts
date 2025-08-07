@@ -1,5 +1,6 @@
 import { create } from 'zustand';
 import { immer } from 'zustand/middleware/immer';
+import { useShallow } from 'zustand/react/shallow';
 // import { getAiPlaylist } from '@/services/api';
 import type {
   Track,
@@ -279,41 +280,51 @@ export const useAIState = () => useDJflyStore((state) => state.ai);
 export const useSessionState = () => useDJflyStore((state) => state.session);
 export const useUIState = () => useDJflyStore((state) => state.ui);
 
-// Action hooks
+// Action hooks with useShallow to prevent infinite re-renders
 export const useAudioActions = () =>
-  useDJflyStore((state) => ({
-    setCurrentTrack: state.setCurrentTrack,
-    setQueue: state.setQueue,
-    addToQueue: state.addToQueue,
-    removeFromQueue: state.removeFromQueue,
-    togglePlayback: state.togglePlayback,
-    setVolume: state.setVolume,
-    updateProgress: state.updateProgress,
-  }));
+  useDJflyStore(
+    useShallow((state) => ({
+      setCurrentTrack: state.setCurrentTrack,
+      setQueue: state.setQueue,
+      addToQueue: state.addToQueue,
+      removeFromQueue: state.removeFromQueue,
+      togglePlayback: state.togglePlayback,
+      setVolume: state.setVolume,
+      updateProgress: state.updateProgress,
+    }))
+  );
 
 export const useCrowdActions = () =>
-  useDJflyStore((state) => ({
-    startListening: state.startListening,
-    stopListening: state.stopListening,
-    updateCrowdMetrics: state.updateCrowdMetrics,
-  }));
+  useDJflyStore(
+    useShallow((state) => ({
+      startListening: state.startListening,
+      stopListening: state.stopListening,
+      updateCrowdMetrics: state.updateCrowdMetrics,
+    }))
+  );
 
 export const useAIActions = () =>
-  useDJflyStore((state) => ({
-    generateSet: state.generateSet,
-    analyzeAudio: state.analyzeAudio,
-  }));
+  useDJflyStore(
+    useShallow((state) => ({
+      generateSet: state.generateSet,
+      analyzeAudio: state.analyzeAudio,
+    }))
+  );
 
 export const useSessionActions = () =>
-  useDJflyStore((state) => ({
-    startSession: state.startSession,
-    endSession: state.endSession,
-    updateSessionMetrics: state.updateSessionMetrics,
-  }));
+  useDJflyStore(
+    useShallow((state) => ({
+      startSession: state.startSession,
+      endSession: state.endSession,
+      updateSessionMetrics: state.updateSessionMetrics,
+    }))
+  );
 
 export const useUIActions = () =>
-  useDJflyStore((state) => ({
-    setCurrentPage: state.setCurrentPage,
-    toggleOnboarding: state.toggleOnboarding,
-    setMobileView: state.setMobileView,
-  }));
+  useDJflyStore(
+    useShallow((state) => ({
+      setCurrentPage: state.setCurrentPage,
+      toggleOnboarding: state.toggleOnboarding,
+      setMobileView: state.setMobileView,
+    }))
+  );

@@ -22,21 +22,5 @@
       "purpose": "maskable any"
     }
   ],
-  "categories": ["music", "entertainment", "productivity"],
-  "screenshots": [
-    {
-      "src": "screenshot-wide.png",
-      "sizes": "1280x720",
-      "type": "image/png",
-      "form_factor": "wide",
-      "label": "DJ Player Interface"
-    },
-    {
-      "src": "screenshot-narrow.png",
-      "sizes": "375x812",
-      "type": "image/png",
-      "form_factor": "narrow",
-      "label": "Mobile DJ Controller"
-    }
-  ]
+  "categories": ["music", "entertainment", "productivity"]
 }

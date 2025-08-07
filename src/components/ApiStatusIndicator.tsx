@@ -17,7 +17,7 @@ const ApiStatusIndicator: React.FC = () => {
   const [services, setServices] = useState<ServiceStatus>({
     spotify: false,
     supabase: false,
-    openai: false
+    openai: false,
   });
   const [isExpanded, setIsExpanded] = useState(false);
   const [isTesting, setIsTesting] = useState(false);
@@ -25,13 +25,13 @@ const ApiStatusIndicator: React.FC = () => {
   useEffect(() => {
     // Initial status check
     updateServiceStatus();
-    
+
     // Test connections on mount
     testAllConnections();
-    
+
     // Set up periodic checks
     const interval = setInterval(updateServiceStatus, 30000); // Check every 30s
-    
+
     return () => clearInterval(interval);
   }, []);
 
@@ -39,7 +39,7 @@ const ApiStatusIndicator: React.FC = () => {
     setServices({
       spotify: serviceStatus.getServiceStatus('spotify'),
       supabase: serviceStatus.getServiceStatus('supabase'),
-      openai: serviceStatus.getServiceStatus('openai')
+      openai: serviceStatus.getServiceStatus('openai'),
     });
   };
 
@@ -58,7 +58,7 @@ const ApiStatusIndicator: React.FC = () => {
   const getOverallStatus = () => {
     const connectedServices = Object.values(services).filter(Boolean).length;
     const totalServices = Object.keys(services).length;
-    
+
     if (connectedServices === totalServices) return 'all';
     if (connectedServices > 0) return 'partial';
     return 'none';
@@ -66,17 +66,23 @@ const ApiStatusIndicator: React.FC = () => {
 
   const getStatusColor = (status: string) => {
     switch (status) {
-      case 'all': return 'text-green-400';
-      case 'partial': return 'text-yellow-400';
-      default: return 'text-red-400';
+      case 'all':
+        return 'text-green-400';
+      case 'partial':
+        return 'text-yellow-400';
+      default:
+        return 'text-red-400';
     }
   };
 
   const getStatusIcon = (status: string) => {
     switch (status) {
-      case 'all': return '🟢';
-      case 'partial': return '🟡';
-      default: return '🔴';
+      case 'all':
+        return '🟢';
+      case 'partial':
+        return '🟡';
+      default:
+        return '🔴';
     }
   };
 
@@ -84,7 +90,7 @@ const ApiStatusIndicator: React.FC = () => {
 
   return (
     <div className="fixed top-4 right-4 z-50">
-      <motion.div 
+      <motion.div
         className="bg-gray-800 rounded-lg shadow-lg border border-gray-700"
         initial={{ opacity: 0, x: 100 }}
         animate={{ opacity: 1, x: 0 }}
@@ -157,7 +163,8 @@ const ApiStatusIndicator: React.FC = () => {
 
                 {/* Summary */}
                 <div className="text-xs text-gray-400 text-center pt-2 border-t border-gray-700">
-                  {Object.values(services).filter(Boolean).length} of {Object.keys(services).length} services connected
+                  {Object.values(services).filter(Boolean).length} of{' '}
+                  {Object.keys(services).length} services connected
                 </div>
               </div>
             </motion.div>
@@ -176,22 +183,20 @@ const ServiceStatusRow: React.FC<{
   <div className="flex items-center justify-between">
     <div className="flex-1">
       <div className="flex items-center space-x-2">
-        <span className={`text-sm font-medium ${status ? 'text-white' : 'text-gray-400'}`}>
+        <span
+          className={`text-sm font-medium ${status ? 'text-white' : 'text-gray-400'}`}
+        >
           {name}
         </span>
-        <span className="text-xs">
-          {status ? '✅' : '❌'}
-        </span>
+        <span className="text-xs">{status ? '✅' : '❌'}</span>
       </div>
-      <div className="text-xs text-gray-500">
-        {description}
-      </div>
+      <div className="text-xs text-gray-500">{description}</div>
     </div>
-    <div className={`px-2 py-1 rounded text-xs font-medium ${
-      status 
-        ? 'bg-green-900 text-green-300' 
-        : 'bg-red-900 text-red-300'
-    }`}>
+    <div
+      className={`px-2 py-1 rounded text-xs font-medium ${
+        status ? 'bg-green-900 text-green-300' : 'bg-red-900 text-red-300'
+      }`}
+    >
       {status ? 'Connected' : 'Offline'}
     </div>
   </div>

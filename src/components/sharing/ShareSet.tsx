@@ -3,18 +3,18 @@
  * Enables viral growth through easy set sharing with social media integration
  */
 
-import { useState, useCallback, useEffect } from 'react';
+import React, { useState, useCallback, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { 
-  Share, 
-  Copy, 
-  Twitter, 
+import {
+  Share,
+  Copy,
+  Twitter,
   Facebook,
   MessageCircle,
   Download,
   QrCode,
   Check,
-  X
+  X,
 } from 'lucide-react';
 import { useAuth } from '@/store/authStore';
 
@@ -42,7 +42,7 @@ const ShareSet: React.FC<ShareSetProps> = ({
   duration,
   trackCount,
   thumbnailUrl,
-  onClose
+  onClose,
 }) => {
   const { isGuestMode } = useAuth();
   const [shareLink, setShareLink] = useState<ShareLink | null>(null);
@@ -60,20 +60,20 @@ const ShareSet: React.FC<ShareSetProps> = ({
       const baseUrl = window.location.origin;
       const fullUrl = `${baseUrl}/set/${setId}`;
       const shortUrl = `${baseUrl}/s/${setId.slice(0, 8)}`;
-      
+
       // Generate QR code URL (would use a service like qr-server.com)
       const qrCodeUrl = `https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(fullUrl)}`;
-      
+
       // Generate embed code
       const embedCode = `<iframe src="${baseUrl}/embed/${setId}" width="400" height="300" frameborder="0"></iframe>`;
-      
+
       const link: ShareLink = {
         url: fullUrl,
         shortUrl,
         embedCode,
-        qrCodeUrl
+        qrCodeUrl,
       };
-      
+
       setShareLink(link);
       return link;
     } finally {
@@ -113,7 +113,7 @@ const ShareSet: React.FC<ShareSetProps> = ({
   // Native share API
   const shareNative = async () => {
     if (!shareLink) return;
-    
+
     if (navigator.share) {
       try {
         await navigator.share({
@@ -121,7 +121,7 @@ const ShareSet: React.FC<ShareSetProps> = ({
           text: `Check out this DJ set - ${trackCount} tracks, ${formatDuration(duration)} of great music!`,
           url: shareLink.url,
         });
-      } catch (error) {
+      } catch {
         // User cancelled or share failed
       }
     }
@@ -146,15 +146,19 @@ const ShareSet: React.FC<ShareSetProps> = ({
       <div className="bg-gray-800 rounded-lg p-6">
         <div className="flex items-center gap-3 mb-4">
           <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-blue-400"></div>
-          <h3 className="text-lg font-semibold text-white">Generating Share Link...</h3>
+          <h3 className="text-lg font-semibold text-white">
+            Generating Share Link...
+          </h3>
         </div>
-        <p className="text-gray-400">Creating your shareable link and preview...</p>
+        <p className="text-gray-400">
+          Creating your shareable link and preview...
+        </p>
       </div>
     );
   }
 
   return (
-    <motion.div 
+    <motion.div
       className="bg-gray-800 rounded-lg overflow-hidden"
       initial={{ opacity: 0, scale: 0.95 }}
       animate={{ opacity: 1, scale: 1 }}
@@ -180,8 +184,8 @@ const ShareSet: React.FC<ShareSetProps> = ({
       <div className="p-4 bg-gray-750">
         <div className="flex items-center gap-4">
           {thumbnailUrl ? (
-            <img 
-              src={thumbnailUrl} 
+            <img
+              src={thumbnailUrl}
               alt={setTitle}
               className="w-16 h-16 rounded-lg object-cover"
             />
@@ -253,7 +257,7 @@ const ShareSet: React.FC<ShareSetProps> = ({
               <Twitter className="w-4 h-4" />
               Twitter
             </button>
-            
+
             <button
               onClick={() => shareToFacebook(shareLink?.shortUrl || '')}
               className="flex items-center justify-center gap-2 bg-blue-700 hover:bg-blue-800 text-white px-3 py-2 rounded-lg transition-colors text-sm"
@@ -261,7 +265,7 @@ const ShareSet: React.FC<ShareSetProps> = ({
               <Facebook className="w-4 h-4" />
               Facebook
             </button>
-            
+
             <button
               onClick={() => shareToWhatsApp(shareLink?.shortUrl || '')}
               className="flex items-center justify-center gap-2 bg-green-600 hover:bg-green-700 text-white px-3 py-2 rounded-lg transition-colors text-sm"
@@ -269,7 +273,7 @@ const ShareSet: React.FC<ShareSetProps> = ({
               <MessageCircle className="w-4 h-4" />
               WhatsApp
             </button>
-            
+
             {'share' in navigator && (
               <button
                 onClick={shareNative}
@@ -291,7 +295,7 @@ const ShareSet: React.FC<ShareSetProps> = ({
             <Download className="w-4 h-4" />
             Embed Code
           </button>
-          
+
           <button
             onClick={() => window.open(shareLink?.qrCodeUrl, '_blank')}
             className="flex items-center gap-2 text-blue-400 hover:text-blue-300 transition-colors text-sm"
@@ -343,13 +347,14 @@ const ShareSet: React.FC<ShareSetProps> = ({
 
         {/* Guest Mode Upgrade Prompt */}
         {isGuestMode && (
-          <motion.div 
+          <motion.div
             className="bg-gradient-to-r from-blue-900/30 to-purple-900/30 border border-blue-600/30 rounded-lg p-3"
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
           >
             <p className="text-blue-300 text-sm mb-2">
-              💡 <strong>Remove watermark</strong> and get advanced sharing features
+              💡 <strong>Remove watermark</strong> and get advanced sharing
+              features
             </p>
             <button className="bg-blue-600 hover:bg-blue-700 text-white text-xs px-3 py-1 rounded transition-colors">
               Upgrade Account

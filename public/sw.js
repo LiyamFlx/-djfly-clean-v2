@@ -4,7 +4,7 @@ const urlsToCache = [
   '/manifest.json',
   '/icon-192.png',
   '/icon-512.png',
-  '/vite.svg'
+  '/vite.svg',
 ];
 
 // Install event
@@ -21,7 +21,19 @@ self.addEventListener('fetch', (event) => {
   event.respondWith(
     caches.match(event.request).then((response) => {
       // Return cached version or fetch from network
-      return response || fetch(event.request);
+      if (response) {
+        return response;
+      }
+      
+      return fetch(event.request).catch((error) => {
+        console.warn('SW: Fetch failed for', event.request.url, error);
+        // Return a fallback for failed requests
+        if (event.request.destination === 'document') {
+          return caches.match('/');
+        }
+        // For other resources, just let it fail gracefully
+        return new Response('', { status: 404 });
+      });
     })
   );
 });
@@ -55,17 +67,25 @@ async function syncQueueData() {
   try {
     const queueData = await getStoredQueueData();
     if (queueData) {
-      await fetch('/api/sync-queue', {
+      // Only sync if we have a backend API configured
+      const apiUrl = self.location.origin + '/api/sync-queue';
+      const response = await fetch(apiUrl, {
         method: 'POST',
         body: JSON.stringify(queueData),
         headers: {
           'Content-Type': 'application/json',
         },
+      }).catch(() => {
+        console.info('SW: No backend API available for queue sync');
+        return null;
       });
-      await clearStoredQueueData();
+      
+      if (response && response.ok) {
+        await clearStoredQueueData();
+      }
     }
   } catch (error) {
-    console.error('Queue sync failed:', error);
+    console.warn('SW: Queue sync failed (this is normal in development):', error);
   }
 }
 

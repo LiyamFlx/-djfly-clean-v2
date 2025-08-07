@@ -197,7 +197,7 @@ class AudioEffectsService {
     if (!this.audioContext) return;
 
     this.distortionNode = this.audioContext.createWaveShaper();
-    (this.distortionNode as any).curve = this.makeDistortionCurve(0);
+    (this.distortionNode as { curve: Float32Array }).curve = this.makeDistortionCurve(0);
     this.distortionNode.oversample = '2x';
   }
 
@@ -231,6 +231,7 @@ class AudioEffectsService {
 
     // Create 4-band EQ
     const frequencies = [100, 500, 2000, 8000];
+    // eslint-disable-next-line no-undef
     const types: BiquadFilterType[] = [
       'lowshelf',
       'peaking',
@@ -361,7 +362,7 @@ class AudioEffectsService {
   setDistortion(params: DistortionParams) {
     if (!this.distortionNode) return;
 
-    (this.distortionNode as any).curve = this.makeDistortionCurve(
+    (this.distortionNode as { curve: Float32Array }).curve = this.makeDistortionCurve(
       params.amount
     );
     this.distortionNode.oversample = params.oversample;
@@ -505,7 +506,7 @@ class AudioEffectsService {
 
       // Apply EQ settings
       if (preset.eq) {
-        preset.eq.forEach((band: any, index: number) => {
+        preset.eq.forEach((band: { frequency: number; gain: number; Q: number }, index: number) => {
           if (this.eqNodes[index]) {
             this.eqNodes[index].frequency.value = band.frequency;
             this.eqNodes[index].gain.value = band.gain;

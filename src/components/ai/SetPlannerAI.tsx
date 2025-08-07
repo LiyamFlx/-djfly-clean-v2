@@ -3,11 +3,11 @@
  * Creates optimized set flow with energy curve analysis
  */
 
-import { useState } from 'react';
+import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { BarChart3, Clock, Zap, TrendingUp, Play, Shuffle } from 'lucide-react';
 import { aiMusicEngine } from '@/services/aiMusicEngine';
-import type { Track } from '@/services/musicLibrary';
+import type { Track } from '@/types';
 
 interface SetPlannerProps {
   targetDuration: number; // minutes
@@ -37,7 +37,7 @@ const SetPlannerAI: React.FC<SetPlannerProps> = ({
   targetDuration,
   venue,
   timeSlot,
-  onPlanGenerated
+  onPlanGenerated,
 }) => {
   const [isGenerating, setIsGenerating] = useState(false);
   const [setPlan, setSetPlan] = useState<SetPlan | null>(null);
@@ -45,16 +45,16 @@ const SetPlannerAI: React.FC<SetPlannerProps> = ({
 
   const generateSetPlan = async () => {
     setIsGenerating(true);
-    
+
     try {
       // Generate 3 different phases for optimal energy flow
       const phases = await generateSetPhases(targetDuration, venue);
-      
+
       // Combine all tracks from phases
       const allTracks: Track[] = [];
       const energyCurve: number[] = [];
       const allMixingTips: string[] = [];
-      
+
       for (const phase of phases) {
         const recommendation = await aiMusicEngine.generateIntelligentPlaylist({
           prompt: `${phase.description} Create ${phase.duration}-minute ${phase.name.toLowerCase()} section for ${venue} at ${timeSlot}`,
@@ -62,26 +62,28 @@ const SetPlannerAI: React.FC<SetPlannerProps> = ({
           duration: phase.duration,
           venue: venue as any,
           timeOfDay: getTimeOfDay(timeSlot),
-          crowdEnergy: phase.targetEnergy
+          crowdEnergy: phase.targetEnergy,
         });
-        
-        phase.tracks = recommendation.tracks.slice(0, Math.ceil(phase.duration / 4)); // ~4 min per track
+
+        phase.tracks = recommendation.tracks.slice(
+          0,
+          Math.ceil(phase.duration / 4)
+        ); // ~4 min per track
         allTracks.push(...phase.tracks);
         energyCurve.push(...recommendation.energyCurve);
         allMixingTips.push(...recommendation.mixingTips);
       }
-      
+
       const plan: SetPlan = {
         tracks: allTracks,
         energyCurve,
         phases,
         totalDuration: targetDuration,
-        mixingTips: allMixingTips
+        mixingTips: allMixingTips,
       };
-      
+
       setSetPlan(plan);
       onPlanGenerated?.(allTracks, plan);
-      
     } catch (error) {
       console.error('Set planning failed:', error);
     } finally {
@@ -90,9 +92,12 @@ const SetPlannerAI: React.FC<SetPlannerProps> = ({
   };
 
   // Generate set phases based on duration and context
-  const generateSetPhases = async (duration: number, venue: string): Promise<SetPhase[]> => {
+  const generateSetPhases = async (
+    duration: number,
+    venue: string
+  ): Promise<SetPhase[]> => {
     const phases: SetPhase[] = [];
-    
+
     if (duration <= 30) {
       // Short set - single build
       phases.push({
@@ -101,7 +106,7 @@ const SetPlannerAI: React.FC<SetPlannerProps> = ({
         duration: duration,
         targetEnergy: venue === 'club' ? 80 : 60,
         description: 'High-energy continuous flow with peak moments',
-        tracks: []
+        tracks: [],
       });
     } else if (duration <= 60) {
       // Medium set - build and sustain
@@ -112,7 +117,7 @@ const SetPlannerAI: React.FC<SetPlannerProps> = ({
           duration: duration * 0.3,
           targetEnergy: 50,
           description: 'Establish groove and build initial energy',
-          tracks: []
+          tracks: [],
         },
         {
           name: 'Peak Time',
@@ -120,7 +125,7 @@ const SetPlannerAI: React.FC<SetPlannerProps> = ({
           duration: duration * 0.7,
           targetEnergy: 85,
           description: 'High-energy peak section with crowd favorites',
-          tracks: []
+          tracks: [],
         }
       );
     } else {
@@ -132,7 +137,7 @@ const SetPlannerAI: React.FC<SetPlannerProps> = ({
           duration: duration * 0.25,
           targetEnergy: 40,
           description: 'Atmospheric opening to draw people in',
-          tracks: []
+          tracks: [],
         },
         {
           name: 'Build',
@@ -140,7 +145,7 @@ const SetPlannerAI: React.FC<SetPlannerProps> = ({
           duration: duration * 0.35,
           targetEnergy: 70,
           description: 'Progressive energy build with crowd engagement',
-          tracks: []
+          tracks: [],
         },
         {
           name: 'Peak',
@@ -148,7 +153,7 @@ const SetPlannerAI: React.FC<SetPlannerProps> = ({
           duration: duration * 0.25,
           targetEnergy: 90,
           description: 'Maximum energy climax with biggest tracks',
-          tracks: []
+          tracks: [],
         },
         {
           name: 'Closing',
@@ -156,22 +161,26 @@ const SetPlannerAI: React.FC<SetPlannerProps> = ({
           duration: duration * 0.15,
           targetEnergy: 60,
           description: 'Memorable closing with emotional impact',
-          tracks: []
+          tracks: [],
         }
       );
     }
-    
+
     return phases;
   };
 
-  const getPhaseMood = (energy: number): 'energetic' | 'chill' | 'progressive' | 'mixed' => {
+  const getPhaseMood = (
+    energy: number
+  ): 'energetic' | 'chill' | 'progressive' | 'mixed' => {
     if (energy >= 80) return 'energetic';
     if (energy >= 60) return 'progressive';
     if (energy >= 40) return 'mixed';
     return 'chill';
   };
 
-  const getTimeOfDay = (timeSlot: string): 'morning' | 'afternoon' | 'evening' | 'late-night' => {
+  const getTimeOfDay = (
+    timeSlot: string
+  ): 'morning' | 'afternoon' | 'evening' | 'late-night' => {
     const slot = timeSlot.toLowerCase();
     if (slot.includes('morning') || slot.includes('am')) return 'morning';
     if (slot.includes('afternoon') || slot.includes('pm')) return 'afternoon';
@@ -207,10 +216,7 @@ const SetPlannerAI: React.FC<SetPlannerProps> = ({
 
       {!setPlan && !isGenerating && (
         <div className="text-center py-8">
-          <motion.div
-            whileHover={{ scale: 1.05 }}
-            whileTap={{ scale: 0.95 }}
-          >
+          <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
             <button
               onClick={generateSetPlan}
               className="bg-purple-600 hover:bg-purple-700 text-white px-8 py-3 rounded-lg font-semibold transition-colors inline-flex items-center gap-2"
@@ -236,7 +242,9 @@ const SetPlannerAI: React.FC<SetPlannerProps> = ({
           >
             <div className="inline-flex items-center gap-3 text-purple-400">
               <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-purple-400"></div>
-              <span className="font-medium">AI is crafting your perfect set...</span>
+              <span className="font-medium">
+                AI is crafting your perfect set...
+              </span>
             </div>
             <div className="space-y-1 text-sm text-gray-400">
               <p>🎯 Analyzing venue and time slot...</p>
@@ -265,10 +273,13 @@ const SetPlannerAI: React.FC<SetPlannerProps> = ({
                   <motion.div
                     key={index}
                     className={`w-2 rounded-t bg-gradient-to-t ${
-                      energy >= 80 ? 'from-red-400 to-red-300' :
-                      energy >= 60 ? 'from-yellow-400 to-yellow-300' :
-                      energy >= 40 ? 'from-blue-400 to-blue-300' :
-                      'from-purple-400 to-purple-300'
+                      energy >= 80
+                        ? 'from-red-400 to-red-300'
+                        : energy >= 60
+                          ? 'from-yellow-400 to-yellow-300'
+                          : energy >= 40
+                            ? 'from-blue-400 to-blue-300'
+                            : 'from-purple-400 to-purple-300'
                     }`}
                     initial={{ height: 0 }}
                     animate={{ height: `${(energy / 100) * 100}%` }}
@@ -295,21 +306,31 @@ const SetPlannerAI: React.FC<SetPlannerProps> = ({
                   animate={{ opacity: 1, x: 0 }}
                   transition={{ delay: index * 0.1 }}
                   className={`border-l-4 border-transparent bg-gray-700 rounded-r-lg p-4 cursor-pointer transition-all ${
-                    selectedPhase === index ? 'border-purple-400 bg-purple-900/20' : 'hover:bg-gray-650'
+                    selectedPhase === index
+                      ? 'border-purple-400 bg-purple-900/20'
+                      : 'hover:bg-gray-650'
                   }`}
-                  onClick={() => setSelectedPhase(selectedPhase === index ? null : index)}
+                  onClick={() =>
+                    setSelectedPhase(selectedPhase === index ? null : index)
+                  }
                 >
                   <div className="flex items-center justify-between mb-2">
                     <h5 className="font-medium text-white">{phase.name}</h5>
                     <div className="flex items-center gap-3 text-sm text-gray-400">
                       <span>{formatDuration(phase.duration)}</span>
-                      <div className={`w-3 h-3 rounded-full bg-gradient-to-r ${getPhaseColor(phase.targetEnergy)}`}></div>
+                      <div
+                        className={`w-3 h-3 rounded-full bg-gradient-to-r ${getPhaseColor(phase.targetEnergy)}`}
+                      ></div>
                       <span>{phase.targetEnergy}% energy</span>
                     </div>
                   </div>
-                  <p className="text-sm text-gray-300 mb-2">{phase.description}</p>
+                  <p className="text-sm text-gray-300 mb-2">
+                    {phase.description}
+                  </p>
                   <div className="text-xs text-gray-400">
-                    {formatDuration(phase.startTime)} - {formatDuration(phase.startTime + phase.duration)} • {phase.tracks.length} tracks
+                    {formatDuration(phase.startTime)} -{' '}
+                    {formatDuration(phase.startTime + phase.duration)} •{' '}
+                    {phase.tracks.length} tracks
                   </div>
 
                   <AnimatePresence>
@@ -321,13 +342,18 @@ const SetPlannerAI: React.FC<SetPlannerProps> = ({
                         className="mt-4 pt-4 border-t border-gray-600 space-y-2"
                       >
                         {phase.tracks.map((track, trackIndex) => (
-                          <div key={track.id} className="flex items-center justify-between text-sm">
+                          <div
+                            key={track.id}
+                            className="flex items-center justify-between text-sm"
+                          >
                             <div className="flex items-center gap-3">
                               <span className="w-6 h-6 bg-gray-600 rounded-full flex items-center justify-center text-xs">
                                 {trackIndex + 1}
                               </span>
                               <div>
-                                <p className="text-white font-medium">{track.title}</p>
+                                <p className="text-white font-medium">
+                                  {track.title}
+                                </p>
                                 <p className="text-gray-400">{track.artist}</p>
                               </div>
                             </div>
@@ -349,7 +375,7 @@ const SetPlannerAI: React.FC<SetPlannerProps> = ({
                 <Play className="w-4 h-4" />
                 Start Set
               </button>
-              <button 
+              <button
                 onClick={generateSetPlan}
                 className="bg-gray-600 hover:bg-gray-700 text-white px-6 py-2 rounded-lg font-semibold transition-colors inline-flex items-center gap-2"
               >

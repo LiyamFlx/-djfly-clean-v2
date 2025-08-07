@@ -1,9 +1,9 @@
 /**
- * Guest Session Timer Component  
+ * Guest Session Timer Component
  * Shows remaining time and upgrade prompts for guest users
  */
 
-import { useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Clock, Zap, X, Plus } from 'lucide-react';
 import { useGuestSession } from '@/store/authStore';
@@ -14,18 +14,18 @@ interface GuestTimerProps {
   className?: string;
 }
 
-const GuestTimer: React.FC<GuestTimerProps> = ({ 
-  onUpgrade, 
+const GuestTimer: React.FC<GuestTimerProps> = ({
+  onUpgrade,
   onExtend,
-  className = '' 
+  className = '',
 }) => {
-  const { 
-    isGuestMode, 
-    guestTimeRemaining, 
-    timeRemainingFormatted, 
+  const {
+    isGuestMode,
+    guestTimeRemaining,
+    timeRemainingFormatted,
     isTimeRunningLow,
     canExtendSession,
-    extendGuestSession
+    extendGuestSession,
   } = useGuestSession();
 
   const [showUpgradePrompt, setShowUpgradePrompt] = useState(false);
@@ -47,20 +47,23 @@ const GuestTimer: React.FC<GuestTimerProps> = ({
     setShowUpgradePrompt(false);
   };
 
-  const progressPercentage = Math.max(0, (guestTimeRemaining / (10 * 60)) * 100);
+  const progressPercentage = Math.max(
+    0,
+    (guestTimeRemaining / (10 * 60)) * 100
+  );
   const isUrgent = guestTimeRemaining < 60; // Last minute
   const isWarning = guestTimeRemaining < 120; // Last 2 minutes
 
   return (
     <>
       {/* Timer Display */}
-      <motion.div 
+      <motion.div
         className={`inline-flex items-center gap-2 px-3 py-1.5 rounded-full text-sm font-medium ${
-          isUrgent 
-            ? 'bg-red-900/50 text-red-300 border border-red-600/30' 
+          isUrgent
+            ? 'bg-red-900/50 text-red-300 border border-red-600/30'
             : isWarning
-            ? 'bg-amber-900/50 text-amber-300 border border-amber-600/30'
-            : 'bg-blue-900/50 text-blue-300 border border-blue-600/30'
+              ? 'bg-amber-900/50 text-amber-300 border border-amber-600/30'
+              : 'bg-blue-900/50 text-blue-300 border border-blue-600/30'
         } ${className}`}
         initial={{ opacity: 0, scale: 0.9 }}
         animate={{ opacity: 1, scale: 1 }}
@@ -80,12 +83,12 @@ const GuestTimer: React.FC<GuestTimerProps> = ({
 
       {/* Progress Bar (for urgent timing) */}
       {isWarning && (
-        <motion.div 
+        <motion.div
           className="fixed top-0 left-0 right-0 h-1 bg-gray-900 z-50"
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
         >
-          <motion.div 
+          <motion.div
             className={`h-full ${isUrgent ? 'bg-red-500' : 'bg-amber-500'}`}
             initial={{ width: '100%' }}
             animate={{ width: `${progressPercentage}%` }}
@@ -97,13 +100,13 @@ const GuestTimer: React.FC<GuestTimerProps> = ({
       {/* Upgrade Prompt Modal */}
       <AnimatePresence>
         {showUpgradePrompt && (
-          <motion.div 
+          <motion.div
             className="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
           >
-            <motion.div 
+            <motion.div
               className="bg-gray-800 rounded-lg p-6 max-w-md w-full border border-gray-700"
               initial={{ scale: 0.9, opacity: 0 }}
               animate={{ scale: 1, opacity: 1 }}
@@ -125,9 +128,11 @@ const GuestTimer: React.FC<GuestTimerProps> = ({
               {/* Content */}
               <div className="space-y-4">
                 <div className="text-center">
-                  <div className={`text-2xl font-bold ${
-                    isUrgent ? 'text-red-400' : 'text-amber-400'
-                  }`}>
+                  <div
+                    className={`text-2xl font-bold ${
+                      isUrgent ? 'text-red-400' : 'text-amber-400'
+                    }`}
+                  >
                     {timeRemainingFormatted}
                   </div>
                   <p className="text-gray-300 text-sm mt-1">

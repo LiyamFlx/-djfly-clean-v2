@@ -49,10 +49,12 @@ class SpotifyService {
   constructor() {
     this.clientId = API_CONFIG.spotify.clientId || '';
     this.clientSecret = API_CONFIG.spotify.clientSecret || '';
-    
+
     // Check if Spotify is properly configured
     if (!this.clientId || !this.clientSecret) {
-      console.warn('⚠️ Spotify API not configured. Some features may not work.');
+      console.warn(
+        '⚠️ Spotify API not configured. Some features may not work.'
+      );
       serviceStatus.setServiceStatus('spotify', false);
     } else {
       console.log('🎵 Spotify service initialized');

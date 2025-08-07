@@ -1,3 +1,4 @@
+import React from 'react';
 import type { Track } from '@/types';
 import Waveform from './Waveform';
 

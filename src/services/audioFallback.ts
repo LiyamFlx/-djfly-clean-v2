@@ -7,15 +7,16 @@
 export const FALLBACK_AUDIO_URLS = [
   'https://www.learningcontainer.com/wp-content/uploads/2020/02/Kalimba.mp3',
   'https://samplelib.com/lib/preview/mp3/sample-3s.mp3',
-  'https://file-examples.com/storage/fe68c625b00ad8ad9df4a8d/2017/11/file_example_MP3_700KB.mp3'
+  'https://file-examples.com/storage/fe68c625b00ad8ad9df4a8d/2017/11/file_example_MP3_700KB.mp3',
 ];
 
 // Default silence/beep for absolute fallback
-export const SILENCE_AUDIO = 'data:audio/wav;base64,UklGRnoGAABXQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YQoGAACBhYqFbF1fdJivrJBhNjVgodDbq2EcBj+a2/LDciUFLIHO8tiJNwgZaLvt559NEAxQp+PwtmMcBjiR1/LMeSwFJHfH8N2QQAoUXrTp66hVFApGn+DyvmAaBjiR1/LNeSsFJHfH8N2QQAoUXrTp66hVFApGn+DyvmAaBjiR1/LNeSsFJHfH8N2QQAoUXrTp66hVFApGn+DyvmAaBjiR1/LNeSsFJHfH8N2QQAoUXrTp66hVFApGn+DyvmAaBjiR1/LNeSsFJHfH8N2QQAoUXrTp66hVFApGn+DyvmAaBjiR1/LNeSsFJHfH8N2QQAoUXrTp66hVFApGn+DyvmAaBjiR1/LNeSsFJHfH8N2QQAoUXrTp66hVFApGn+DyvmAaBjiR1/LNeSsFJHfH8N2QQAoUXrTp66hVFApGn+DyvmAaBjiR1/LNeSsFJHfH8N2QQAoUXrTp66hVFApGn+DyvmAaBjiR1/LNeSsFJHfH8N2QQAoUXrTp66hVFApGn+DyvmAaBjiR1/LNeSsFJHfH8N2QQAoUXrTp66hVFApGn+DyvmAaBjiR1/LNeSsFJHfH8N2QQAoUXrTp66hVFApGn+DyvmAaBjiR1/LNeSsFJHfH8N2QQAoUXrTp66hVFApGn+DyvmAaBjiR1/LNeSsFJHfH8N2QQAoUXrTp66hVFApGn+DyvmAaBjiR1/LNeSsFJHfH8N2QQAoUXrTp66hVFApGn+DyvmAa';
+export const SILENCE_AUDIO =
+  'data:audio/wav;base64,UklGRnoGAABXQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YQoGAACBhYqFbF1fdJivrJBhNjVgodDbq2EcBj+a2/LDciUFLIHO8tiJNwgZaLvt559NEAxQp+PwtmMcBjiR1/LMeSwFJHfH8N2QQAoUXrTp66hVFApGn+DyvmAaBjiR1/LNeSsFJHfH8N2QQAoUXrTp66hVFApGn+DyvmAaBjiR1/LNeSsFJHfH8N2QQAoUXrTp66hVFApGn+DyvmAaBjiR1/LNeSsFJHfH8N2QQAoUXrTp66hVFApGn+DyvmAaBjiR1/LNeSsFJHfH8N2QQAoUXrTp66hVFApGn+DyvmAaBjiR1/LNeSsFJHfH8N2QQAoUXrTp66hVFApGn+DyvmAaBjiR1/LNeSsFJHfH8N2QQAoUXrTp66hVFApGn+DyvmAaBjiR1/LNeSsFJHfH8N2QQAoUXrTp66hVFApGn+DyvmAaBjiR1/LNeSsFJHfH8N2QQAoUXrTp66hVFApGn+DyvmAaBjiR1/LNeSsFJHfH8N2QQAoUXrTp66hVFApGn+DyvmAaBjiR1/LNeSsFJHfH8N2QQAoUXrTp66hVFApGn+DyvmAaBjiR1/LNeSsFJHfH8N2QQAoUXrTp66hVFApGn+DyvmAaBjiR1/LNeSsFJHfH8N2QQAoUXrTp66hVFApGn+DyvmAaBjiR1/LNeSsFJHfH8N2QQAoUXrTp66hVFApGn+DyvmAaBjiR1/LNeSsFJHfH8N2QQAoUXrTp66hVFApGn+DyvmAa';
 
 export class AudioFallbackService {
   private static failedUrls = new Set<string>();
-  
+
   /**
    * Get a working audio URL with fallback support
    */
@@ -24,7 +25,7 @@ export class AudioFallbackService {
     if (this.failedUrls.has(primaryUrl)) {
       return this.getFallbackUrl();
     }
-    
+
     try {
       // Test if the primary URL works
       const response = await fetch(primaryUrl, { method: 'HEAD' });
@@ -34,11 +35,11 @@ export class AudioFallbackService {
     } catch (error) {
       console.warn(`Primary audio URL failed: ${primaryUrl}`, error);
     }
-    
+
     this.failedUrls.add(primaryUrl);
     return this.getFallbackUrl();
   }
-  
+
   /**
    * Get a fallback URL that should work
    */
@@ -49,11 +50,11 @@ export class AudioFallbackService {
         return url;
       }
     }
-    
+
     // If all else fails, return silence
     return SILENCE_AUDIO;
   }
-  
+
   /**
    * Test an audio URL
    */
@@ -69,7 +70,7 @@ export class AudioFallbackService {
       return false;
     }
   }
-  
+
   /**
    * Preload and validate audio URLs
    */
@@ -80,7 +81,7 @@ export class AudioFallbackService {
         return { ...track, previewUrl: workingUrl };
       })
     );
-    
+
     return validatedTracks;
   }
 }

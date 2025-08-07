@@ -1,3 +1,5 @@
+import React from 'react';
+
 const LibraryPage: React.FC = () => {
   return (
     <div className="min-h-screen py-8">
