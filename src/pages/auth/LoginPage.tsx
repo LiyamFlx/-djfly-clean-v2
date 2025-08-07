@@ -52,7 +52,9 @@ const LoginPage = () => {
       >
         <div className="bg-gray-800 rounded-xl p-8 shadow-2xl">
           <div className="text-center mb-8">
-            <h1 className="text-3xl font-bold text-blue-400 mb-2">Welcome Back</h1>
+            <h1 className="text-3xl font-bold text-blue-400 mb-2">
+              Welcome Back
+            </h1>
             <p className="text-gray-400">
               Log in to your DJfly account to access your mixes and playlists
             </p>
@@ -83,7 +85,10 @@ const LoginPage = () => {
             </div>
 
             <div>
-              <label className="block text-sm font-medium mb-2" htmlFor="password">
+              <label
+                className="block text-sm font-medium mb-2"
+                htmlFor="password"
+              >
                 Password
               </label>
               <input
@@ -101,10 +106,7 @@ const LoginPage = () => {
 
             <div className="flex items-center justify-between">
               <label className="flex items-center">
-                <input
-                  type="checkbox"
-                  className="accent-blue-500 mr-2"
-                />
+                <input type="checkbox" className="accent-blue-500 mr-2" />
                 <span className="text-sm text-gray-400">Remember me</span>
               </label>
               <Link

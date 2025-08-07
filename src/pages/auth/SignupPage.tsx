@@ -50,7 +50,9 @@ const SignupPage = () => {
       >
         <div className="bg-gray-800 rounded-xl p-8 shadow-2xl">
           <div className="text-center mb-8">
-            <h1 className="text-3xl font-bold text-blue-400 mb-2">Create Account</h1>
+            <h1 className="text-3xl font-bold text-blue-400 mb-2">
+              Create Account
+            </h1>
             <p className="text-gray-400">
               Join DJfly to create amazing mixes and discover new music
             </p>
@@ -98,7 +100,10 @@ const SignupPage = () => {
             </div>
 
             <div>
-              <label className="block text-sm font-medium mb-2" htmlFor="password">
+              <label
+                className="block text-sm font-medium mb-2"
+                htmlFor="password"
+              >
                 Password
               </label>
               <input
@@ -115,7 +120,10 @@ const SignupPage = () => {
             </div>
 
             <div>
-              <label className="block text-sm font-medium mb-2" htmlFor="confirmPassword">
+              <label
+                className="block text-sm font-medium mb-2"
+                htmlFor="confirmPassword"
+              >
                 Confirm Password
               </label>
               <input
@@ -140,11 +148,17 @@ const SignupPage = () => {
               />
               <label htmlFor="terms" className="text-sm text-gray-400">
                 I agree to the{' '}
-                <Link to="/legal/terms" className="text-blue-400 hover:text-blue-300">
+                <Link
+                  to="/legal/terms"
+                  className="text-blue-400 hover:text-blue-300"
+                >
                   Terms of Service
                 </Link>{' '}
                 and{' '}
-                <Link to="/legal/privacy" className="text-blue-400 hover:text-blue-300">
+                <Link
+                  to="/legal/privacy"
+                  className="text-blue-400 hover:text-blue-300"
+                >
                   Privacy Policy
                 </Link>
               </label>

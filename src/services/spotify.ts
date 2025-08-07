@@ -1,5 +1,6 @@
 import { Track } from '@/types';
 import { cache } from '@/utils/cache';
+import { API_CONFIG, serviceStatus } from '@/config/apiConfig';
 
 interface SpotifyAuthResponse {
   access_token: string;
@@ -46,8 +47,16 @@ class SpotifyService {
   private tokenExpiry: number = 0;
 
   constructor() {
-    this.clientId = import.meta.env.VITE_SPOTIFY_CLIENT_ID || '';
-    this.clientSecret = import.meta.env.VITE_SPOTIFY_CLIENT_SECRET || '';
+    this.clientId = API_CONFIG.spotify.clientId || '';
+    this.clientSecret = API_CONFIG.spotify.clientSecret || '';
+    
+    // Check if Spotify is properly configured
+    if (!this.clientId || !this.clientSecret) {
+      console.warn('⚠️ Spotify API not configured. Some features may not work.');
+      serviceStatus.setServiceStatus('spotify', false);
+    } else {
+      console.log('🎵 Spotify service initialized');
+    }
 
     if (!this.clientId) {
       console.warn(

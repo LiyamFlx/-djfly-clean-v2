@@ -181,7 +181,14 @@ export function useTouchGestures() {
       }, longPressDelay);
     };
 
+    let lastMoveTime = 0;
+    const moveThrottleMs = 16; // ~60fps
+
     const handleMove = (e: TouchEvent) => {
+      const now = Date.now();
+      if (now - lastMoveTime < moveThrottleMs) return;
+      lastMoveTime = now;
+
       const touch = e.touches[0];
       const deltaX = touch.clientX - gestureState.startPoint.x;
       const deltaY = touch.clientY - gestureState.startPoint.y;
@@ -239,9 +246,11 @@ export function useTouchGestures() {
       });
     };
 
-    element.addEventListener('touchstart', handleStart);
-    element.addEventListener('touchmove', handleMove);
-    element.addEventListener('touchend', handleEnd);
+    // Use passive listeners for better performance
+    const options: AddEventListenerOptions = { passive: true };
+    element.addEventListener('touchstart', handleStart, options);
+    element.addEventListener('touchmove', handleMove, options);
+    element.addEventListener('touchend', handleEnd, options);
 
     return () => {
       element.removeEventListener('touchstart', handleStart);

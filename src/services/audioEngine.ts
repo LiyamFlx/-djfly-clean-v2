@@ -32,7 +32,8 @@ export class AudioEngine {
   private isInitialized = false;
 
   constructor() {
-    this.audioContext = new (window.AudioContext || (window as any).webkitAudioContext)();
+    this.audioContext = new (window.AudioContext ||
+      (window as any).webkitAudioContext)();
     this.setupAudioNodes();
   }
 
@@ -52,16 +53,25 @@ export class AudioEngine {
 
     this.trebleNode = this.audioContext.createBiquadFilter();
     this.trebleNode.type = 'highshelf';
-    this.trebleNode.frequency.setValueAtTime(3200, this.audioContext.currentTime);
+    this.trebleNode.frequency.setValueAtTime(
+      3200,
+      this.audioContext.currentTime
+    );
 
     // Filter effects
     this.lowPassNode = this.audioContext.createBiquadFilter();
     this.lowPassNode.type = 'lowpass';
-    this.lowPassNode.frequency.setValueAtTime(22000, this.audioContext.currentTime);
+    this.lowPassNode.frequency.setValueAtTime(
+      22000,
+      this.audioContext.currentTime
+    );
 
     this.highPassNode = this.audioContext.createBiquadFilter();
     this.highPassNode.type = 'highpass';
-    this.highPassNode.frequency.setValueAtTime(20, this.audioContext.currentTime);
+    this.highPassNode.frequency.setValueAtTime(
+      20,
+      this.audioContext.currentTime
+    );
 
     // Reverb
     this.convolver = this.audioContext.createConvolver();
@@ -101,8 +111,12 @@ export class AudioEngine {
     try {
       // Create a simple artificial reverb impulse response
       const length = this.audioContext.sampleRate * 2; // 2 second reverb
-      const impulse = this.audioContext.createBuffer(2, length, this.audioContext.sampleRate);
-      
+      const impulse = this.audioContext.createBuffer(
+        2,
+        length,
+        this.audioContext.sampleRate
+      );
+
       for (let channel = 0; channel < 2; channel++) {
         const channelData = impulse.getChannelData(channel);
         for (let i = 0; i < length; i++) {
@@ -110,7 +124,7 @@ export class AudioEngine {
           channelData[i] = (Math.random() * 2 - 1) * decay * 0.1;
         }
       }
-      
+
       this.convolver.buffer = impulse;
     } catch (error) {
       console.error('Failed to load impulse response:', error);
@@ -123,7 +137,7 @@ export class AudioEngine {
     }
 
     this.source = this.audioContext.createMediaElementSource(audioElement);
-    
+
     // Connect the audio processing chain
     this.source
       .connect(this.gainNode)
@@ -179,22 +193,28 @@ export class AudioEngine {
   public setLowPassFilter(frequency: number) {
     // Frequency range: 200Hz to 22000Hz
     const freq = Math.max(200, Math.min(22000, frequency));
-    this.lowPassNode.frequency.setValueAtTime(freq, this.audioContext.currentTime);
+    this.lowPassNode.frequency.setValueAtTime(
+      freq,
+      this.audioContext.currentTime
+    );
   }
 
   public setHighPassFilter(frequency: number) {
     const freq = Math.max(20, Math.min(1000, frequency));
-    this.highPassNode.frequency.setValueAtTime(freq, this.audioContext.currentTime);
+    this.highPassNode.frequency.setValueAtTime(
+      freq,
+      this.audioContext.currentTime
+    );
   }
 
   public setReverb(wetness: number) {
     // Wetness from 0-100
     const wet = wetness / 100;
     const dry = 1 - wet;
-    
+
     // Fade between dry and wet signals
     this.dryGain.gain.setValueAtTime(dry, this.audioContext.currentTime);
-    
+
     // Connect/disconnect reverb based on wetness
     if (wetness > 0) {
       try {
@@ -211,10 +231,19 @@ export class AudioEngine {
     // Delay amount from 0-100 (0-500ms)
     const delayTime = (amount / 100) * 0.5;
     const wetness = amount / 100;
-    
-    this.delayNode.delayTime.setValueAtTime(delayTime, this.audioContext.currentTime);
-    this.wetGain.gain.setValueAtTime(wetness * 0.3, this.audioContext.currentTime);
-    this.dryGain.gain.setValueAtTime(1 - wetness * 0.3, this.audioContext.currentTime);
+
+    this.delayNode.delayTime.setValueAtTime(
+      delayTime,
+      this.audioContext.currentTime
+    );
+    this.wetGain.gain.setValueAtTime(
+      wetness * 0.3,
+      this.audioContext.currentTime
+    );
+    this.dryGain.gain.setValueAtTime(
+      1 - wetness * 0.3,
+      this.audioContext.currentTime
+    );
   }
 
   public applyEffects(effects: Partial<AudioEffects>) {
@@ -224,7 +253,8 @@ export class AudioEngine {
     if (effects.bass !== undefined) this.setBass(effects.bass);
     if (effects.mid !== undefined) this.setMid(effects.mid);
     if (effects.treble !== undefined) this.setTreble(effects.treble);
-    if (effects.lowPassFilter !== undefined) this.setLowPassFilter(effects.lowPassFilter);
+    if (effects.lowPassFilter !== undefined)
+      this.setLowPassFilter(effects.lowPassFilter);
     if (effects.reverb !== undefined) this.setReverb(effects.reverb);
     if (effects.delay !== undefined) this.setDelay(effects.delay);
   }
@@ -249,7 +279,7 @@ export class AudioEngine {
     // Simple BPM detection using frequency analysis
     const freqData = this.getFrequencyData();
     const bassEnergy = freqData.slice(0, 10).reduce((sum, val) => sum + val, 0);
-    
+
     // This is a simplified BPM estimation - in reality, you'd need more complex analysis
     const estimatedBPM = Math.round((bassEnergy / 10) * 0.3 + 120);
     return Math.max(80, Math.min(200, estimatedBPM));
@@ -257,12 +287,15 @@ export class AudioEngine {
 
   public getVUMeter(): { left: number; right: number } {
     const dataArray = this.getTimeDomainData();
-    const rms = Math.sqrt(dataArray.reduce((sum, val) => sum + (val - 128) ** 2, 0) / dataArray.length);
+    const rms = Math.sqrt(
+      dataArray.reduce((sum, val) => sum + (val - 128) ** 2, 0) /
+        dataArray.length
+    );
     const level = (rms / 128) * 100;
-    
+
     return {
       left: level,
-      right: level * 0.95 // Slight variation for stereo effect
+      right: level * 0.95, // Slight variation for stereo effect
     };
   }
 
@@ -275,7 +308,7 @@ export class AudioEngine {
         lowPassFilter: 15000,
         reverb: 20,
         delay: 10,
-        gain: 85
+        gain: 85,
       },
       chill: {
         bass: 40,
@@ -284,7 +317,7 @@ export class AudioEngine {
         lowPassFilter: 8000,
         reverb: 40,
         delay: 25,
-        gain: 70
+        gain: 70,
       },
       clear: {
         bass: 50,
@@ -293,7 +326,7 @@ export class AudioEngine {
         lowPassFilter: 22000,
         reverb: 0,
         delay: 0,
-        gain: 80
+        gain: 80,
       },
       vocal: {
         bass: 30,
@@ -302,8 +335,8 @@ export class AudioEngine {
         lowPassFilter: 12000,
         reverb: 15,
         delay: 5,
-        gain: 75
-      }
+        gain: 75,
+      },
     };
 
     this.applyEffects(presets[presetName]);

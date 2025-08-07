@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef, useCallback } from 'react';
+import { useState, Suspense, lazy } from 'react';
 import {
   BrowserRouter,
   Routes,
@@ -7,21 +7,50 @@ import {
   useNavigate,
 } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { audioEngine } from '@/services/audioEngine';
-import LoginPage from '@/pages/auth/LoginPage';
-import SignupPage from '@/pages/auth/SignupPage';
+import { PlaylistGenerator } from '@/services/musicLibrary';
+import ApiStatusIndicator from '@/components/ApiStatusIndicator';
+import type { Track } from '@/services/musicLibrary';
+
+// Lazy load heavy components for better performance
+const LoginPage = lazy(() => import('@/pages/auth/LoginPage'));
+const SignupPage = lazy(() => import('@/pages/auth/SignupPage'));
+const PlayerPage = lazy(() => import('@/pages/PlayerPage'));
+const GuestMode = lazy(() => import('@/components/auth/GuestMode'));
+
+// Loading component for Suspense fallback
+const LoadingSpinner = ({ message = "Loading..." }: { message?: string }) => (
+  <div className="min-h-screen bg-club-gradient flex items-center justify-center">
+    <div className="text-center">
+      <div className="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-blue-400 mb-4"></div>
+      <p className="text-gray-300">{message}</p>
+    </div>
+  </div>
+);
 
 // Additional page components - simple implementations
 const ForgotPasswordPage = () => (
   <div className="min-h-screen bg-gray-900 text-white flex items-center justify-center p-8">
     <div className="bg-gray-800 rounded-xl p-8 max-w-md w-full">
       <h1 className="text-2xl font-bold text-blue-400 mb-4">Reset Password</h1>
-      <p className="text-gray-400 mb-6">Enter your email to receive reset instructions</p>
+      <p className="text-gray-400 mb-6">
+        Enter your email to receive reset instructions
+      </p>
       <form className="space-y-4">
-        <input type="email" placeholder="your@email.com" className="w-full px-4 py-3 bg-gray-700 border border-gray-600 rounded-lg focus:border-blue-500 focus:outline-none" />
-        <button className="w-full py-3 bg-blue-600 hover:bg-blue-700 rounded-lg font-semibold">Send Reset Link</button>
+        <input
+          type="email"
+          placeholder="your@email.com"
+          className="w-full px-4 py-3 bg-gray-700 border border-gray-600 rounded-lg focus:border-blue-500 focus:outline-none"
+        />
+        <button className="w-full py-3 bg-blue-600 hover:bg-blue-700 rounded-lg font-semibold">
+          Send Reset Link
+        </button>
       </form>
-      <Link to="/auth/login" className="block text-center text-blue-400 hover:text-blue-300 mt-4">Back to Login</Link>
+      <Link
+        to="/auth/login"
+        className="block text-center text-blue-400 hover:text-blue-300 mt-4"
+      >
+        Back to Login
+      </Link>
     </div>
   </div>
 );
@@ -29,11 +58,23 @@ const ForgotPasswordPage = () => (
 const ResetPasswordPage = () => (
   <div className="min-h-screen bg-gray-900 text-white flex items-center justify-center p-8">
     <div className="bg-gray-800 rounded-xl p-8 max-w-md w-full">
-      <h1 className="text-2xl font-bold text-blue-400 mb-4">Set New Password</h1>
+      <h1 className="text-2xl font-bold text-blue-400 mb-4">
+        Set New Password
+      </h1>
       <form className="space-y-4">
-        <input type="password" placeholder="New password" className="w-full px-4 py-3 bg-gray-700 border border-gray-600 rounded-lg focus:border-blue-500 focus:outline-none" />
-        <input type="password" placeholder="Confirm password" className="w-full px-4 py-3 bg-gray-700 border border-gray-600 rounded-lg focus:border-blue-500 focus:outline-none" />
-        <button className="w-full py-3 bg-blue-600 hover:bg-blue-700 rounded-lg font-semibold">Update Password</button>
+        <input
+          type="password"
+          placeholder="New password"
+          className="w-full px-4 py-3 bg-gray-700 border border-gray-600 rounded-lg focus:border-blue-500 focus:outline-none"
+        />
+        <input
+          type="password"
+          placeholder="Confirm password"
+          className="w-full px-4 py-3 bg-gray-700 border border-gray-600 rounded-lg focus:border-blue-500 focus:outline-none"
+        />
+        <button className="w-full py-3 bg-blue-600 hover:bg-blue-700 rounded-lg font-semibold">
+          Update Password
+        </button>
       </form>
     </div>
   </div>
@@ -60,12 +101,19 @@ const ProducerAnalyticsPage = () => (
       <div className="bg-gray-800 p-6 rounded-xl">
         <h3 className="text-xl font-semibold mb-4">Popular Tracks</h3>
         <div className="space-y-3">
-          {['Electronic Dreams', 'Bass Drop Madness', 'Synth Wave Sunset'].map((track, i) => (
-            <div key={i} className="flex items-center justify-between p-3 bg-gray-700 rounded-lg">
-              <span>{track}</span>
-              <span className="text-blue-400">{Math.floor(Math.random() * 500)} plays</span>
-            </div>
-          ))}
+          {['Electronic Dreams', 'Bass Drop Madness', 'Synth Wave Sunset'].map(
+            (track, i) => (
+              <div
+                key={i}
+                className="flex items-center justify-between p-3 bg-gray-700 rounded-lg"
+              >
+                <span>{track}</span>
+                <span className="text-blue-400">
+                  {Math.floor(Math.random() * 500)} plays
+                </span>
+              </div>
+            )
+          )}
         </div>
       </div>
     </div>
@@ -80,9 +128,15 @@ const TermsPage = () => (
         <h2>1. Acceptance of Terms</h2>
         <p>By using DJfly, you agree to these terms and conditions.</p>
         <h2>2. Use of Service</h2>
-        <p>DJfly is an AI-powered DJ platform for creating and sharing music mixes.</p>
+        <p>
+          DJfly is an AI-powered DJ platform for creating and sharing music
+          mixes.
+        </p>
         <h2>3. User Content</h2>
-        <p>Users retain ownership of their original content but grant DJfly license to use it.</p>
+        <p>
+          Users retain ownership of their original content but grant DJfly
+          license to use it.
+        </p>
         <h2>4. Privacy</h2>
         <p>We respect your privacy. See our Privacy Policy for details.</p>
       </div>
@@ -146,13 +200,21 @@ const ContactPage = () => (
           </div>
           <div>
             <label className="block text-sm font-medium mb-2">Email</label>
-            <input type="email" className="w-full px-4 py-3 bg-gray-700 border border-gray-600 rounded-lg focus:border-blue-500 focus:outline-none" />
+            <input
+              type="email"
+              className="w-full px-4 py-3 bg-gray-700 border border-gray-600 rounded-lg focus:border-blue-500 focus:outline-none"
+            />
           </div>
           <div>
             <label className="block text-sm font-medium mb-2">Message</label>
-            <textarea rows={5} className="w-full px-4 py-3 bg-gray-700 border border-gray-600 rounded-lg focus:border-blue-500 focus:outline-none"></textarea>
+            <textarea
+              rows={5}
+              className="w-full px-4 py-3 bg-gray-700 border border-gray-600 rounded-lg focus:border-blue-500 focus:outline-none"
+            ></textarea>
           </div>
-          <button className="w-full py-3 bg-blue-600 hover:bg-blue-700 rounded-lg font-semibold">Send Message</button>
+          <button className="w-full py-3 bg-blue-600 hover:bg-blue-700 rounded-lg font-semibold">
+            Send Message
+          </button>
         </form>
       </div>
     </div>
@@ -166,13 +228,21 @@ const DocsPage = () => (
       <div className="grid md:grid-cols-2 gap-8">
         <div className="bg-gray-800 p-6 rounded-xl">
           <h3 className="text-xl font-semibold mb-4">API Reference</h3>
-          <p className="text-gray-400 mb-4">Complete API documentation for developers.</p>
-          <button className="bg-blue-600 hover:bg-blue-700 px-4 py-2 rounded">View API Docs</button>
+          <p className="text-gray-400 mb-4">
+            Complete API documentation for developers.
+          </p>
+          <button className="bg-blue-600 hover:bg-blue-700 px-4 py-2 rounded">
+            View API Docs
+          </button>
         </div>
         <div className="bg-gray-800 p-6 rounded-xl">
           <h3 className="text-xl font-semibold mb-4">SDK</h3>
-          <p className="text-gray-400 mb-4">JavaScript SDK for integrating DJfly into your app.</p>
-          <button className="bg-purple-600 hover:bg-purple-700 px-4 py-2 rounded">Download SDK</button>
+          <p className="text-gray-400 mb-4">
+            JavaScript SDK for integrating DJfly into your app.
+          </p>
+          <button className="bg-purple-600 hover:bg-purple-700 px-4 py-2 rounded">
+            Download SDK
+          </button>
         </div>
       </div>
     </div>
@@ -184,30 +254,33 @@ const NotFoundPage = () => (
     <div className="text-center">
       <h1 className="text-6xl font-bold text-blue-400 mb-4">404</h1>
       <p className="text-xl text-gray-400 mb-6">Page not found</p>
-      <Link to="/" className="bg-blue-600 hover:bg-blue-700 px-6 py-3 rounded-lg font-semibold">Go Home</Link>
+      <Link
+        to="/"
+        className="bg-blue-600 hover:bg-blue-700 px-6 py-3 rounded-lg font-semibold"
+      >
+        Go Home
+      </Link>
     </div>
   </div>
 );
 
-// Track interface
-interface Track {
-  id: string; // Spotify IDs are strings
-  title: string;
-  artist: string;
-  image?: string;
-  duration?: number;
-  previewUrl?: string;
-  bpm?: number;
-  key?: string;
-  genre?: string;
-}
+// Export Track interface from musicLibrary
+// interface Track is imported from musicLibrary service
 
-// Simple state management
+// Simple state management with initial tracks
 const appState = {
   currentTrack: null as Track | null,
   queue: [] as Track[],
   isPlaying: false,
 };
+
+// Initialize with tracks asynchronously
+PlaylistGenerator.generateByVibe('mixed').then(tracks => {
+  if (tracks.length > 0) {
+    appState.queue = tracks;
+    console.log('🎵 Initial playlist loaded:', tracks.length, 'tracks');
+  }
+});
 
 const HomePage = () => (
   <div className="min-h-screen bg-gray-900 text-white p-8">
@@ -216,20 +289,59 @@ const HomePage = () => (
       🚀 DJfly v1.2.0 Demo - Live Testing Environment
     </div>
     <div className="max-w-4xl mx-auto text-center">
-      <h1 className="text-4xl font-bold text-blue-400 mb-8">DJfly</h1>
-      <p className="text-xl mb-8">AI-powered DJ platform</p>
+      <h1 className="text-4xl font-bold text-blue-400 mb-4">DJfly</h1>
+      <p className="text-xl mb-8">AI-powered DJ platform that reads any room instantly</p>
+      
+      {/* Quick Demo Access */}
+      <div className="bg-gradient-to-r from-blue-900/30 to-purple-900/30 border border-blue-600/30 rounded-xl p-6 mb-8">
+        <h2 className="text-2xl font-bold mb-3">🎵 Try DJfly Now - No Signup Required</h2>
+        <p className="text-gray-300 mb-4">
+          Experience AI-powered music discovery with our 10-minute demo
+        </p>
+        <div className="flex flex-col sm:flex-row gap-3 justify-center">
+          <Link
+            to="/guest"
+            className="bg-green-600 hover:bg-green-700 px-6 py-3 rounded-lg font-semibold transition-colors inline-flex items-center gap-2"
+          >
+            🚀 Start Free Demo
+          </Link>
+          <Link
+            to="/studio"
+            className="bg-blue-600 hover:bg-blue-700 px-6 py-3 rounded-lg font-semibold transition-colors"
+          >
+            🎛️ Full Studio
+          </Link>
+        </div>
+      </div>
+
+      {/* Feature Highlights */}
+      <div className="grid md:grid-cols-3 gap-6 mb-8">
+        <div className="bg-gray-800 p-4 rounded-lg">
+          <h3 className="text-lg font-semibold mb-2 text-blue-400">🤖 AI Music Discovery</h3>
+          <p className="text-sm text-gray-300">
+            Our AI analyzes crowd energy and generates perfect playlists instantly
+          </p>
+        </div>
+        <div className="bg-gray-800 p-4 rounded-lg">
+          <h3 className="text-lg font-semibold mb-2 text-purple-400">🎯 Smart Matching</h3>
+          <p className="text-sm text-gray-300">
+            Record crowd noise to get AI-powered track recommendations
+          </p>
+        </div>
+        <div className="bg-gray-800 p-4 rounded-lg">
+          <h3 className="text-lg font-semibold mb-2 text-green-400">🎧 Professional Tools</h3>
+          <p className="text-sm text-gray-300">
+            Real-time effects, BPM matching, and seamless mixing
+          </p>
+        </div>
+      </div>
+
       <div className="space-x-4">
-        <Link
-          to="/studio"
-          className="bg-blue-600 px-6 py-3 rounded hover:bg-blue-700 transition-colors"
-        >
-          Studio
-        </Link>
         <Link
           to="/player"
           className="bg-purple-600 px-6 py-3 rounded hover:bg-purple-700 transition-colors"
         >
-          Player
+          🎵 Player
         </Link>
       </div>
     </div>
@@ -267,6 +379,7 @@ const StudioPage = () => (
 const MagicMatchPage = () => {
   const navigate = useNavigate();
   const [status, setStatus] = useState('ready');
+  const [aiAnalysis, setAiAnalysis] = useState<any>(null);
 
   const handleAnalyze = async () => {
     setStatus('recording');
@@ -275,46 +388,43 @@ const MagicMatchPage = () => {
       const recorder = new MediaRecorder(stream);
       recorder.start();
 
-      setTimeout(() => {
+      setTimeout(async () => {
         recorder.stop();
         stream.getTracks().forEach((track) => track.stop()); // Stop microphone access
 
-        // Simulate analysis and generate playlist
+        // AI-powered crowd analysis and playlist generation
         setStatus('complete');
-        // In a real app, you'd analyze the recorded audio data.
-        // For now, we just generate a mock playlist as before.
-        appState.queue = [
-          {
-            id: 'match1',
-            title: 'Summer Electronic Vibes',
-            artist: 'AI Generated',
-            bpm: 125,
-            key: 'Am',
-            previewUrl:
-              'https://www.soundjay.com/misc/sounds/bell-ringing-05.wav',
-            duration: 180,
-          },
-          {
-            id: 'match2',
-            title: 'Deep House Flow',
-            artist: 'AI Generated',
-            bpm: 128,
-            key: 'G',
-            previewUrl:
-              'https://actions.google.com/sounds/v1/alarms/beep_short.ogg',
-            duration: 180,
-          },
-          {
-            id: 'match3',
-            title: 'Progressive Energy',
-            artist: 'AI Generated',
-            bpm: 126,
-            key: 'C',
-            previewUrl:
-              'https://actions.google.com/sounds/v1/alarms/digital_watch_alarm_long.ogg',
-            duration: 180,
-          },
-        ];
+        
+        try {
+          const { aiMusicEngine } = await import('@/services/aiMusicEngine');
+          
+          // Simulate crowd energy detection (in real app this would analyze audio)
+          const crowdEnergy = Math.floor(Math.random() * 40) + 60; // 60-100 for demo
+          const timeOfDay = new Date().getHours() > 18 ? 'evening' : 'afternoon';
+          
+          // Generate AI-powered recommendations
+          const recommendation = await aiMusicEngine.generateIntelligentPlaylist({
+            prompt: `Crowd energy detected: ${crowdEnergy}/100. Generate playlist for current vibe and energy level.`,
+            mood: crowdEnergy > 80 ? 'energetic' : crowdEnergy > 60 ? 'progressive' : 'mixed',
+            crowdEnergy,
+            timeOfDay: timeOfDay as any,
+            venue: 'club',
+            duration: 45
+          });
+          
+          setAiAnalysis({
+            crowdEnergy,
+            timeOfDay,
+            recommendation
+          });
+          
+          appState.queue = recommendation.tracks;
+        } catch (error) {
+          console.warn('AI analysis failed, using fallback:', error);
+          // Fallback to existing generator
+          const playlist = await PlaylistGenerator.generateByVibe('mixed');
+          appState.queue = playlist;
+        }
       }, 5000); // Record for 5 seconds
     } catch (err) {
       console.error('Microphone access denied:', err);
@@ -361,9 +471,24 @@ const MagicMatchPage = () => {
         {status === 'complete' && (
           <div className="text-center">
             <div className="bg-green-900 bg-opacity-30 p-6 rounded-lg mb-8">
-              <h2 className="text-2xl font-bold mb-2">Analysis Complete!</h2>
+              <h2 className="text-2xl font-bold mb-2">🤖 AI Analysis Complete!</h2>
+              {aiAnalysis && (
+                <div className="mb-4 space-y-2">
+                  <p className="text-green-300">
+                    Crowd Energy: <span className="font-bold">{aiAnalysis.crowdEnergy}/100</span>
+                  </p>
+                  <p className="text-green-300">
+                    Time: <span className="capitalize">{aiAnalysis.timeOfDay}</span>
+                  </p>
+                  {aiAnalysis.recommendation && (
+                    <p className="text-sm text-green-200">
+                      {aiAnalysis.recommendation.reasoning}
+                    </p>
+                  )}
+                </div>
+              )}
               <p className="mb-4">
-                We've generated the perfect playlist for your crowd.
+                AI has generated the perfect playlist for your crowd.
               </p>
               <button
                 onClick={() => navigate('/player')}
@@ -404,8 +529,9 @@ const MagicSetPage = () => {
   const [prompt, setPrompt] = useState('');
   const [status, setStatus] = useState('ready'); // ready, generating, complete
   const [generatedTracks, setGeneratedTracks] = useState<Track[]>([]);
+  const [aiRecommendation, setAiRecommendation] = useState<any>(null);
 
-  const generatePlaylist = () => {
+  const generatePlaylist = async () => {
     if (!prompt.trim()) {
       alert('Please describe the playlist you want to create!');
       return;
@@ -413,70 +539,48 @@ const MagicSetPage = () => {
 
     setStatus('generating');
 
-    // Simulate AI generation (keeping working demo)
-    setTimeout(() => {
-      const mockTracks: Track[] = [
-        {
-          id: '1',
-          title: 'Summer Vibes',
-          artist: 'DJfly AI',
-          bpm: 120,
-          key: 'C',
-          genre: 'Electronic',
-          previewUrl:
-            'https://actions.google.com/sounds/v1/alarms/beep_short.ogg',
-          duration: 180,
-        },
-        {
-          id: '2',
-          title: 'Deep House Flow',
-          artist: 'DJfly AI',
-          bpm: 122,
-          key: 'G',
-          genre: 'House',
-          previewUrl:
-            'https://actions.google.com/sounds/v1/alarms/digital_watch_alarm_long.ogg',
-          duration: 180,
-        },
-        {
-          id: '3',
-          title: 'Energetic Beats',
-          artist: 'DJfly AI',
-          bpm: 128,
-          key: 'Am',
-          genre: 'Techno',
-          previewUrl:
-            'https://actions.google.com/sounds/v1/cartoon/cartoon_boing.ogg',
-          duration: 180,
-        },
-        {
-          id: '4',
-          title: 'Chill Sunset',
-          artist: 'DJfly AI',
-          bpm: 110,
-          key: 'F',
-          genre: 'Ambient',
-          previewUrl:
-            'https://actions.google.com/sounds/v1/animals/cat_purr_close.ogg',
-          duration: 180,
-        },
-        {
-          id: '5',
-          title: 'Party Anthem',
-          artist: 'DJfly AI',
-          bpm: 132,
-          key: 'D',
-          genre: 'Progressive',
-          previewUrl:
-            'https://actions.google.com/sounds/v1/cartoon/cartoon_cowbell.ogg',
-          duration: 180,
-        },
-      ];
-
-      setGeneratedTracks(mockTracks);
+    try {
+      // Import AI engine dynamically
+      const { aiMusicEngine } = await import('@/services/aiMusicEngine');
+      
+      // Generate AI-powered playlist
+      const recommendation = await aiMusicEngine.generateIntelligentPlaylist({
+        prompt,
+        mood: detectMoodFromPrompt(prompt),
+        duration: 60, // 1 hour default
+        venue: detectVenueFromPrompt(prompt)
+      });
+      
+      setAiRecommendation(recommendation);
+      setGeneratedTracks(recommendation.tracks);
       setStatus('complete');
-      appState.queue = mockTracks;
-    }, 3000);
+      appState.queue = recommendation.tracks;
+    } catch (error) {
+      console.warn('AI generation failed, using fallback:', error);
+      // Fallback to existing generator
+      const generatedTracks = await PlaylistGenerator.generateByPrompt(prompt);
+      setGeneratedTracks(generatedTracks);
+      setStatus('complete');
+      appState.queue = generatedTracks;
+    }
+  };
+
+  // Helper functions to detect mood and venue from prompt
+  const detectMoodFromPrompt = (prompt: string): 'energetic' | 'chill' | 'progressive' | 'mixed' => {
+    const lowerPrompt = prompt.toLowerCase();
+    if (lowerPrompt.includes('energetic') || lowerPrompt.includes('party') || lowerPrompt.includes('dance')) return 'energetic';
+    if (lowerPrompt.includes('chill') || lowerPrompt.includes('relax') || lowerPrompt.includes('lounge')) return 'chill';
+    if (lowerPrompt.includes('progressive') || lowerPrompt.includes('build')) return 'progressive';
+    return 'mixed';
+  };
+
+  const detectVenueFromPrompt = (prompt: string): 'club' | 'lounge' | 'festival' | 'radio' | 'workout' => {
+    const lowerPrompt = prompt.toLowerCase();
+    if (lowerPrompt.includes('club') || lowerPrompt.includes('nightclub')) return 'club';
+    if (lowerPrompt.includes('lounge') || lowerPrompt.includes('cocktail')) return 'lounge';
+    if (lowerPrompt.includes('festival') || lowerPrompt.includes('outdoor')) return 'festival';
+    if (lowerPrompt.includes('workout') || lowerPrompt.includes('gym')) return 'workout';
+    return 'club';
   };
 
   const resetGenerator = () => {
@@ -624,11 +728,16 @@ const MagicSetPage = () => {
           <div className="mb-8">
             <div className="bg-green-900 bg-opacity-30 p-6 rounded-xl mb-6">
               <h2 className="text-2xl font-bold mb-2">
-                ✅ Playlist Generated!
+                ✅ AI Playlist Generated!
               </h2>
-              <p className="mb-4">
+              <p className="mb-2">
                 Perfect tracks selected based on: "{prompt}"
               </p>
+              {aiRecommendation && (
+                <p className="text-sm text-green-300 mb-4">
+                  🤖 {aiRecommendation.reasoning}
+                </p>
+              )}
               <div className="flex gap-4">
                 <button
                   onClick={() => navigate('/player')}
@@ -644,6 +753,21 @@ const MagicSetPage = () => {
                 </button>
               </div>
             </div>
+
+            {/* AI Mixing Tips */}
+            {aiRecommendation?.mixingTips && (
+              <div className="bg-blue-900 bg-opacity-30 p-4 rounded-xl mb-6">
+                <h3 className="text-lg font-semibold mb-2 text-blue-300">🎧 AI Mixing Tips</h3>
+                <ul className="space-y-1 text-sm text-blue-200">
+                  {aiRecommendation.mixingTips.map((tip: string, index: number) => (
+                    <li key={index} className="flex items-start gap-2">
+                      <span className="text-blue-400">•</span>
+                      {tip}
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            )}
 
             <div className="bg-gray-800 p-6 rounded-xl">
               <h3 className="text-xl font-semibold mb-4">
@@ -677,534 +801,6 @@ const MagicSetPage = () => {
                 ))}
               </div>
             </div>
-          </div>
-        )}
-      </div>
-    </div>
-  );
-};
-
-const PlayerPage = () => {
-  const [isPlaying, setIsPlaying] = useState(appState.isPlaying);
-  const [currentTime, setCurrentTime] = useState(0);
-  const [duration, setDuration] = useState(0);
-  const [volume, setVolume] = useState(80);
-  const [currentTrack, setCurrentTrack] = useState(
-    appState.currentTrack || appState.queue[0]
-  );
-  const [shuffle, setShuffle] = useState(false);
-  const [repeat, setRepeat] = useState<'none' | 'one' | 'all'>('none');
-
-  // DJ Effects State
-  const [bassLevel, setBassLevel] = useState(50);
-  const [midLevel, setMidLevel] = useState(50);
-  const [trebleLevel, setTrebleLevel] = useState(50);
-  const [filterFreq, setFilterFreq] = useState(20000);
-  const [reverbWet, setReverbWet] = useState(0);
-  const [delayTime, setDelayTime] = useState(0);
-  const [showEffects, setShowEffects] = useState(false);
-
-  // Visualization state
-  const [vuMeter, setVuMeter] = useState({ left: 0, right: 0 });
-  const [detectedBPM, setDetectedBPM] = useState(120);
-
-  const audioRef = useRef<HTMLAudioElement>(null);
-
-  const handleNextTrack = useCallback(() => {
-    const currentIndex = appState.queue.findIndex(
-      (t) => t.id === currentTrack?.id
-    );
-    if (currentIndex !== -1) {
-      let nextIndex;
-      if (shuffle) {
-        nextIndex = Math.floor(Math.random() * appState.queue.length);
-      } else {
-        nextIndex = (currentIndex + 1) % appState.queue.length;
-      }
-      const nextTrack = appState.queue[nextIndex];
-      appState.currentTrack = nextTrack;
-      setCurrentTrack(nextTrack);
-    }
-  }, [currentTrack, shuffle]);
-
-  useEffect(() => {
-    const audio = audioRef.current;
-    if (!audio) return;
-
-    const handleTimeUpdate = () => {
-      setCurrentTime(audio.currentTime);
-      // Update VU meter and BPM detection
-      const vu = audioEngine.getVUMeter();
-      setVuMeter(vu);
-      const bpm = audioEngine.getBPM();
-      setDetectedBPM(bpm);
-    };
-    
-    const handleLoadedMetadata = () => {
-      setDuration(audio.duration);
-    };
-    
-    const handleEnded = () => {
-      if (repeat === 'one') {
-        audio.currentTime = 0;
-        audio.play();
-      } else if (repeat === 'all' || appState.queue.length > 1) {
-        handleNextTrack();
-      } else {
-        setIsPlaying(false);
-        appState.isPlaying = false;
-      }
-    };
-
-    audio.addEventListener('timeupdate', handleTimeUpdate);
-    audio.addEventListener('loadedmetadata', handleLoadedMetadata);
-    audio.addEventListener('ended', handleEnded);
-
-    return () => {
-      audio.removeEventListener('timeupdate', handleTimeUpdate);
-      audio.removeEventListener('loadedmetadata', handleLoadedMetadata);
-      audio.removeEventListener('ended', handleEnded);
-    };
-  }, [currentTrack, handleNextTrack, repeat]);
-
-  useEffect(() => {
-    const audio = audioRef.current;
-    if (!audio) return;
-
-    if (currentTrack && currentTrack.previewUrl) {
-      if (audio.src !== currentTrack.previewUrl) {
-        audio.src = currentTrack.previewUrl;
-        // Connect audio engine when new track loads
-        audio.addEventListener('loadeddata', () => {
-          audioEngine.connectAudioElement(audio);
-        }, { once: true });
-      }
-      if (isPlaying) {
-        audioEngine.resumeContext().then(() => {
-          audio.play().catch((e) => {
-            console.error('Audio play failed:', e);
-            setIsPlaying(false);
-            appState.isPlaying = false;
-          });
-        });
-      } else {
-        audio.pause();
-      }
-    } else {
-      audio.pause();
-    }
-  }, [currentTrack, isPlaying]);
-
-  // Apply audio effects in real-time
-  useEffect(() => {
-    audioEngine.applyEffects({
-      bass: bassLevel,
-      mid: midLevel,
-      treble: trebleLevel,
-      lowPassFilter: filterFreq,
-      reverb: reverbWet,
-      delay: delayTime,
-      gain: volume
-    });
-  }, [bassLevel, midLevel, trebleLevel, filterFreq, reverbWet, delayTime, volume]);
-
-  useEffect(() => {
-    if (audioRef.current) {
-      audioRef.current.volume = volume / 100;
-    }
-  }, [volume]);
-
-  const togglePlay = () => {
-    const newIsPlaying = !isPlaying;
-    setIsPlaying(newIsPlaying);
-    appState.isPlaying = newIsPlaying;
-  };
-
-  const nextTrack = () => {
-    handleNextTrack();
-  };
-
-  const prevTrack = () => {
-    const currentIndex = appState.queue.findIndex(
-      (t) => t.id === currentTrack?.id
-    );
-    if (currentIndex !== -1) {
-      const prevIndex =
-        (currentIndex - 1 + appState.queue.length) % appState.queue.length;
-      const prevTrack = appState.queue[prevIndex];
-      appState.currentTrack = prevTrack;
-      setCurrentTrack(prevTrack);
-    }
-  };
-
-  const handleVolumeChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const newVolume = parseInt(e.target.value);
-    setVolume(newVolume);
-  };
-
-  const handleSeek = (e: React.MouseEvent<HTMLDivElement>) => {
-    const audio = audioRef.current;
-    if (!audio || !duration) return;
-
-    const rect = e.currentTarget.getBoundingClientRect();
-    const clickX = e.clientX - rect.left;
-    const percentage = clickX / rect.width;
-    const newTime = percentage * duration;
-    
-    audio.currentTime = newTime;
-    setCurrentTime(newTime);
-  };
-
-  const formatTime = (seconds: number) => {
-    const mins = Math.floor(seconds / 60);
-    const secs = Math.floor(seconds % 60);
-    return `${mins}:${secs.toString().padStart(2, '0')}`;
-  };
-
-  const trackDuration = duration || currentTrack?.duration || 180;
-
-  return (
-    <div className="min-h-screen bg-gray-900 text-white p-8">
-      <audio ref={audioRef} />
-      <div className="max-w-4xl mx-auto">
-        <h1 className="text-3xl font-bold mb-8">🎧 Player</h1>
-
-        {currentTrack ? (
-          <div className="text-center">
-            <div className="w-64 h-64 bg-gray-800 rounded-xl mx-auto mb-8 overflow-hidden">
-              <div className="w-full h-full flex items-center justify-center text-6xl">
-                🎵
-              </div>
-            </div>
-
-            <h2 className="text-2xl font-bold">{currentTrack.title}</h2>
-            <p className="text-gray-400 mb-8">{currentTrack.artist}</p>
-
-            <div className="mb-4">
-              <div 
-                className="h-2 bg-gray-700 rounded-full overflow-hidden mb-2 cursor-pointer relative"
-                onClick={handleSeek}
-              >
-                <div
-                  className="h-full bg-gradient-to-r from-blue-500 to-purple-500 transition-all duration-100"
-                  style={{ width: `${(currentTime / trackDuration) * 100}%` }}
-                ></div>
-                <div 
-                  className="absolute top-1/2 transform -translate-y-1/2 w-4 h-4 bg-white rounded-full shadow-lg"
-                  style={{ left: `${(currentTime / trackDuration) * 100}%`, marginLeft: '-8px' }}
-                ></div>
-              </div>
-              <div className="flex justify-between text-sm text-gray-400">
-                <span>{formatTime(currentTime)}</span>
-                <div className="flex items-center space-x-4">
-                  <span className="text-xs text-purple-400">BPM: {detectedBPM}</span>
-                  <span className="text-xs text-green-400">
-                    L:{Math.round(vuMeter.left)}% R:{Math.round(vuMeter.right)}%
-                  </span>
-                </div>
-                <span>{formatTime(trackDuration)}</span>
-              </div>
-            </div>
-
-            <div className="flex items-center justify-center space-x-6 mb-8">
-              <button
-                onClick={() => setShuffle(!shuffle)}
-                className={`p-2 rounded-full hover:bg-gray-800 transition-colors ${shuffle ? 'text-blue-400' : 'text-gray-400'}`}
-                aria-label="Shuffle"
-              >
-                🔀
-              </button>
-              <button
-                onClick={prevTrack}
-                className="p-2 rounded-full hover:bg-gray-800 transition-colors"
-                aria-label="Previous track"
-              >
-                ⏮
-              </button>
-              <button
-                onClick={togglePlay}
-                className="w-16 h-16 bg-blue-600 rounded-full flex items-center justify-center hover:bg-blue-700 transition-colors"
-                aria-label={isPlaying ? 'Pause' : 'Play'}
-              >
-                {isPlaying ? '⏸' : '▶'}
-              </button>
-              <button
-                onClick={nextTrack}
-                className="p-2 rounded-full hover:bg-gray-800 transition-colors"
-                aria-label="Next track"
-              >
-                ⏭
-              </button>
-              <button
-                onClick={() => setRepeat(repeat === 'none' ? 'all' : repeat === 'all' ? 'one' : 'none')}
-                className={`p-2 rounded-full hover:bg-gray-800 transition-colors ${repeat !== 'none' ? 'text-blue-400' : 'text-gray-400'}`}
-                aria-label="Repeat"
-              >
-                {repeat === 'one' ? '🔂' : '🔁'}
-              </button>
-            </div>
-
-            <div className="flex items-center justify-center space-x-4">
-              <span className="text-gray-400">🔈</span>
-              <input
-                type="range"
-                min="0"
-                max="100"
-                value={volume}
-                onChange={handleVolumeChange}
-                className="w-32 accent-blue-500"
-              />
-              <span className="text-gray-400 w-10 text-right">{volume}%</span>
-            </div>
-
-            {/* DJ Effects Panel */}
-            <div className="mt-8">
-              <button
-                onClick={() => setShowEffects(!showEffects)}
-                className="w-full bg-purple-600 hover:bg-purple-700 text-white font-bold py-3 px-6 rounded-lg mb-4 transition-colors"
-              >
-                🎛️ DJ Effects {showEffects ? '▼' : '▶'}
-              </button>
-
-              {showEffects && (
-                <div className="bg-gray-800 p-6 rounded-xl mb-8">
-                  <div className="grid md:grid-cols-2 gap-6">
-                    {/* EQ Section */}
-                    <div>
-                      <h4 className="text-lg font-semibold mb-4">🎚️ EQ</h4>
-                      <div className="space-y-4">
-                        <div>
-                          <label className="block text-sm text-gray-400 mb-2">
-                            Bass
-                          </label>
-                          <input
-                            type="range"
-                            min="0"
-                            max="100"
-                            value={bassLevel}
-                            onChange={(e) =>
-                              setBassLevel(Number(e.target.value))
-                            }
-                            className="w-full accent-purple-500"
-                          />
-                          <span className="text-xs text-gray-400">
-                            {bassLevel}%
-                          </span>
-                        </div>
-                        <div>
-                          <label className="block text-sm text-gray-400 mb-2">
-                            Mid
-                          </label>
-                          <input
-                            type="range"
-                            min="0"
-                            max="100"
-                            value={midLevel}
-                            onChange={(e) =>
-                              setMidLevel(Number(e.target.value))
-                            }
-                            className="w-full accent-purple-500"
-                          />
-                          <span className="text-xs text-gray-400">
-                            {midLevel}%
-                          </span>
-                        </div>
-                        <div>
-                          <label className="block text-sm text-gray-400 mb-2">
-                            Treble
-                          </label>
-                          <input
-                            type="range"
-                            min="0"
-                            max="100"
-                            value={trebleLevel}
-                            onChange={(e) =>
-                              setTrebleLevel(Number(e.target.value))
-                            }
-                            className="w-full accent-purple-500"
-                          />
-                          <span className="text-xs text-gray-400">
-                            {trebleLevel}%
-                          </span>
-                        </div>
-                      </div>
-                    </div>
-
-                    {/* Effects Section */}
-                    <div>
-                      <h4 className="text-lg font-semibold mb-4">✨ Effects</h4>
-                      <div className="space-y-4">
-                        <div>
-                          <label className="block text-sm text-gray-400 mb-2">
-                            Filter (Hz)
-                          </label>
-                          <input
-                            type="range"
-                            min="200"
-                            max="20000"
-                            value={filterFreq}
-                            onChange={(e) =>
-                              setFilterFreq(Number(e.target.value))
-                            }
-                            className="w-full accent-blue-500"
-                          />
-                          <span className="text-xs text-gray-400">
-                            {filterFreq} Hz
-                          </span>
-                        </div>
-                        <div>
-                          <label className="block text-sm text-gray-400 mb-2">
-                            Reverb
-                          </label>
-                          <input
-                            type="range"
-                            min="0"
-                            max="100"
-                            value={reverbWet}
-                            onChange={(e) =>
-                              setReverbWet(Number(e.target.value))
-                            }
-                            className="w-full accent-blue-500"
-                          />
-                          <span className="text-xs text-gray-400">
-                            {reverbWet}%
-                          </span>
-                        </div>
-                        <div>
-                          <label className="block text-sm text-gray-400 mb-2">
-                            Delay
-                          </label>
-                          <input
-                            type="range"
-                            min="0"
-                            max="100"
-                            value={delayTime}
-                            onChange={(e) =>
-                              setDelayTime(Number(e.target.value))
-                            }
-                            className="w-full accent-blue-500"
-                          />
-                          <span className="text-xs text-gray-400">
-                            {delayTime}%
-                          </span>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* Preset Buttons */}
-                  <div className="mt-6 flex gap-2 flex-wrap">
-                    <button
-                      onClick={() => {
-                        audioEngine.applyPreset('party');
-                        setBassLevel(75);
-                        setMidLevel(60);
-                        setTrebleLevel(70);
-                        setFilterFreq(15000);
-                        setReverbWet(20);
-                        setDelayTime(10);
-                      }}
-                      className="bg-orange-600 hover:bg-orange-700 px-4 py-2 rounded text-sm"
-                    >
-                      🔥 Party Mode
-                    </button>
-                    <button
-                      onClick={() => {
-                        audioEngine.applyPreset('chill');
-                        setBassLevel(40);
-                        setMidLevel(55);
-                        setTrebleLevel(45);
-                        setFilterFreq(8000);
-                        setReverbWet(40);
-                        setDelayTime(25);
-                      }}
-                      className="bg-blue-600 hover:bg-blue-700 px-4 py-2 rounded text-sm"
-                    >
-                      🌊 Chill Vibes
-                    </button>
-                    <button
-                      onClick={() => {
-                        audioEngine.applyPreset('vocal');
-                        setBassLevel(30);
-                        setMidLevel(70);
-                        setTrebleLevel(60);
-                        setFilterFreq(12000);
-                        setReverbWet(15);
-                        setDelayTime(5);
-                      }}
-                      className="bg-purple-600 hover:bg-purple-700 px-4 py-2 rounded text-sm"
-                    >
-                      🎤 Vocal Boost
-                    </button>
-                    <button
-                      onClick={() => {
-                        audioEngine.applyPreset('clear');
-                        setBassLevel(50);
-                        setMidLevel(50);
-                        setTrebleLevel(50);
-                        setFilterFreq(22000);
-                        setReverbWet(0);
-                        setDelayTime(0);
-                      }}
-                      className="bg-gray-600 hover:bg-gray-700 px-4 py-2 rounded text-sm"
-                    >
-                      🔄 Reset
-                    </button>
-                  </div>
-                </div>
-              )}
-            </div>
-
-            <div className="mt-8">
-              <h3 className="text-lg font-semibold mb-4">
-                Up Next ({appState.queue.length} tracks)
-              </h3>
-              <div className="space-y-2 max-h-48 overflow-y-auto pr-2">
-                {appState.queue.map((track, index) => (
-                  <div
-                    key={track.id}
-                    className={`p-3 rounded-lg cursor-pointer hover:bg-gray-700 ${track.id === currentTrack.id ? 'bg-blue-900 bg-opacity-30' : 'bg-gray-800'}`}
-                    onClick={() => {
-                      setCurrentTrack(track);
-                      appState.currentTrack = track;
-                    }}
-                  >
-                    <div className="flex items-center">
-                      <span className="w-6 text-gray-400">{index + 1}.</span>
-                      <div className="flex-1">
-                        <p
-                          className={`${track.id === currentTrack.id ? 'text-blue-400 font-semibold' : ''}`}
-                        >
-                          {track.title}
-                        </p>
-                        <p className="text-sm text-gray-400">
-                          {track.artist} • {track.genre}
-                        </p>
-                      </div>
-                      <div className="text-right">
-                        <span className="text-xs text-gray-500">
-                          {track.bpm} BPM
-                        </span>
-                        <br />
-                        <span className="text-xs text-purple-400">
-                          {track.key}
-                        </span>
-                      </div>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </div>
-          </div>
-        ) : (
-          <div className="text-center py-16">
-            <p className="text-xl text-gray-400 mb-6">No tracks in queue</p>
-            <Link
-              to="/studio"
-              className="inline-block bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-6 rounded-full transition-colors"
-            >
-              Add Tracks
-            </Link>
           </div>
         )}
       </div>
@@ -1343,34 +939,69 @@ function App() {
   return (
     <BrowserRouter>
       <div className="pb-16">
+        <ApiStatusIndicator />
         <Routes>
           <Route path="/" element={<HomePage />} />
           <Route path="/studio" element={<StudioPage />} />
           <Route path="/studio/match" element={<MagicMatchPage />} />
           <Route path="/studio/set" element={<MagicSetPage />} />
-          <Route path="/player" element={<PlayerPage />} />
+          <Route 
+            path="/player" 
+            element={
+              <Suspense fallback={<LoadingSpinner message="Loading DJ Player..." />}>
+                <PlayerPage />
+              </Suspense>
+            } 
+          />
           <Route path="/profile" element={<ProfilePage />} />
-          
+
+          {/* Guest Mode Route */}
+          <Route 
+            path="/guest" 
+            element={
+              <Suspense fallback={<LoadingSpinner message="Setting up demo..." />}>
+                <GuestMode onStartDemo={() => {}} onSignUp={() => {}} />
+              </Suspense>
+            } 
+          />
+
           {/* Authentication Routes */}
-          <Route path="/auth/login" element={<LoginPage />} />
-          <Route path="/auth/signup" element={<SignupPage />} />
-          <Route path="/auth/forgot-password" element={<ForgotPasswordPage />} />
+          <Route 
+            path="/auth/login" 
+            element={
+              <Suspense fallback={<LoadingSpinner message="Loading login..." />}>
+                <LoginPage />
+              </Suspense>
+            } 
+          />
+          <Route 
+            path="/auth/signup" 
+            element={
+              <Suspense fallback={<LoadingSpinner message="Loading signup..." />}>
+                <SignupPage />
+              </Suspense>
+            } 
+          />
+          <Route
+            path="/auth/forgot-password"
+            element={<ForgotPasswordPage />}
+          />
           <Route path="/auth/reset-password" element={<ResetPasswordPage />} />
-          
+
           {/* Producer Analytics */}
           <Route path="/producer" element={<ProducerAnalyticsPage />} />
-          
+
           {/* Legal Pages */}
           <Route path="/legal/terms" element={<TermsPage />} />
           <Route path="/legal/privacy" element={<PrivacyPage />} />
-          
+
           {/* Support Pages */}
           <Route path="/support/help" element={<HelpPage />} />
           <Route path="/support/contact" element={<ContactPage />} />
-          
+
           {/* Documentation */}
           <Route path="/docs" element={<DocsPage />} />
-          
+
           {/* 404 Page */}
           <Route path="*" element={<NotFoundPage />} />
         </Routes>
