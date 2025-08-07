@@ -4,7 +4,7 @@
   "installCommand": "npm install --legacy-peer-deps",
   "rewrites": [
     {
-      "source": "/(?!assets|icon-|manifest|sw\\.js|.*\\.(js|css|png|jpg|jpeg|gif|svg|ico|woff|woff2|ttf|eot))(.*)$",
+      "source": "/((?!assets/).*)",
       "destination": "/index.html"
     }
   ],
