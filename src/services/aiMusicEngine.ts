@@ -401,7 +401,8 @@ Create playlists that:
       // Energy match
       const energyMap = { low: 1, medium: 2, high: 3 };
       const trackEnergyValue = track.energy || 0.5;
-      const trackEnergy = trackEnergyValue > 0.7 ? 3 : trackEnergyValue < 0.4 ? 1 : 2;
+      const trackEnergy =
+        trackEnergyValue > 0.7 ? 3 : trackEnergyValue < 0.4 ? 1 : 2;
       const suggestionEnergy =
         energyMap[suggestion.energy as keyof typeof energyMap] || 2;
       if (trackEnergy === suggestionEnergy) score += 25;
@@ -453,7 +454,9 @@ Create playlists that:
     // Filter by BPM range if specified
     if (request.bpmRange) {
       tracks = tracks.filter(
-        (t) => (t.bpm || 120) >= request.bpmRange!.min && (t.bpm || 120) <= request.bpmRange!.max
+        (t) =>
+          (t.bpm || 120) >= request.bpmRange!.min &&
+          (t.bpm || 120) <= request.bpmRange!.max
       );
     }
 
@@ -467,7 +470,9 @@ Create playlists that:
       );
     } else if (request.mood === 'chill') {
       tracks = tracks.filter(
-        (t) => (t.energy || 0) < 0.4 || ((t.energy || 0) >= 0.4 && (t.energy || 0) <= 0.7)
+        (t) =>
+          (t.energy || 0) < 0.4 ||
+          ((t.energy || 0) >= 0.4 && (t.energy || 0) <= 0.7)
       );
       tracks.sort((a, b) => (a.bpm || 120) - (b.bpm || 120));
     }
@@ -532,7 +537,12 @@ Create playlists that:
     response: string;
     suggestions: string[];
   } {
-    const baseEnergy = (track.energy || 0) > 0.7 ? 75 : (track.energy || 0) >= 0.4 && (track.energy || 0) <= 0.7 ? 50 : 30;
+    const baseEnergy =
+      (track.energy || 0) > 0.7
+        ? 75
+        : (track.energy || 0) >= 0.4 && (track.energy || 0) <= 0.7
+          ? 50
+          : 30;
     const venueModifier = venue === 'club' ? 15 : venue === 'festival' ? 20 : 0;
     const energy = Math.min(
       100,
@@ -555,7 +565,13 @@ Create playlists that:
   }
 
   private getAvailableGenres(): string[] {
-    return [...new Set(MUSIC_LIBRARY.map((t: Track) => t.genre).filter((genre): genre is string => genre !== undefined))];
+    return [
+      ...new Set(
+        MUSIC_LIBRARY.map((t: Track) => t.genre).filter(
+          (genre): genre is string => genre !== undefined
+        )
+      ),
+    ];
   }
 
   private generateCacheKey(type: string, data: any): string {

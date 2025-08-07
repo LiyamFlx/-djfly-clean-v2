@@ -34,6 +34,7 @@ pnpm lint
 ## 🏗️ Architecture
 
 ### Tech Stack
+
 - **Frontend**: React 18 + TypeScript + Vite
 - **State Management**: Zustand with Immer
 - **Styling**: Tailwind CSS
@@ -42,6 +43,7 @@ pnpm lint
 - **Testing**: Vitest + Testing Library
 
 ### Project Structure
+
 ```
 src/
 ├── components/        # Reusable UI components
@@ -57,7 +59,9 @@ src/
 ```
 
 ### State Management
+
 The app uses a single Zustand store with slices for different concerns:
+
 - **Audio**: Playback state, queue, current track
 - **Crowd**: Real-time crowd analysis data
 - **AI**: Generation state and results
@@ -67,29 +71,34 @@ The app uses a single Zustand store with slices for different concerns:
 ## 📱 Pages & Features
 
 ### HomePage
+
 - Hero section with animated elements
 - Clear value proposition
 - Feature highlights
 - Call-to-action buttons
 
 ### Magic Studio
+
 - Tabbed interface (Set vs Match)
 - Context-aware descriptions
 - Onboarding help system
 
 ### Magic Set Page
+
 - AI prompt-based generation
 - Manual track curation
 - Set statistics and visualization
 - Track management (add/remove)
 
 ### Magic Match Page
+
 - Microphone access for crowd analysis
 - Real-time audio processing
 - Crowd metrics visualization
 - AI recommendations
 
 ### Player Page
+
 - Full-screen immersive interface
 - Animated album art
 - Professional controls
@@ -97,6 +106,7 @@ The app uses a single Zustand store with slices for different concerns:
 - Queue management
 
 ### Producer Page
+
 - Performance analytics
 - Crowd insights
 - AI coaching suggestions
@@ -105,12 +115,14 @@ The app uses a single Zustand store with slices for different concerns:
 ## 🎨 Design System
 
 ### Colors
+
 - **Electric Blue**: `#00D4FF` - Primary brand color
 - **Bright Turquoise**: `#00FFCC` - Secondary accent
 - **Laser Pink**: `#FF0080` - Highlight color
 - **Rich Black**: `#0D0D0D` - Background
 
 ### Components
+
 - **Glass Cards**: Frosted glass effect with backdrop blur
 - **Club Buttons**: Gradient buttons with hover effects
 - **Gradient Text**: Multi-color text gradients
@@ -118,11 +130,13 @@ The app uses a single Zustand store with slices for different concerns:
 ## 🧪 Testing
 
 The project includes comprehensive testing setup:
+
 - **Unit Tests**: Component and hook testing
 - **Integration Tests**: User flow testing
 - **Mocks**: Web Audio API, MediaDevices, etc.
 
 Run tests with:
+
 ```bash
 pnpm test        # Run tests
 pnpm test:ui     # Run with UI
@@ -131,17 +145,20 @@ pnpm test:ui     # Run with UI
 ## 📦 Build & Deploy
 
 ### Production Build
+
 ```bash
 pnpm build
 ```
 
 The build is optimized with:
+
 - Code splitting by vendor and features
 - Tree shaking for unused code
 - Asset optimization
 - Source maps for debugging
 
 ### Performance Features
+
 - Lazy-loaded routes
 - Optimized bundle chunks
 - Efficient state updates with Immer
@@ -150,12 +167,14 @@ The build is optimized with:
 ## 🔧 Development
 
 ### Code Quality
+
 - **ESLint**: Strict TypeScript and React rules
-- **Prettier**: Consistent code formatting  
+- **Prettier**: Consistent code formatting
 - **TypeScript**: Strict type checking
 - **Path Aliases**: Clean imports with `@/` prefix
 
 ### Scripts
+
 - `pnpm dev` - Development server
 - `pnpm build` - Production build
 - `pnpm preview` - Preview production build

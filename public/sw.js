@@ -24,7 +24,7 @@ self.addEventListener('fetch', (event) => {
       if (response) {
         return response;
       }
-      
+
       return fetch(event.request).catch((error) => {
         console.warn('SW: Fetch failed for', event.request.url, error);
         // Return a fallback for failed requests
@@ -79,13 +79,16 @@ async function syncQueueData() {
         console.info('SW: No backend API available for queue sync');
         return null;
       });
-      
+
       if (response && response.ok) {
         await clearStoredQueueData();
       }
     }
   } catch (error) {
-    console.warn('SW: Queue sync failed (this is normal in development):', error);
+    console.warn(
+      'SW: Queue sync failed (this is normal in development):',
+      error
+    );
   }
 }
 

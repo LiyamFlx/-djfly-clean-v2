@@ -197,7 +197,8 @@ class AudioEffectsService {
     if (!this.audioContext) return;
 
     this.distortionNode = this.audioContext.createWaveShaper();
-    (this.distortionNode as { curve: Float32Array }).curve = this.makeDistortionCurve(0);
+    (this.distortionNode as { curve: Float32Array }).curve =
+      this.makeDistortionCurve(0);
     this.distortionNode.oversample = '2x';
   }
 
@@ -362,9 +363,8 @@ class AudioEffectsService {
   setDistortion(params: DistortionParams) {
     if (!this.distortionNode) return;
 
-    (this.distortionNode as { curve: Float32Array }).curve = this.makeDistortionCurve(
-      params.amount
-    );
+    (this.distortionNode as { curve: Float32Array }).curve =
+      this.makeDistortionCurve(params.amount);
     this.distortionNode.oversample = params.oversample;
   }
 
@@ -506,13 +506,18 @@ class AudioEffectsService {
 
       // Apply EQ settings
       if (preset.eq) {
-        preset.eq.forEach((band: { frequency: number; gain: number; Q: number }, index: number) => {
-          if (this.eqNodes[index]) {
-            this.eqNodes[index].frequency.value = band.frequency;
-            this.eqNodes[index].gain.value = band.gain;
-            this.eqNodes[index].Q.value = band.Q;
+        preset.eq.forEach(
+          (
+            band: { frequency: number; gain: number; Q: number },
+            index: number
+          ) => {
+            if (this.eqNodes[index]) {
+              this.eqNodes[index].frequency.value = band.frequency;
+              this.eqNodes[index].gain.value = band.gain;
+              this.eqNodes[index].Q.value = band.Q;
+            }
           }
-        });
+        );
       }
 
       // Apply delay settings

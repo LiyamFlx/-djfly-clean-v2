@@ -298,7 +298,11 @@ class OpenAIService {
     suggestions: string[];
     reorderedTracks?: Track[];
   }> {
-    if (!this.apiKey || this.apiKey === 'demo_openai_key' || tracks.length < 3) {
+    if (
+      !this.apiKey ||
+      this.apiKey === 'demo_openai_key' ||
+      tracks.length < 3
+    ) {
       return this.getDemoPlaylistAnalysis(tracks);
     }
 
@@ -354,13 +358,16 @@ class OpenAIService {
   /**
    * Get demo playlist when OpenAI is not available
    */
-  private async getDemoPlaylist(prompt: string, onProgress: (progress: number) => void): Promise<Track[]> {
+  private async getDemoPlaylist(
+    prompt: string,
+    onProgress: (progress: number) => void
+  ): Promise<Track[]> {
     onProgress(20);
-    
+
     // Simulate API delay
-    await new Promise(resolve => setTimeout(resolve, 1000));
+    await new Promise((resolve) => setTimeout(resolve, 1000));
     onProgress(50);
-    
+
     // Demo tracks based on prompt keywords
     const demoTracks: Track[] = [
       {
@@ -374,10 +381,10 @@ class OpenAIService {
         bpm: 128,
         key: 'A minor',
         energy: 0.8,
-        preview_url: '/demo-track-1.mp3'
+        preview_url: '/demo-track-1.mp3',
       },
       {
-        id: 'demo2', 
+        id: 'demo2',
         title: 'Future Bass Flow',
         artist: 'AI Generated',
         duration: 200,
@@ -387,10 +394,10 @@ class OpenAIService {
         bpm: 140,
         key: 'C major',
         energy: 0.9,
-        preview_url: '/demo-track-1.mp3'
-      }
+        preview_url: '/demo-track-1.mp3',
+      },
     ];
-    
+
     onProgress(100);
     console.info('🎵 Using demo playlist for prompt:', prompt);
     return demoTracks;
@@ -404,12 +411,15 @@ class OpenAIService {
     onProgress: (progress: number) => void
   ): Promise<Track[]> {
     onProgress(30);
-    await new Promise(resolve => setTimeout(resolve, 800));
-    
+    await new Promise((resolve) => setTimeout(resolve, 800));
+
     // Return demo tracks based on crowd energy
-    const tracks = await spotifyService.searchTracks('demo electronic house', 5);
+    const tracks = await spotifyService.searchTracks(
+      'demo electronic house',
+      5
+    );
     onProgress(100);
-    
+
     console.info('🎵 Demo crowd suggestions based on:', crowdData);
     return tracks;
   }
@@ -417,7 +427,10 @@ class OpenAIService {
   /**
    * Get demo transition suggestion when OpenAI is not available
    */
-  private getDemoTransitionSuggestion(currentTrack: Track, nextTrack: Track): {
+  private getDemoTransitionSuggestion(
+    currentTrack: Track,
+    nextTrack: Track
+  ): {
     suggestion: string;
     bpmAdjustment?: number;
     crossfadePoint?: number;
@@ -426,16 +439,22 @@ class OpenAIService {
     const currentBpm = currentTrack.bpm || 128;
     const nextBpm = nextTrack.bpm || 128;
     const bpmDiff = Math.abs(currentBpm - nextBpm);
-    
-    console.info('🎵 Demo transition suggestion between tracks:', currentTrack.title, '→', nextTrack.title);
-    
+
+    console.info(
+      '🎵 Demo transition suggestion between tracks:',
+      currentTrack.title,
+      '→',
+      nextTrack.title
+    );
+
     return {
-      suggestion: bpmDiff > 10 
-        ? 'Use pitch adjustment to match BPMs, then apply a smooth crossfade' 
-        : 'Perfect BPM match! Use a standard crossfade transition',
+      suggestion:
+        bpmDiff > 10
+          ? 'Use pitch adjustment to match BPMs, then apply a smooth crossfade'
+          : 'Perfect BPM match! Use a standard crossfade transition',
       bpmAdjustment: bpmDiff > 10 ? (nextBpm - currentBpm) / currentBpm : 0,
       crossfadePoint: 32,
-      effects: bpmDiff > 5 ? ['reverb', 'filter'] : ['filter']
+      effects: bpmDiff > 5 ? ['reverb', 'filter'] : ['filter'],
     };
   }
 
@@ -450,26 +469,38 @@ class OpenAIService {
     if (tracks.length < 3) {
       return {
         score: 0.6,
-        suggestions: ['Add more tracks for better flow analysis', 'Consider BPM progression']
+        suggestions: [
+          'Add more tracks for better flow analysis',
+          'Consider BPM progression',
+        ],
       };
     }
 
     // Basic analysis based on BPM progression
-    const bpms = tracks.map(t => t.bpm || 128);
+    const bpms = tracks.map((t) => t.bpm || 128);
     const avgBpm = bpms.reduce((a, b) => a + b, 0) / bpms.length;
-    const bpmVariance = bpms.reduce((sum, bpm) => sum + Math.pow(bpm - avgBpm, 2), 0) / bpms.length;
-    
-    const score = Math.max(0.5, Math.min(0.95, 1 - (bpmVariance / 1000)));
-    
-    console.info('🎵 Demo playlist analysis for', tracks.length, 'tracks, score:', score);
-    
+    const bpmVariance =
+      bpms.reduce((sum, bpm) => sum + Math.pow(bpm - avgBpm, 2), 0) /
+      bpms.length;
+
+    const score = Math.max(0.5, Math.min(0.95, 1 - bpmVariance / 1000));
+
+    console.info(
+      '🎵 Demo playlist analysis for',
+      tracks.length,
+      'tracks, score:',
+      score
+    );
+
     return {
       score,
       suggestions: [
-        score < 0.7 ? 'Consider smoother BPM transitions between tracks' : 'Good BPM flow!',
+        score < 0.7
+          ? 'Consider smoother BPM transitions between tracks'
+          : 'Good BPM flow!',
         'Try grouping tracks by key for harmonic mixing',
-        'Consider the energy curve throughout the set'
-      ]
+        'Consider the energy curve throughout the set',
+      ],
     };
   }
 

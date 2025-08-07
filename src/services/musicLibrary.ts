@@ -14,20 +14,23 @@ export const MUSIC_LIBRARY: Track[] = [
     title: 'Neon Dreams',
     artist: 'Synthwave Express',
     duration: 240,
-    image: 'https://images.unsplash.com/photo-1470225620780-dba8ba36b745?w=400&h=400&fit=crop',
+    image:
+      'https://images.unsplash.com/photo-1470225620780-dba8ba36b745?w=400&h=400&fit=crop',
     source: 'demo' as const,
     genre: 'Electronic',
     bpm: 128,
     key: 'Am',
     energy: 0.8,
-    preview_url: 'https://www.learningcontainer.com/wp-content/uploads/2020/02/Kalimba.mp3',
+    preview_url:
+      'https://www.learningcontainer.com/wp-content/uploads/2020/02/Kalimba.mp3',
   },
   {
     id: 'house-1',
     title: 'Deep Groove',
     artist: 'House Collective',
     duration: 280,
-    image: 'https://images.unsplash.com/photo-1493225457124-a3eb161ffa5f?w=400&h=400&fit=crop',
+    image:
+      'https://images.unsplash.com/photo-1493225457124-a3eb161ffa5f?w=400&h=400&fit=crop',
     preview_url: 'https://www.soundjay.com/misc/sounds/bell-ringing-05.wav',
     source: 'demo' as const,
     bpm: 122,
@@ -40,8 +43,10 @@ export const MUSIC_LIBRARY: Track[] = [
     title: 'Industrial Drive',
     artist: 'Techno Underground',
     duration: 320,
-    image: 'https://images.unsplash.com/photo-1571974599782-87ad85adba70?w=400&h=400&fit=crop',
-    preview_url: 'https://actions.google.com/sounds/v1/alarms/digital_watch_alarm_long.ogg',
+    image:
+      'https://images.unsplash.com/photo-1571974599782-87ad85adba70?w=400&h=400&fit=crop',
+    preview_url:
+      'https://actions.google.com/sounds/v1/alarms/digital_watch_alarm_long.ogg',
     source: 'demo' as const,
     bpm: 132,
     key: 'Gm',
@@ -53,7 +58,8 @@ export const MUSIC_LIBRARY: Track[] = [
     title: 'Sunset Horizon',
     artist: 'Progressive Waves',
     duration: 360,
-    image: 'https://images.unsplash.com/photo-1502134249126-9f3755a50d78?w=400&h=400&fit=crop',
+    image:
+      'https://images.unsplash.com/photo-1502134249126-9f3755a50d78?w=400&h=400&fit=crop',
     preview_url: 'https://actions.google.com/sounds/v1/alarms/beep_short.ogg',
     source: 'demo' as const,
     bpm: 126,
@@ -66,8 +72,10 @@ export const MUSIC_LIBRARY: Track[] = [
     title: 'Ethereal Spaces',
     artist: 'Ambient Collective',
     duration: 300,
-    image: 'https://images.unsplash.com/photo-1518609878373-06d740f60d8b?w=400&h=400&fit=crop',
-    preview_url: 'https://actions.google.com/sounds/v1/animals/cat_purr_close.ogg',
+    image:
+      'https://images.unsplash.com/photo-1518609878373-06d740f60d8b?w=400&h=400&fit=crop',
+    preview_url:
+      'https://actions.google.com/sounds/v1/animals/cat_purr_close.ogg',
     source: 'demo' as const,
     bpm: 110,
     key: 'D',
@@ -79,8 +87,10 @@ export const MUSIC_LIBRARY: Track[] = [
     title: 'Electric Pulse',
     artist: 'Digital Soundscape',
     duration: 260,
-    image: 'https://images.unsplash.com/photo-1514525253161-7a46d19cd819?w=400&h=400&fit=crop',
-    preview_url: 'https://actions.google.com/sounds/v1/cartoon/cartoon_boing.ogg',
+    image:
+      'https://images.unsplash.com/photo-1514525253161-7a46d19cd819?w=400&h=400&fit=crop',
+    preview_url:
+      'https://actions.google.com/sounds/v1/cartoon/cartoon_boing.ogg',
     source: 'demo' as const,
     bpm: 130,
     key: 'Em',
@@ -92,8 +102,10 @@ export const MUSIC_LIBRARY: Track[] = [
     title: 'Midnight Groove',
     artist: 'House Masters',
     duration: 290,
-    image: 'https://images.unsplash.com/photo-1493225457124-a3eb161ffa5f?w=400&h=400&fit=crop',
-    preview_url: 'https://actions.google.com/sounds/v1/cartoon/cartoon_cowbell.ogg',
+    image:
+      'https://images.unsplash.com/photo-1493225457124-a3eb161ffa5f?w=400&h=400&fit=crop',
+    preview_url:
+      'https://actions.google.com/sounds/v1/cartoon/cartoon_cowbell.ogg',
     source: 'demo' as const,
     bpm: 124,
     key: 'Bbm',
@@ -105,7 +117,8 @@ export const MUSIC_LIBRARY: Track[] = [
     title: 'Machine Dreams',
     artist: 'Cyber Rhythms',
     duration: 310,
-    image: 'https://images.unsplash.com/photo-1571974599782-87ad85adba70?w=400&h=400&fit=crop',
+    image:
+      'https://images.unsplash.com/photo-1571974599782-87ad85adba70?w=400&h=400&fit=crop',
     preview_url: 'https://samplelib.com/lib/preview/mp3/sample-3s.mp3',
     source: 'demo' as const,
     bpm: 134,
@@ -118,8 +131,10 @@ export const MUSIC_LIBRARY: Track[] = [
     title: 'Uplifting Journey',
     artist: 'Trance State',
     duration: 420,
-    image: 'https://images.unsplash.com/photo-1493225457124-a3eb161ffa5f?w=400&h=400&fit=crop',
-    preview_url: 'https://file-examples.com/storage/fe68c625b00ad8ad9df4a8d/2017/11/file_example_MP3_700KB.mp3',
+    image:
+      'https://images.unsplash.com/photo-1493225457124-a3eb161ffa5f?w=400&h=400&fit=crop',
+    preview_url:
+      'https://file-examples.com/storage/fe68c625b00ad8ad9df4a8d/2017/11/file_example_MP3_700KB.mp3',
     source: 'demo' as const,
     bpm: 136,
     key: 'F',
@@ -131,8 +146,10 @@ export const MUSIC_LIBRARY: Track[] = [
     title: 'Lazy Sunday',
     artist: 'Chill Vibes',
     duration: 240,
-    image: 'https://images.unsplash.com/photo-1518609878373-06d740f60d8b?w=400&h=400&fit=crop',
-    preview_url: 'https://www.learningcontainer.com/wp-content/uploads/2020/02/Kalimba.mp3',
+    image:
+      'https://images.unsplash.com/photo-1518609878373-06d740f60d8b?w=400&h=400&fit=crop',
+    preview_url:
+      'https://www.learningcontainer.com/wp-content/uploads/2020/02/Kalimba.mp3',
     source: 'demo' as const,
     bpm: 95,
     key: 'G',
@@ -144,7 +161,8 @@ export const MUSIC_LIBRARY: Track[] = [
     title: 'Future Bass',
     artist: 'Bass Architects',
     duration: 200,
-    image: 'https://images.unsplash.com/photo-1470225620780-dba8ba36b745?w=400&h=400&fit=crop',
+    image:
+      'https://images.unsplash.com/photo-1470225620780-dba8ba36b745?w=400&h=400&fit=crop',
     preview_url: 'https://www.soundjay.com/misc/sounds/bell-ringing-05.wav',
     source: 'demo' as const,
     bpm: 140,
@@ -157,8 +175,10 @@ export const MUSIC_LIBRARY: Track[] = [
     title: 'Subtle Movements',
     artist: 'Minimal Tech',
     duration: 380,
-    image: 'https://images.unsplash.com/photo-1571974599782-87ad85adba70?w=400&h=400&fit=crop',
-    preview_url: 'https://actions.google.com/sounds/v1/alarms/digital_watch_alarm_long.ogg',
+    image:
+      'https://images.unsplash.com/photo-1571974599782-87ad85adba70?w=400&h=400&fit=crop',
+    preview_url:
+      'https://actions.google.com/sounds/v1/alarms/digital_watch_alarm_long.ogg',
     source: 'demo' as const,
     bpm: 118,
     key: 'Dm',
@@ -288,17 +308,17 @@ export class PlaylistGenerator {
         playlist.push(
           ...MUSIC_LIBRARY.filter(
             (track) =>
-              [0.2, 0.5].includes(track.energy || 0) && (track.bpm || 120) <= 120
+              [0.2, 0.5].includes(track.energy || 0) &&
+              (track.bpm || 120) <= 120
           ).slice(0, 5)
         );
         break;
 
       case 'progressive': {
         // Gradual energy build from low to high
-        const lowEnergy = MUSIC_LIBRARY.filter((t) => (t.energy || 0.5) === 0.2).slice(
-          0,
-          2
-        );
+        const lowEnergy = MUSIC_LIBRARY.filter(
+          (t) => (t.energy || 0.5) === 0.2
+        ).slice(0, 2);
         const mediumEnergy = MUSIC_LIBRARY.filter(
           (t) => (t.energy || 0.5) === 0.5
         ).slice(0, 2);
