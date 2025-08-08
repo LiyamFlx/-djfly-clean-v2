@@ -7,7 +7,7 @@ import {
   useNavigate,
 } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { PlaylistGenerator } from '@/services/musicLibrary';
+import { musicLibrary } from '@/services/musicLibrary';
 import type { Track, AIRecommendation } from '@/types/shared';
 import ApiStatusIndicator from '@/components/ApiStatusIndicator';
 import SpotifyCallbackPage from '@/pages/auth/SpotifyCallbackPage';
@@ -16,7 +16,6 @@ import SpotifyCallbackPage from '@/pages/auth/SpotifyCallbackPage';
 const LoginPage = lazy(() => import('@/pages/auth/LoginPage'));
 const SignupPage = lazy(() => import('@/pages/auth/SignupPage'));
 const PlayerPage = lazy(() => import('@/pages/PlayerPage'));
-const GuestMode = lazy(() => import('@/components/auth/GuestMode'));
 
 // Loading component for Suspense fallback
 const LoadingSpinner = ({ message = 'Loading...' }: { message?: string }) => (
@@ -303,7 +302,7 @@ const appState = {
 };
 
 // Initialize with tracks asynchronously
-PlaylistGenerator.generateByVibe('mixed').then((tracks) => {
+        musicLibrary.searchTracks('electronic house techno', 8).then((tracks) => {
   if (tracks.length > 0) {
     appState.queue = tracks;
     console.log('🎵 Initial playlist loaded:', tracks.length, 'tracks');
@@ -466,7 +465,7 @@ const MagicMatchPage = () => {
         } catch (error) {
           console.warn('AI analysis failed, using fallback:', error);
           // Fallback to existing generator
-          const playlist = await PlaylistGenerator.generateByVibe('mixed');
+          const playlist = await musicLibrary.searchTracks('electronic house techno', 8);
           appState.queue = playlist;
         }
       }, 5000); // Record for 5 seconds
@@ -610,7 +609,7 @@ const MagicSetPage = () => {
     } catch (error) {
       console.warn('AI generation failed, using fallback:', error);
       // Fallback to existing generator
-      const generatedTracks = await PlaylistGenerator.generateByPrompt(prompt);
+              const generatedTracks = await musicLibrary.generatePlaylist(prompt);
       setGeneratedTracks(generatedTracks);
       setStatus('complete');
       appState.queue = generatedTracks;

@@ -58,10 +58,7 @@ const StudioPage: React.FC = () => {
 
   return (
     <div className="min-h-screen bg-club-gradient text-white p-8">
-      {/* Demo Banner */}
-      <div className="bg-yellow-600 text-black text-center py-2 mb-6 rounded-lg">
-        🚀 DJfly v1.2.0 Demo - Live Testing Environment
-      </div>
+
 
       <div className="max-w-6xl mx-auto">
         {/* Header */}

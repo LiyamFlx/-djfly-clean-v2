@@ -266,7 +266,7 @@ const PlayerPage = () => {
         audioRef.current.pause();
       } else {
         audioRef.current.play().catch(() => {
-          alert('Audio playback failed. This is a demo with basic audio data.');
+          console.error('Audio playback failed');
         });
       }
       setIsPlaying(!isPlaying);

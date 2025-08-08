@@ -5,7 +5,7 @@
 
 import { API_CONFIG } from '@/config/apiConfig';
 import type { Track } from '@/types';
-import { MUSIC_LIBRARY } from '@/services/musicLibrary';
+import { musicLibrary } from '@/services/musicLibrary';
 
 interface AIPlaylistRequest {
   prompt: string;
@@ -345,7 +345,7 @@ Create playlists that:
 
   private mapAIResultToTracks(aiResult: unknown): AIRecommendation {
     const tracks: Track[] = [];
-    const trackPool = [...MUSIC_LIBRARY];
+    const trackPool = [...musicLibrary.getAllTracks()];
 
     // Map AI suggestions to closest matches in our library
     for (const suggestion of aiResult.tracks || []) {
@@ -442,7 +442,7 @@ Create playlists that:
   private generateFallbackPlaylist(
     request: AIPlaylistRequest
   ): AIRecommendation {
-    let tracks = [...MUSIC_LIBRARY];
+    let tracks = [...musicLibrary.getAllTracks()];
 
     // Filter by genre if specified
     if (request.genre) {
@@ -486,7 +486,7 @@ Create playlists that:
         'Curated playlist based on your preferences using intelligent fallback selection',
       energyCurve: tracks.map((_, i) => 40 + i * 7),
       mixingTips: this.generateDefaultMixingTips(tracks),
-      nextTrackSuggestions: MUSIC_LIBRARY.slice(0, 5),
+      nextTrackSuggestions: musicLibrary.getAllTracks().slice(0, 5),
     };
   }
 
@@ -567,7 +567,7 @@ Create playlists that:
   private getAvailableGenres(): string[] {
     return [
       ...new Set(
-        MUSIC_LIBRARY.map((t: Track) => t.genre).filter(
+        musicLibrary.getAllTracks().map((t: Track) => t.genre).filter(
           (genre): genre is string => genre !== undefined
         )
       ),
