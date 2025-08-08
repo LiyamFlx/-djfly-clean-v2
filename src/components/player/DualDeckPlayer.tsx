@@ -17,6 +17,26 @@ interface DeckControls {
   energy: number;
 }
 
+interface MixingState {
+  crossfader: number;
+  masterVolume: number;
+  eq: { low: number; mid: number; high: number };
+  effects: { reverb: number; delay: number; filter: number };
+}
+
+interface TransitionQuality {
+  score: number;
+  factors: { bpmMatch: number; keyCompatibility: number; energyFlow: number; timing: number };
+  suggestions: string[];
+}
+
+interface AudioAnalytics {
+  deckA?: Partial<DeckControls>;
+  deckB?: Partial<DeckControls>;
+  mixing?: Partial<MixingState>;
+  transitionQuality?: Partial<TransitionQuality>;
+}
+
 const DualDeckPlayer: React.FC<DualDeckPlayerProps> = ({ className = '' }) => {
   const [deckA, setDeckA] = useState<DeckControls>({
     isPlaying: false,
@@ -38,17 +58,17 @@ const DualDeckPlayer: React.FC<DualDeckPlayerProps> = ({ className = '' }) => {
     energy: 0,
   });
 
-  const [mixingState, setMixingState] = useState({
+  const [mixingState, setMixingState] = useState<MixingState>({
     crossfader: 0.5,
     masterVolume: 1.0,
     eq: { low: 0, mid: 0, high: 0 },
     effects: { reverb: 0, delay: 0, filter: 0 },
   });
 
-  const [transitionQuality, setTransitionQuality] = useState({
+  const [transitionQuality, setTransitionQuality] = useState<TransitionQuality>({
     score: 0,
     factors: { bpmMatch: 0, keyCompatibility: 0, energyFlow: 0, timing: 0 },
-    suggestions: [] as string[],
+    suggestions: [],
   });
 
   const [showAnalytics, setShowAnalytics] = useState(false);
@@ -57,32 +77,51 @@ const DualDeckPlayer: React.FC<DualDeckPlayerProps> = ({ className = '' }) => {
   useEffect(() => {
     // Start analytics monitoring
     analyticsInterval.current = setInterval(() => {
-      const analytics = advancedAudioService.getAnalytics();
+      try {
+        const analytics = advancedAudioService.getAnalytics() as AudioAnalytics;
 
-      if (analytics.deckA) {
-        setDeckA((prev) => ({
-          ...prev,
-          isPlaying: analytics.deckA.isPlaying,
-          currentTime: analytics.deckA.currentTime,
-          volume: analytics.deckA.volume,
-          pitch: analytics.deckA.pitch,
-          energy: analytics.deckA.energy,
-        }));
+        if (analytics.deckA) {
+          setDeckA((prev) => ({
+            ...prev,
+            isPlaying: analytics.deckA?.isPlaying ?? prev.isPlaying,
+            currentTime: analytics.deckA?.currentTime ?? prev.currentTime,
+            volume: analytics.deckA?.volume ?? prev.volume,
+            pitch: analytics.deckA?.pitch ?? prev.pitch,
+            energy: analytics.deckA?.energy ?? prev.energy,
+            waveform: analytics.deckA?.waveform ?? prev.waveform,
+            duration: analytics.deckA?.duration ?? prev.duration,
+          }));
+        }
+
+        if (analytics.deckB) {
+          setDeckB((prev) => ({
+            ...prev,
+            isPlaying: analytics.deckB?.isPlaying ?? prev.isPlaying,
+            currentTime: analytics.deckB?.currentTime ?? prev.currentTime,
+            volume: analytics.deckB?.volume ?? prev.volume,
+            pitch: analytics.deckB?.pitch ?? prev.pitch,
+            energy: analytics.deckB?.energy ?? prev.energy,
+            waveform: analytics.deckB?.waveform ?? prev.waveform,
+            duration: analytics.deckB?.duration ?? prev.duration,
+          }));
+        }
+
+        if (analytics.mixing) {
+          setMixingState((prev) => ({
+            ...prev,
+            ...analytics.mixing,
+          }));
+        }
+
+        if (analytics.transitionQuality) {
+          setTransitionQuality((prev) => ({
+            ...prev,
+            ...analytics.transitionQuality,
+          }));
+        }
+      } catch (error) {
+        console.warn('Analytics update failed:', error);
       }
-
-      if (analytics.deckB) {
-        setDeckB((prev) => ({
-          ...prev,
-          isPlaying: analytics.deckB.isPlaying,
-          currentTime: analytics.deckB.currentTime,
-          volume: analytics.deckB.volume,
-          pitch: analytics.deckB.pitch,
-          energy: analytics.deckB.energy,
-        }));
-      }
-
-      setMixingState(analytics.mixing);
-      setTransitionQuality(analytics.transitionQuality);
     }, 100);
 
     return () => {
@@ -93,28 +132,80 @@ const DualDeckPlayer: React.FC<DualDeckPlayerProps> = ({ className = '' }) => {
   }, []);
 
   const togglePlay = (deck: 'A' | 'B') => {
-    advancedAudioService.togglePlay(deck);
+    try {
+      advancedAudioService.togglePlay(deck);
+    } catch (error) {
+      console.error(`Failed to toggle play for deck ${deck}:`, error);
+    }
   };
 
   const setVolume = (deck: 'A' | 'B', volume: number) => {
-    advancedAudioService.setDeckVolume(deck, volume);
+    try {
+      advancedAudioService.setDeckVolume(deck, volume);
+      if (deck === 'A') {
+        setDeckA(prev => ({ ...prev, volume }));
+      } else {
+        setDeckB(prev => ({ ...prev, volume }));
+      }
+    } catch (error) {
+      console.error(`Failed to set volume for deck ${deck}:`, error);
+    }
   };
 
   const setPitch = (deck: 'A' | 'B', pitch: number) => {
-    advancedAudioService.setPitch(deck, pitch);
+    try {
+      advancedAudioService.setPitch(deck, pitch);
+      if (deck === 'A') {
+        setDeckA(prev => ({ ...prev, pitch }));
+      } else {
+        setDeckB(prev => ({ ...prev, pitch }));
+      }
+    } catch (error) {
+      console.error(`Failed to set pitch for deck ${deck}:`, error);
+    }
   };
 
   const setCrossfader = (position: number) => {
-    advancedAudioService.setCrossfader(position);
+    try {
+      advancedAudioService.setCrossfader(position);
+      setMixingState(prev => ({ ...prev, crossfader: position }));
+    } catch (error) {
+      console.error('Failed to set crossfader:', error);
+    }
   };
 
   const setEQ = (band: 'low' | 'mid' | 'high', value: number) => {
-    advancedAudioService.setEQ(band, value);
+    try {
+      advancedAudioService.setEQ(band, value);
+      setMixingState(prev => ({
+        ...prev,
+        eq: { ...prev.eq, [band]: value }
+      }));
+    } catch (error) {
+      console.error(`Failed to set EQ ${band}:`, error);
+    }
   };
 
-  // const setEffect = (effect: 'reverb' | 'delay' | 'filter', value: number) => {
-  //   advancedAudioService.setEffect(effect, value);
-  // };
+  const setEffect = (effect: 'reverb' | 'delay' | 'filter', value: number) => {
+    try {
+      advancedAudioService.setEffect(effect, value);
+      setMixingState(prev => ({
+        ...prev,
+        effects: { ...prev.effects, [effect]: value }
+      }));
+    } catch (error) {
+      console.error(`Failed to set effect ${effect}:`, error);
+    }
+  };
+
+  const setMasterVolume = (volume: number) => {
+    try {
+      advancedAudioService.setMasterVolume?.(volume);
+      setMixingState(prev => ({ ...prev, masterVolume: volume }));
+    } catch (error) {
+      console.error('Failed to set master volume:', error);
+    }
+  };
 
   const formatTime = (seconds: number): string => {
     const mins = Math.floor(seconds / 60);
@@ -133,6 +224,26 @@ const DualDeckPlayer: React.FC<DualDeckPlayerProps> = ({ className = '' }) => {
     if (score > 60) return 'text-yellow-400';
     return 'text-red-400';
   };
+
+  const WaveformDisplay: React.FC<{ waveform: Float32Array; color: string }> = ({ 
+    waveform, 
+    color 
+  }) => (
+    <div className="h-24 bg-gray-700 rounded-lg mb-4 relative overflow-hidden">
+      <div className="absolute inset-0 flex items-center justify-center">
+        {Array.from(waveform).map((value, index) => (
+          <div
+            key={index}
+            className={`${color} mx-px`}
+            style={{
+              height: `${Math.max(1, Math.abs(value) * 100)}%`,
+              width: `${100 / waveform.length}%`,
+            }}
+          />
+        ))}
+      </div>
+    </div>
+  );
 
   return (
     <div className={`bg-gray-900 text-white p-6 rounded-xl ${className}`}>
@@ -157,34 +268,19 @@ const DualDeckPlayer: React.FC<DualDeckPlayerProps> = ({ className = '' }) => {
       </div>
 
       {/* Dual Deck Layout */}
-      <div className="grid grid-cols-2 gap-6 mb-6">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
         {/* Deck A */}
         <div className="bg-gray-800 p-4 rounded-lg">
           <div className="flex items-center justify-between mb-4">
             <h3 className="text-lg font-semibold text-blue-400">Deck A</h3>
-            <div
-              className={`flex items-center gap-1 ${getEnergyColor(deckA.energy)}`}
-            >
+            <div className={`flex items-center gap-1 ${getEnergyColor(deckA.energy)}`}>
               <Zap className="w-4 h-4" />
               <span className="text-sm">{Math.round(deckA.energy * 100)}%</span>
             </div>
           </div>
 
           {/* Waveform */}
-          <div className="h-24 bg-gray-700 rounded-lg mb-4 relative overflow-hidden">
-            <div className="absolute inset-0 flex items-center">
-              {deckA.waveform.map((value, index) => (
-                <div
-                  key={index}
-                  className="bg-blue-400 mx-px"
-                  style={{
-                    height: `${Math.max(1, value * 100)}%`,
-                    width: `${100 / deckA.waveform.length}%`,
-                  }}
-                />
-              ))}
-            </div>
-          </div>
+          <WaveformDisplay waveform={deckA.waveform} color="bg-blue-400" />
 
           {/* Controls */}
           <div className="space-y-3">
@@ -217,7 +313,7 @@ const DualDeckPlayer: React.FC<DualDeckPlayerProps> = ({ className = '' }) => {
                 step="0.01"
                 value={deckA.volume}
                 onChange={(e) => setVolume('A', parseFloat(e.target.value))}
-                className="w-full"
+                className="w-full accent-blue-500"
               />
             </div>
 
@@ -233,7 +329,7 @@ const DualDeckPlayer: React.FC<DualDeckPlayerProps> = ({ className = '' }) => {
                 step="0.01"
                 value={deckA.pitch}
                 onChange={(e) => setPitch('A', parseFloat(e.target.value))}
-                className="w-full"
+                className="w-full accent-blue-500"
               />
               <span className="text-xs text-gray-400">
                 {deckA.pitch.toFixed(2)}x
@@ -246,29 +342,14 @@ const DualDeckPlayer: React.FC<DualDeckPlayerProps> = ({ className = '' }) => {
         <div className="bg-gray-800 p-4 rounded-lg">
           <div className="flex items-center justify-between mb-4">
             <h3 className="text-lg font-semibold text-green-400">Deck B</h3>
-            <div
-              className={`flex items-center gap-1 ${getEnergyColor(deckB.energy)}`}
-            >
+            <div className={`flex items-center gap-1 ${getEnergyColor(deckB.energy)}`}>
               <Zap className="w-4 h-4" />
               <span className="text-sm">{Math.round(deckB.energy * 100)}%</span>
             </div>
           </div>
 
           {/* Waveform */}
-          <div className="h-24 bg-gray-700 rounded-lg mb-4 relative overflow-hidden">
-            <div className="absolute inset-0 flex items-center">
-              {deckB.waveform.map((value, index) => (
-                <div
-                  key={index}
-                  className="bg-green-400 mx-px"
-                  style={{
-                    height: `${Math.max(1, value * 100)}%`,
-                    width: `${100 / deckB.waveform.length}%`,
-                  }}
-                />
-              ))}
-            </div>
-          </div>
+          <WaveformDisplay waveform={deckB.waveform} color="bg-green-400" />
 
           {/* Controls */}
           <div className="space-y-3">
@@ -301,7 +382,7 @@ const DualDeckPlayer: React.FC<DualDeckPlayerProps> = ({ className = '' }) => {
                 step="0.01"
                 value={deckB.volume}
                 onChange={(e) => setVolume('B', parseFloat(e.target.value))}
-                className="w-full"
+                className="w-full accent-green-500"
               />
             </div>
 
@@ -317,7 +398,7 @@ const DualDeckPlayer: React.FC<DualDeckPlayerProps> = ({ className = '' }) => {
                 step="0.01"
                 value={deckB.pitch}
                 onChange={(e) => setPitch('B', parseFloat(e.target.value))}
-                className="w-full"
+                className="w-full accent-green-500"
               />
               <span className="text-xs text-gray-400">
                 {deckB.pitch.toFixed(2)}x
@@ -331,7 +412,7 @@ const DualDeckPlayer: React.FC<DualDeckPlayerProps> = ({ className = '' }) => {
       <div className="bg-gray-800 p-4 rounded-lg mb-6">
         <h3 className="text-lg font-semibold mb-4">Mixing Controls</h3>
 
-        <div className="grid grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           {/* Crossfader */}
           <div className="space-y-3">
             <label htmlFor="crossfader" className="text-sm text-gray-300">
@@ -346,7 +427,7 @@ const DualDeckPlayer: React.FC<DualDeckPlayerProps> = ({ className = '' }) => {
                 step="0.01"
                 value={mixingState.crossfader}
                 onChange={(e) => setCrossfader(parseFloat(e.target.value))}
-                className="w-full"
+                className="w-full accent-purple-500"
               />
               <div className="flex justify-between text-xs text-gray-400 mt-1">
                 <span>Deck A</span>
@@ -369,15 +450,10 @@ const DualDeckPlayer: React.FC<DualDeckPlayerProps> = ({ className = '' }) => {
                 max="1"
                 step="0.01"
                 value={mixingState.masterVolume}
-                onChange={(e) =>
-                  setMixingState((prev) => ({
-                    ...prev,
-                    masterVolume: parseFloat(e.target.value),
-                  }))
-                }
-                className="flex-1"
+                onChange={(e) => setMasterVolume(parseFloat(e.target.value))}
+                className="flex-1 accent-orange-500"
               />
-              <span className="text-xs text-gray-400">
+              <span className="text-xs text-gray-400 w-12">
                 {Math.round(mixingState.masterVolume * 100)}%
               </span>
             </div>
@@ -399,9 +475,9 @@ const DualDeckPlayer: React.FC<DualDeckPlayerProps> = ({ className = '' }) => {
                   step="1"
                   value={mixingState.eq.low}
                   onChange={(e) => setEQ('low', parseInt(e.target.value))}
-                  className="flex-1"
+                  className="flex-1 accent-red-500"
                 />
-                <span className="text-xs w-8">{mixingState.eq.low}dB</span>
+                <span className="text-xs w-12">{mixingState.eq.low}dB</span>
               </div>
               <div className="flex items-center gap-2">
                 <label htmlFor="eq-mid" className="text-xs w-8">
@@ -415,9 +491,9 @@ const DualDeckPlayer: React.FC<DualDeckPlayerProps> = ({ className = '' }) => {
                   step="1"
                   value={mixingState.eq.mid}
                   onChange={(e) => setEQ('mid', parseInt(e.target.value))}
-                  className="flex-1"
+                  className="flex-1 accent-yellow-500"
                 />
-                <span className="text-xs w-8">{mixingState.eq.mid}dB</span>
+                <span className="text-xs w-12">{mixingState.eq.mid}dB</span>
               </div>
               <div className="flex items-center gap-2">
                 <label htmlFor="eq-high" className="text-xs w-8">
@@ -431,10 +507,71 @@ const DualDeckPlayer: React.FC<DualDeckPlayerProps> = ({ className = '' }) => {
                   step="1"
                   value={mixingState.eq.high}
                   onChange={(e) => setEQ('high', parseInt(e.target.value))}
-                  className="flex-1"
+                  className="flex-1 accent-cyan-500"
                 />
-                <span className="text-xs w-8">{mixingState.eq.high}dB</span>
+                <span className="text-xs w-12">{mixingState.eq.high}dB</span>
               </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Effects Section */}
+        <div className="mt-6 pt-4 border-t border-gray-700">
+          <h4 className="text-sm font-medium mb-3">Effects</h4>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div className="flex items-center gap-2">
+              <label htmlFor="effect-reverb" className="text-xs w-16">
+                Reverb
+              </label>
+              <input
+                id="effect-reverb"
+                type="range"
+                min="0"
+                max="1"
+                step="0.01"
+                value={mixingState.effects.reverb}
+                onChange={(e) => setEffect('reverb', parseFloat(e.target.value))}
+                className="flex-1 accent-blue-500"
+              />
+              <span className="text-xs w-12">
+                {Math.round(mixingState.effects.reverb * 100)}%
+              </span>
+            </div>
+            <div className="flex items-center gap-2">
+              <label htmlFor="effect-delay" className="text-xs w-16">
+                Delay
+              </label>
+              <input
+                id="effect-delay"
+                type="range"
+                min="0"
+                max="1"
+                step="0.01"
+                value={mixingState.effects.delay}
+                onChange={(e) => setEffect('delay', parseFloat(e.target.value))}
+                className="flex-1 accent-purple-500"
+              />
+              <span className="text-xs w-12">
+                {Math.round(mixingState.effects.delay * 100)}%
+              </span>
+            </div>
+            <div className="flex items-center gap-2">
+              <label htmlFor="effect-filter" className="text-xs w-16">
+                Filter
+              </label>
+              <input
+                id="effect-filter"
+                type="range"
+                min="0"
+                max="1"
+                step="0.01"
+                value={mixingState.effects.filter}
+                onChange={(e) => setEffect('filter', parseFloat(e.target.value))}
+                className="flex-1 accent-green-500"
+              />
+              <span className="text-xs w-12">
+                {Math.round(mixingState.effects.filter * 100)}%
+              </span>
             </div>
           </div>
         </div>
@@ -451,7 +588,7 @@ const DualDeckPlayer: React.FC<DualDeckPlayerProps> = ({ className = '' }) => {
           >
             <h3 className="text-lg font-semibold mb-4">Live Analytics</h3>
 
-            <div className="grid grid-cols-2 gap-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               {/* Transition Quality */}
               <div className="space-y-3">
                 <div className="flex items-center justify-between">
@@ -487,14 +624,20 @@ const DualDeckPlayer: React.FC<DualDeckPlayerProps> = ({ className = '' }) => {
               <div className="space-y-3">
                 <h4 className="text-sm font-medium">Suggestions</h4>
                 <div className="space-y-2">
-                  {transitionQuality.suggestions.map((suggestion, index) => (
-                    <div
-                      key={index}
-                      className="text-xs text-gray-300 bg-gray-700 p-2 rounded"
-                    >
-                      {suggestion}
+                  {transitionQuality.suggestions.length > 0 ? (
+                    transitionQuality.suggestions.map((suggestion, index) => (
+                      <div
+                        key={index}
+                        className="text-xs text-gray-300 bg-gray-700 p-2 rounded"
+                      >
+                        {suggestion}
+                      </div>
+                    ))
+                  ) : (
+                    <div className="text-xs text-gray-400 bg-gray-700 p-2 rounded">
+                      No suggestions available
                     </div>
-                  ))}
+                  )}
                 </div>
               </div>
             </div>

@@ -291,9 +291,6 @@ const NotFoundPage = () => (
   </div>
 );
 
-// Export Track interface from musicLibrary
-// interface Track is imported from musicLibrary service
-
 // Simple state management with initial tracks
 const appState = {
   currentTrack: null as Track | null,
@@ -302,7 +299,7 @@ const appState = {
 };
 
 // Initialize with tracks asynchronously
-        musicLibrary.searchTracks('electronic house techno', 8).then((tracks) => {
+musicLibrary.searchTracks('electronic house techno', 8).then((tracks) => {
   if (tracks.length > 0) {
     appState.queue = tracks;
     console.log('🎵 Initial playlist loaded:', tracks.length, 'tracks');
@@ -317,29 +314,29 @@ const HomePage = () => (
         AI-powered DJ platform that reads any room instantly
       </p>
 
-              {/* Get Started */}
-        <div className="bg-gradient-to-r from-blue-900/30 to-purple-900/30 border border-blue-600/30 rounded-xl p-6 mb-8">
-          <h2 className="text-2xl font-bold mb-3">
-            🎵 Get Started with DJfly
-          </h2>
-          <p className="text-gray-300 mb-4">
-            Experience AI-powered music discovery instantly
-          </p>
-          <div className="flex flex-col sm:flex-row gap-3 justify-center">
-            <Link
-              to="/auth/login"
-              className="bg-green-600 hover:bg-green-700 px-6 py-3 rounded-lg font-semibold transition-colors inline-flex items-center gap-2"
-            >
-              🚀 Sign In
-            </Link>
-            <Link
-              to="/auth/signup"
-              className="bg-blue-600 hover:bg-blue-700 px-6 py-3 rounded-lg font-semibold transition-colors"
-            >
-              🎛️ Create Account
-            </Link>
-          </div>
+      {/* Get Started */}
+      <div className="bg-gradient-to-r from-blue-900/30 to-purple-900/30 border border-blue-600/30 rounded-xl p-6 mb-8">
+        <h2 className="text-2xl font-bold mb-3">
+          🎵 Get Started with DJfly
+        </h2>
+        <p className="text-gray-300 mb-4">
+          Experience AI-powered music discovery instantly
+        </p>
+        <div className="flex flex-col sm:flex-row gap-3 justify-center">
+          <Link
+            to="/auth/login"
+            className="bg-green-600 hover:bg-green-700 px-6 py-3 rounded-lg font-semibold transition-colors inline-flex items-center gap-2"
+          >
+            🚀 Sign In
+          </Link>
+          <Link
+            to="/auth/signup"
+            className="bg-blue-600 hover:bg-blue-700 px-6 py-3 rounded-lg font-semibold transition-colors"
+          >
+            🎛️ Create Account
+          </Link>
         </div>
+      </div>
 
       {/* Feature Highlights */}
       <div className="grid md:grid-cols-3 gap-6 mb-8">
@@ -617,7 +614,7 @@ const MagicSetPage = () => {
     } catch (error) {
       console.warn('AI generation failed, using fallback:', error);
       // Fallback to existing generator
-              const generatedTracks = await musicLibrary.generatePlaylist(prompt);
+      const generatedTracks = await musicLibrary.generatePlaylist(prompt);
       setGeneratedTracks(generatedTracks);
       setStatus('complete');
       appState.queue = generatedTracks;
@@ -706,7 +703,7 @@ const MagicSetPage = () => {
             </div>
 
             <div className="bg-gray-800 p-6 rounded-xl">
-                              <h3 className="text-lg font-semibold mb-4">💡 Try These Prompts</h3>
+              <h3 className="text-lg font-semibold mb-4">💡 Example Prompts</h3>
               <div className="grid md:grid-cols-2 gap-4">
                 <button
                   onClick={() =>
@@ -907,8 +904,6 @@ const ProfilePage = () => {
 
   return (
     <div className="min-h-screen bg-gray-900 text-white p-8 pb-20">
-
-
       <div className="max-w-4xl mx-auto">
         <h1 className="text-3xl font-bold mb-8">👤 Profile</h1>
 
@@ -1010,13 +1005,6 @@ function App() {
           <Route path="/profile" element={<ProfilePage />} />
           
           {/* Authentication Routes */}
-          <Route path="/auth/login" element={<LoginPage />} />
-          <Route path="/auth/signup" element={<SignupPage />} />
-          <Route path="/auth/forgot-password" element={<ForgotPasswordPage />} />
-          <Route path="/auth/reset-password" element={<ResetPasswordPage />} />
-          <Route path="/auth/spotify/callback" element={<SpotifyCallbackPage />} />
-
-          {/* Authentication Routes */}
           <Route
             path="/auth/login"
             element={
@@ -1037,11 +1025,9 @@ function App() {
               </Suspense>
             }
           />
-          <Route
-            path="/auth/forgot-password"
-            element={<ForgotPasswordPage />}
-          />
+          <Route path="/auth/forgot-password" element={<ForgotPasswordPage />} />
           <Route path="/auth/reset-password" element={<ResetPasswordPage />} />
+          <Route path="/auth/spotify/callback" element={<SpotifyCallbackPage />} />
 
           {/* Producer Analytics */}
           <Route path="/producer" element={<ProducerAnalyticsPage />} />
