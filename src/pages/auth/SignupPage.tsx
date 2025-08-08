@@ -34,6 +34,7 @@ const SignupPage = () => {
       email?: string; 
       password?: string; 
       confirmPassword?: string;
+      passwordStrength?: string[];
     } = {};
     
     if (formData.name.length < 2 || formData.name.length > 50) {

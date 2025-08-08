@@ -22,6 +22,22 @@ interface SecureAppConfig {
     redirectUri?: string;
   };
 
+  // YouTube Configuration
+  youtube: {
+    apiKey?: string;
+  };
+
+  // Last.fm Configuration
+  lastfm: {
+    apiKey?: string;
+    secret?: string;
+  };
+
+  // Google Studio Configuration
+  googleStudio: {
+    apiKey?: string;
+  };
+
   // Backend Services
   supabase: {
     url?: string;
@@ -70,7 +86,7 @@ const getNumberEnv = (key: string, defaultValue: number): number => {
 };
 
 // Validation functions
-const validateApiKey = (key: string | undefined, service: string): boolean => {
+const validateApiKey = (key: string | undefined, _service: string): boolean => {
   if (!key) return false;
   
   // Check for placeholder/demo values
@@ -116,6 +132,22 @@ export const secureConfig: SecureAppConfig = {
     clientId: getSecureEnvVar('VITE_SPOTIFY_CLIENT_ID'),
     clientSecret: getSecureEnvVar('VITE_SPOTIFY_CLIENT_SECRET'),
     redirectUri: getSecureEnvVar('VITE_SPOTIFY_REDIRECT_URI'),
+  },
+
+  // YouTube Configuration
+  youtube: {
+    apiKey: getSecureEnvVar('VITE_YOUTUBE_API_KEY'),
+  },
+
+  // Last.fm Configuration
+  lastfm: {
+    apiKey: getSecureEnvVar('VITE_LASTFM_API_KEY'),
+    secret: getSecureEnvVar('VITE_LASTFM_SECRET'),
+  },
+
+  // Google Studio Configuration
+  googleStudio: {
+    apiKey: getSecureEnvVar('VITE_GOOGLE_STUDIO_API_KEY'),
   },
 
   // Backend Services

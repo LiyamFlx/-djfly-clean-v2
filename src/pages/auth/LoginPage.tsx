@@ -66,7 +66,7 @@ const LoginPage = () => {
     }
   };
 
-  const handleOAuthLogin = async (provider: 'google' | 'spotify' | 'apple') => {
+  const handleOAuthLogin = async (_provider: 'google' | 'spotify' | 'apple') => {
     try {
       // OAuth login would be handled by secure auth service
       setError('OAuth login is not available in secure mode');
