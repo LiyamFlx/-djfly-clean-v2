@@ -120,7 +120,7 @@ class CollaborationService {
     }
   }
 
-  private handleMessage(data: any) {
+  private handleMessage(data: unknown) {
     switch (data.type) {
       case 'session_updated':
         this.currentSession = data.session;
@@ -160,7 +160,7 @@ class CollaborationService {
     }
   }
 
-  private emit(event: string, data?: any) {
+  private emit(event: string, data?: unknown) {
     const listeners = this.eventListeners.get(event);
     if (listeners) {
       listeners.forEach((listener) => listener(data));
@@ -478,7 +478,7 @@ class CollaborationService {
   /**
    * Send message via WebSocket
    */
-  private sendMessage(message: any) {
+  private sendMessage(message: unknown) {
     if (this.websocket && this.websocket.readyState === WebSocket.OPEN) {
       this.websocket.send(JSON.stringify(message));
     } else {

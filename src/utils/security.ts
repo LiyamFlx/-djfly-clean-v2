@@ -50,18 +50,26 @@ export const escapeAttribute = (str: string): string => {
 export const generateCSRFToken = (): string => {
   const array = new Uint8Array(32);
   crypto.getRandomValues(array);
-  return Array.from(array, byte => byte.toString(16).padStart(2, '0')).join('');
+  return Array.from(array, (byte) => byte.toString(16).padStart(2, '0')).join(
+    ''
+  );
 };
 
-export const validateCSRFToken = (token: string, storedToken: string): boolean => {
+export const validateCSRFToken = (
+  token: string,
+  storedToken: string
+): boolean => {
   return token === storedToken;
 };
 
 // Secure error handling
-export const sanitizeError = (error: unknown, context: string = 'Unknown'): string => {
+export const sanitizeError = (
+  error: unknown,
+  context: string = 'Unknown'
+): string => {
   // Don't expose internal error details to users
   console.error(`Error in ${context}:`, error);
-  
+
   if (error instanceof Error) {
     // Only expose safe error messages
     const safeMessages = [
@@ -71,12 +79,12 @@ export const sanitizeError = (error: unknown, context: string = 'Unknown'): stri
       'Invalid input',
       'Authentication required',
     ];
-    
+
     if (safeMessages.includes(error.message)) {
       return error.message;
     }
   }
-  
+
   return 'An error occurred. Please try again.';
 };
 
@@ -105,14 +113,17 @@ export const getSecurityHeaders = (): Record<string, string> => {
 
   // Add HSTS header in production
   if (import.meta.env.PROD) {
-    headers['Strict-Transport-Security'] = 'max-age=31536000; includeSubDomains';
+    headers['Strict-Transport-Security'] =
+      'max-age=31536000; includeSubDomains';
   }
 
   return headers;
 };
 
 // Password strength validation
-export const validatePasswordStrength = (password: string): {
+export const validatePasswordStrength = (
+  password: string
+): {
   isValid: boolean;
   score: number;
   feedback: string[];
@@ -157,10 +168,18 @@ export const validatePasswordStrength = (password: string): {
 
   // Common password check
   const commonPasswords = [
-    'password', '123456', 'qwerty', 'admin', 'letmein',
-    'welcome', 'monkey', 'dragon', 'master', 'football'
+    'password',
+    '123456',
+    'qwerty',
+    'admin',
+    'letmein',
+    'welcome',
+    'monkey',
+    'dragon',
+    'master',
+    'football',
   ];
-  
+
   if (commonPasswords.includes(password.toLowerCase())) {
     score -= 2;
     feedback.push('Password is too common');
@@ -175,7 +194,10 @@ export const validatePasswordStrength = (password: string): {
 
 // Rate limiting utilities
 export class RateLimiter {
-  private attempts = new Map<string, { count: number; lastAttempt: number; blocked: boolean }>();
+  private attempts = new Map<
+    string,
+    { count: number; lastAttempt: number; blocked: boolean }
+  >();
   private readonly maxAttempts: number;
   private readonly lockoutDuration: number;
   private readonly blockDuration: number;
@@ -221,7 +243,7 @@ export class RateLimiter {
     if (attempt) {
       attempt.count++;
       attempt.lastAttempt = now;
-      
+
       // Block if max attempts exceeded
       if (attempt.count >= this.maxAttempts) {
         attempt.blocked = true;
@@ -266,7 +288,7 @@ export class SecureStorage {
       const data = encoder.encode(keyMaterial);
       const hash = await crypto.subtle.digest('SHA-256', data);
       this.encryptionKey = Array.from(new Uint8Array(hash))
-        .map(b => b.toString(16).padStart(2, '0'))
+        .map((b) => b.toString(16).padStart(2, '0'))
         .join('');
     }
     return this.encryptionKey;

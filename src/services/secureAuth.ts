@@ -3,6 +3,38 @@
  * Addresses security vulnerabilities in the original auth service
  */
 
+// Add fetch API types
+declare global {
+  interface RequestInit {
+    method?: string;
+    headers?: Record<string, string> | string[][];
+    body?: string | FormData | URLSearchParams | ReadableStream | null;
+    mode?: 'cors' | 'no-cors' | 'same-origin';
+    credentials?: 'omit' | 'same-origin' | 'include';
+    cache?:
+      | 'default'
+      | 'no-store'
+      | 'reload'
+      | 'no-cache'
+      | 'force-cache'
+      | 'only-if-cached';
+    redirect?: 'follow' | 'error' | 'manual';
+    referrer?: string;
+    referrerPolicy?:
+      | 'no-referrer'
+      | 'no-referrer-when-downgrade'
+      | 'origin'
+      | 'origin-when-cross-origin'
+      | 'same-origin'
+      | 'strict-origin'
+      | 'strict-origin-when-cross-origin'
+      | 'unsafe-url';
+    integrity?: string;
+    keepalive?: boolean;
+    signal?: AbortSignal | null;
+  }
+}
+
 import { cache } from '@/utils/cache';
 
 export interface SecureUser {
@@ -165,7 +197,10 @@ class SecureAuthService {
 
       if (response.ok) {
         const data = await response.json();
-        this.saveTokenToStorage(data.token, Date.now() + data.expires_in * 1000);
+        this.saveTokenToStorage(
+          data.token,
+          Date.now() + data.expires_in * 1000
+        );
         return data.token;
       }
     } catch (error) {
@@ -177,14 +212,18 @@ class SecureAuthService {
   /**
    * Secure login with input validation and rate limiting
    */
-  async login(credentials: LoginCredentials): Promise<{ user: SecureUser; token: string }> {
+  async login(
+    credentials: LoginCredentials
+  ): Promise<{ user: SecureUser; token: string }> {
     // Input validation
     if (!validateEmail(credentials.email)) {
       throw new Error('Invalid email format');
     }
 
     if (!validatePassword(credentials.password)) {
-      throw new Error('Password must be at least 8 characters with uppercase, lowercase, number, and special character');
+      throw new Error(
+        'Password must be at least 8 characters with uppercase, lowercase, number, and special character'
+      );
     }
 
     // Rate limiting
@@ -213,7 +252,7 @@ class SecureAuthService {
       }
 
       const data = await response.json();
-      
+
       // Validate token before saving
       if (!(await this.validateToken(data.token))) {
         throw new Error('Invalid authentication token received');
@@ -235,14 +274,18 @@ class SecureAuthService {
   /**
    * Secure signup with input validation
    */
-  async signup(userData: SignupData): Promise<{ user: SecureUser; token: string }> {
+  async signup(
+    userData: SignupData
+  ): Promise<{ user: SecureUser; token: string }> {
     // Input validation
     if (!validateEmail(userData.email)) {
       throw new Error('Invalid email format');
     }
 
     if (!validatePassword(userData.password)) {
-      throw new Error('Password must be at least 8 characters with uppercase, lowercase, number, and special character');
+      throw new Error(
+        'Password must be at least 8 characters with uppercase, lowercase, number, and special character'
+      );
     }
 
     if (userData.name.length < 2 || userData.name.length > 50) {
@@ -268,7 +311,7 @@ class SecureAuthService {
       }
 
       const data = await response.json();
-      
+
       // Validate token before saving
       if (!(await this.validateToken(data.token))) {
         throw new Error('Invalid authentication token received');
@@ -425,7 +468,9 @@ class SecureAuthService {
    */
   async resetPassword(token: string, newPassword: string): Promise<void> {
     if (!validatePassword(newPassword)) {
-      throw new Error('Password must be at least 8 characters with uppercase, lowercase, number, and special character');
+      throw new Error(
+        'Password must be at least 8 characters with uppercase, lowercase, number, and special character'
+      );
     }
 
     try {
@@ -467,7 +512,37 @@ class SecureAuthService {
   /**
    * Make authenticated API request with automatic token refresh
    */
-  async apiRequest<T>(endpoint: string, options: RequestInit = {}): Promise<T> {
+  async apiRequest<T>(
+    endpoint: string,
+    options: {
+      method?: string;
+      headers?: Record<string, string> | string[][];
+      body?: string | FormData | URLSearchParams | ReadableStream | null;
+      mode?: 'cors' | 'no-cors' | 'same-origin';
+      credentials?: 'omit' | 'same-origin' | 'include';
+      cache?:
+        | 'default'
+        | 'no-store'
+        | 'reload'
+        | 'no-cache'
+        | 'force-cache'
+        | 'only-if-cached';
+      redirect?: 'follow' | 'error' | 'manual';
+      referrer?: string;
+      referrerPolicy?:
+        | 'no-referrer'
+        | 'no-referrer-when-downgrade'
+        | 'origin'
+        | 'origin-when-cross-origin'
+        | 'same-origin'
+        | 'strict-origin'
+        | 'strict-origin-when-cross-origin'
+        | 'unsafe-url';
+      integrity?: string;
+      keepalive?: boolean;
+      signal?: AbortSignal | null;
+    } = {}
+  ): Promise<T> {
     const url = endpoint.startsWith('http')
       ? endpoint
       : `${this.baseUrl}${endpoint}`;
@@ -480,7 +555,7 @@ class SecureAuthService {
       }
     }
 
-    const config: RequestInit = {
+    const config = {
       ...options,
       headers: {
         'Content-Type': 'application/json',

@@ -1,7 +1,11 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { secureAuthService, validateEmail, validatePassword } from '@/services/secureAuth';
+import {
+  secureAuthService,
+  validateEmail,
+  validatePassword,
+} from '@/services/secureAuth';
 import { sanitizeError, RateLimiter } from '@/utils/security';
 
 const LoginPage = () => {
@@ -11,9 +15,12 @@ const LoginPage = () => {
   });
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState('');
-  const [validationErrors, setValidationErrors] = useState<{ email?: string; password?: string }>({});
+  const [validationErrors, setValidationErrors] = useState<{
+    email?: string;
+    password?: string;
+  }>({});
   const navigate = useNavigate();
-  
+
   // Initialize rate limiter
   const rateLimiter = new RateLimiter(5, 15 * 60 * 1000, 60 * 60 * 1000);
 
@@ -25,15 +32,16 @@ const LoginPage = () => {
 
     // Input validation
     const errors: { email?: string; password?: string } = {};
-    
+
     if (!validateEmail(formData.email)) {
       errors.email = 'Please enter a valid email address';
     }
-    
+
     if (!validatePassword(formData.password)) {
-      errors.password = 'Password must be at least 8 characters with uppercase, lowercase, number, and special character';
+      errors.password =
+        'Password must be at least 8 characters with uppercase, lowercase, number, and special character';
     }
-    
+
     if (Object.keys(errors).length > 0) {
       setValidationErrors(errors);
       setIsLoading(false);
@@ -49,13 +57,13 @@ const LoginPage = () => {
 
     try {
       rateLimiter.recordAttempt(formData.email);
-      
+
       // Use secure auth service
       await secureAuthService.login({
         email: formData.email,
         password: formData.password,
       });
-      
+
       rateLimiter.resetAttempts(formData.email);
       navigate('/');
     } catch (err) {
@@ -66,7 +74,9 @@ const LoginPage = () => {
     }
   };
 
-  const handleOAuthLogin = async (_provider: 'google' | 'spotify' | 'apple') => {
+  const handleOAuthLogin = async (
+    _provider: 'google' | 'spotify' | 'apple'
+  ) => {
     try {
       // OAuth login would be handled by secure auth service
       setError('OAuth login is not available in secure mode');
@@ -112,17 +122,24 @@ const LoginPage = () => {
                 onChange={(e) => {
                   setFormData({ ...formData, email: e.target.value });
                   if (validationErrors.email) {
-                    setValidationErrors({ ...validationErrors, email: undefined });
+                    setValidationErrors({
+                      ...validationErrors,
+                      email: undefined,
+                    });
                   }
                 }}
                 className={`w-full px-4 py-3 bg-gray-700 border rounded-lg focus:outline-none transition-colors ${
-                  validationErrors.email ? 'border-red-500' : 'border-gray-600 focus:border-blue-500'
+                  validationErrors.email
+                    ? 'border-red-500'
+                    : 'border-gray-600 focus:border-blue-500'
                 }`}
                 placeholder="your@email.com"
                 required
               />
               {validationErrors.email && (
-                <p className="text-red-400 text-sm mt-1">{validationErrors.email}</p>
+                <p className="text-red-400 text-sm mt-1">
+                  {validationErrors.email}
+                </p>
               )}
             </div>
 
@@ -140,17 +157,24 @@ const LoginPage = () => {
                 onChange={(e) => {
                   setFormData({ ...formData, password: e.target.value });
                   if (validationErrors.password) {
-                    setValidationErrors({ ...validationErrors, password: undefined });
+                    setValidationErrors({
+                      ...validationErrors,
+                      password: undefined,
+                    });
                   }
                 }}
                 className={`w-full px-4 py-3 bg-gray-700 border rounded-lg focus:outline-none transition-colors ${
-                  validationErrors.password ? 'border-red-500' : 'border-gray-600 focus:border-blue-500'
+                  validationErrors.password
+                    ? 'border-red-500'
+                    : 'border-gray-600 focus:border-blue-500'
                 }`}
                 placeholder="Enter your password"
                 required
               />
               {validationErrors.password && (
-                <p className="text-red-400 text-sm mt-1">{validationErrors.password}</p>
+                <p className="text-red-400 text-sm mt-1">
+                  {validationErrors.password}
+                </p>
               )}
             </div>
 

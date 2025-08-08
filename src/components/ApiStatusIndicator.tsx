@@ -3,7 +3,7 @@
  * Shows the connection status of all integrated services
  */
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { serviceStatus, testConnections } from '@/config/apiConfig';
 
@@ -22,6 +22,26 @@ const ApiStatusIndicator: React.FC = () => {
   const [isExpanded, setIsExpanded] = useState(false);
   const [isTesting, setIsTesting] = useState(false);
 
+  const updateServiceStatus = () => {
+    setServices({
+      spotify: serviceStatus.getServiceStatus('spotify'),
+      supabase: serviceStatus.getServiceStatus('supabase'),
+      openai: serviceStatus.getServiceStatus('openai'),
+    });
+  };
+
+  const testAllConnections = useCallback(async () => {
+    setIsTesting(true);
+    try {
+      await testConnections.all();
+      updateServiceStatus();
+    } catch (error) {
+      console.error('Failed to test connections:', error);
+    } finally {
+      setIsTesting(false);
+    }
+  }, []);
+
   useEffect(() => {
     // Initial status check
     updateServiceStatus();
@@ -33,27 +53,7 @@ const ApiStatusIndicator: React.FC = () => {
     const interval = setInterval(updateServiceStatus, 30000); // Check every 30s
 
     return () => clearInterval(interval);
-  }, []);
-
-  const updateServiceStatus = () => {
-    setServices({
-      spotify: serviceStatus.getServiceStatus('spotify'),
-      supabase: serviceStatus.getServiceStatus('supabase'),
-      openai: serviceStatus.getServiceStatus('openai'),
-    });
-  };
-
-  const testAllConnections = async () => {
-    setIsTesting(true);
-    try {
-      await testConnections.all();
-      updateServiceStatus();
-    } catch (error) {
-      console.error('Failed to test connections:', error);
-    } finally {
-      setIsTesting(false);
-    }
-  };
+  }, [testAllConnections]);
 
   const getOverallStatus = () => {
     const connectedServices = Object.values(services).filter(Boolean).length;

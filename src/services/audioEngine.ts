@@ -33,7 +33,7 @@ export class AudioEngine {
 
   constructor() {
     this.audioContext = new (window.AudioContext ||
-      (window as any).webkitAudioContext)();
+      (window as unknown).webkitAudioContext)();
     this.setupAudioNodes();
   }
 

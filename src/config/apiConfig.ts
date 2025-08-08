@@ -186,7 +186,7 @@ export const validateApiConfig = () => {
     if (!allValid) {
       Object.entries(checks).forEach(([key, valid]) => {
         if (!valid) {
-          if (key === 'isPlaceholder' && (checks as any).isPlaceholder) {
+          if (key === 'isPlaceholder' && (checks as unknown).isPlaceholder) {
             console.warn(
               `  🔄 ${service}: Using placeholder/demo credentials - see API_CREDENTIALS_GUIDE.md`
             );
@@ -199,7 +199,7 @@ export const validateApiConfig = () => {
   });
 
   // Additional helpful messages
-  if ((validations.spotify as any).isPlaceholder) {
+  if ((validations.spotify as unknown).isPlaceholder) {
     console.log(`📖 To use real Spotify data, see: API_CREDENTIALS_GUIDE.md`);
   }
 

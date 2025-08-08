@@ -8,8 +8,8 @@ import {
 } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { PlaylistGenerator } from '@/services/musicLibrary';
+import type { Track } from '@/types/api';
 import ApiStatusIndicator from '@/components/ApiStatusIndicator';
-import type { Track } from '@/types';
 
 // Lazy load heavy components for better performance
 const LoginPage = lazy(() => import('@/pages/auth/LoginPage'));
@@ -195,20 +195,47 @@ const ContactPage = () => (
       <div className="bg-gray-800 p-8 rounded-xl">
         <form className="space-y-6">
           <div>
-            <label className="block text-sm font-medium mb-2">Name</label>
-            <input className="w-full px-4 py-3 bg-gray-700 border border-gray-600 rounded-lg focus:border-blue-500 focus:outline-none" />
-          </div>
-          <div>
-            <label className="block text-sm font-medium mb-2">Email</label>
+            <label
+              htmlFor="contact-name"
+              className="block text-sm font-medium mb-2"
+            >
+              Name
+            </label>
             <input
-              type="email"
+              id="contact-name"
+              name="name"
+              type="text"
+              required
               className="w-full px-4 py-3 bg-gray-700 border border-gray-600 rounded-lg focus:border-blue-500 focus:outline-none"
             />
           </div>
           <div>
-            <label className="block text-sm font-medium mb-2">Message</label>
+            <label
+              htmlFor="contact-email"
+              className="block text-sm font-medium mb-2"
+            >
+              Email
+            </label>
+            <input
+              id="contact-email"
+              name="email"
+              type="email"
+              required
+              className="w-full px-4 py-3 bg-gray-700 border border-gray-600 rounded-lg focus:border-blue-500 focus:outline-none"
+            />
+          </div>
+          <div>
+            <label
+              htmlFor="contact-message"
+              className="block text-sm font-medium mb-2"
+            >
+              Message
+            </label>
             <textarea
+              id="contact-message"
+              name="message"
               rows={5}
+              required
               className="w-full px-4 py-3 bg-gray-700 border border-gray-600 rounded-lg focus:border-blue-500 focus:outline-none"
             ></textarea>
           </div>
@@ -387,10 +414,20 @@ const StudioPage = () => (
   </div>
 );
 
+interface AIAnalysis {
+  crowdEnergy: number;
+  timeOfDay: string;
+  recommendation: {
+    tracks: Track[];
+    energy: number;
+    mood: string;
+  };
+}
+
 const MagicMatchPage = () => {
   const navigate = useNavigate();
   const [status, setStatus] = useState('ready');
-  const [aiAnalysis, setAiAnalysis] = useState<any>(null);
+  const [aiAnalysis, setAiAnalysis] = useState<AIAnalysis | null>(null);
 
   const handleAnalyze = async () => {
     setStatus('recording');
@@ -425,7 +462,7 @@ const MagicMatchPage = () => {
                     ? 'progressive'
                     : 'mixed',
               crowdEnergy,
-              timeOfDay: timeOfDay as any,
+              timeOfDay: timeOfDay as string,
               venue: 'club',
               duration: 45,
             });
@@ -553,7 +590,9 @@ const MagicSetPage = () => {
   const [prompt, setPrompt] = useState('');
   const [status, setStatus] = useState('ready'); // ready, generating, complete
   const [generatedTracks, setGeneratedTracks] = useState<Track[]>([]);
-  const [aiRecommendation, setAiRecommendation] = useState<any>(null);
+  const [aiRecommendation, setAiRecommendation] = useState<
+    AIAnalysis['recommendation'] | null
+  >(null);
 
   const generatePlaylist = async () => {
     if (!prompt.trim()) {

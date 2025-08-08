@@ -64,13 +64,16 @@ interface SecureAppConfig {
 }
 
 // Secure environment variable loading
-const getSecureEnvVar = (key: string, required: boolean = false): string | undefined => {
+const getSecureEnvVar = (
+  key: string,
+  required: boolean = false
+): string | undefined => {
   const value = import.meta.env[key];
-  
+
   if (!value && required) {
     throw new Error(`Required environment variable ${key} is not set`);
   }
-  
+
   return value;
 };
 
@@ -88,7 +91,7 @@ const getNumberEnv = (key: string, defaultValue: number): number => {
 // Validation functions
 const validateApiKey = (key: string | undefined, _service: string): boolean => {
   if (!key) return false;
-  
+
   // Check for placeholder/demo values
   const placeholderPatterns = [
     /^demo_/,
@@ -97,8 +100,8 @@ const validateApiKey = (key: string | undefined, _service: string): boolean => {
     /^abc123/,
     /^xyz456/,
   ];
-  
-  return !placeholderPatterns.some(pattern => pattern.test(key));
+
+  return !placeholderPatterns.some((pattern) => pattern.test(key));
 };
 
 const validateUrl = (url: string | undefined): boolean => {
@@ -112,7 +115,11 @@ const validateUrl = (url: string | undefined): boolean => {
 };
 
 // Create secure configuration
-const environment = getSecureEnvVar('VITE_APP_ENVIRONMENT', true) as 'development' | 'production' | 'preview' || 'development';
+const environment =
+  (getSecureEnvVar('VITE_APP_ENVIRONMENT', true) as
+    | 'development'
+    | 'production'
+    | 'preview') || 'development';
 const isProduction = environment === 'production';
 
 export const secureConfig: SecureAppConfig = {
@@ -158,11 +165,15 @@ export const secureConfig: SecureAppConfig = {
 
   // Feature Flags
   features: {
-    magicMatchEnabled: isProduction || getBooleanEnv('VITE_MAGIC_MATCH_ENABLED', true),
-    magicSetEnabled: isProduction || getBooleanEnv('VITE_MAGIC_SET_ENABLED', true),
-    analyticsEnabled: isProduction || getBooleanEnv('VITE_ANALYTICS_ENABLED', true),
+    magicMatchEnabled:
+      isProduction || getBooleanEnv('VITE_MAGIC_MATCH_ENABLED', true),
+    magicSetEnabled:
+      isProduction || getBooleanEnv('VITE_MAGIC_SET_ENABLED', true),
+    analyticsEnabled:
+      isProduction || getBooleanEnv('VITE_ANALYTICS_ENABLED', true),
     devMode: !isProduction && getBooleanEnv('VITE_DEV_MODE', false),
-    mockAiResponses: !isProduction && getBooleanEnv('VITE_MOCK_AI_RESPONSES', false),
+    mockAiResponses:
+      !isProduction && getBooleanEnv('VITE_MOCK_AI_RESPONSES', false),
   },
 
   // Security Settings
@@ -189,7 +200,9 @@ export const validateSecureConfig = (): {
     if (isProduction) {
       errors.push('OpenAI API key is required in production');
     } else {
-      warnings.push('OpenAI API key not configured - AI features will be limited');
+      warnings.push(
+        'OpenAI API key not configured - AI features will be limited'
+      );
     }
   }
 
@@ -197,7 +210,9 @@ export const validateSecureConfig = (): {
     if (isProduction) {
       errors.push('Spotify Client ID is required in production');
     } else {
-      warnings.push('Spotify Client ID not configured - music features will be limited');
+      warnings.push(
+        'Spotify Client ID not configured - music features will be limited'
+      );
     }
   }
 
@@ -205,7 +220,9 @@ export const validateSecureConfig = (): {
     if (isProduction) {
       errors.push('Supabase URL is required in production');
     } else {
-      warnings.push('Supabase URL not configured - database features will be limited');
+      warnings.push(
+        'Supabase URL not configured - database features will be limited'
+      );
     }
   }
 
@@ -228,7 +245,8 @@ export const validateSecureConfig = (): {
 // Service status tracking
 export class SecureServiceStatus {
   private static instance: SecureServiceStatus;
-  private services: Map<string, { available: boolean; lastCheck: number }> = new Map();
+  private services: Map<string, { available: boolean; lastCheck: number }> =
+    new Map();
 
   static getInstance(): SecureServiceStatus {
     if (!SecureServiceStatus.instance) {

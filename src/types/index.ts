@@ -68,3 +68,9 @@ export interface UIState {
   theme: 'dark' | 'light';
   isMobileView: boolean;
 }
+
+// Enhanced Session Management Types
+export * from './session';
+
+// Enhanced Audio Analysis Types
+export * from './audio';

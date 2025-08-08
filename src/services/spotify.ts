@@ -312,7 +312,7 @@ class SpotifyService {
   /**
    * Get playlists for a user (requires user authentication)
    */
-  async getUserPlaylists(userId: string, token: string): Promise<any[]> {
+  async getUserPlaylists(userId: string, token: string): Promise<unknown[]> {
     try {
       const response = await fetch(
         `https://api.spotify.com/v1/users/${userId}/playlists`,
@@ -343,7 +343,7 @@ class SpotifyService {
     token: string,
     name: string,
     description?: string
-  ): Promise<any> {
+  ): Promise<unknown> {
     try {
       const response = await fetch(
         `https://api.spotify.com/v1/users/${userId}/playlists`,

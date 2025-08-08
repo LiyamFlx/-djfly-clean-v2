@@ -199,7 +199,7 @@ export class PlaylistGenerator {
     if (serviceStatus.getServiceStatus('spotify')) {
       try {
         const results = await spotifyService.searchTracks(query, limit);
-        return results.map((spotifyTrack: any) => ({
+        return results.map((spotifyTrack: unknown) => ({
           id: spotifyTrack.id,
           title: spotifyTrack.name,
           artist: spotifyTrack.artists[0]?.name || 'Unknown Artist',
@@ -222,7 +222,7 @@ export class PlaylistGenerator {
   /**
    * Infer genre from Spotify track data
    */
-  private static inferGenreFromTrack(spotifyTrack: any): string {
+  private static inferGenreFromTrack(spotifyTrack: unknown): string {
     const name = spotifyTrack.name.toLowerCase();
     const artist = spotifyTrack.artists[0]?.name?.toLowerCase() || '';
 
@@ -240,7 +240,7 @@ export class PlaylistGenerator {
   /**
    * Infer energy level from track data
    */
-  private static inferEnergyFromTrack(track: any): number {
+  private static inferEnergyFromTrack(track: unknown): number {
     const popularity = track.popularity || 50;
     if (popularity > 70) return 0.8;
     if (popularity > 40) return 0.5;

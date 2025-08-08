@@ -104,16 +104,22 @@ const MagicMatchPage = () => {
       <div className="max-w-2xl mx-auto text-center">
         <h1 className="text-3xl font-bold mb-8">Magic Match</h1>
 
-        <div
+        <button
           className={`w-32 h-32 mx-auto mb-8 rounded-full flex items-center justify-center cursor-pointer border-4 ${
             isRecording
               ? 'bg-red-600 border-red-400 animate-pulse'
               : 'bg-blue-600 border-blue-400 hover:bg-blue-500'
           }`}
           onClick={handleRecord}
+          onKeyDown={(e) => {
+            if (e.key === 'Enter' || e.key === ' ') {
+              e.preventDefault();
+              handleRecord();
+            }
+          }}
         >
           <span className="text-4xl">{isRecording ? '🔴' : '🎤'}</span>
-        </div>
+        </button>
 
         <h2 className="text-xl mb-4">
           {isRecording
@@ -362,9 +368,9 @@ const PlayerPage = () => {
             </h3>
             <div className="space-y-2">
               {globalQueue.map((track, index) => (
-                <div
+                <button
                   key={track.id}
-                  className={`flex items-center space-x-3 p-3 rounded cursor-pointer transition-colors ${
+                  className={`flex items-center space-x-3 p-3 rounded cursor-pointer transition-colors w-full text-left ${
                     track.id === currentTrack?.id
                       ? 'bg-blue-600'
                       : 'bg-gray-700 hover:bg-gray-600'
@@ -373,6 +379,14 @@ const PlayerPage = () => {
                     setCurrentTrack(track);
                     globalCurrentTrack = track;
                     setIsPlaying(false);
+                  }}
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter' || e.key === ' ') {
+                      e.preventDefault();
+                      setCurrentTrack(track);
+                      globalCurrentTrack = track;
+                      setIsPlaying(false);
+                    }
                   }}
                 >
                   <span className="text-sm w-6 text-center">{index + 1}</span>
@@ -383,7 +397,7 @@ const PlayerPage = () => {
                   {track.id === currentTrack?.id && (
                     <span className="text-green-400">♪</span>
                   )}
-                </div>
+                </button>
               ))}
             </div>
           </div>
@@ -395,7 +409,9 @@ const PlayerPage = () => {
             setIsPlaying(false);
             nextTrack();
           }}
-        />
+        >
+          <track kind="captions" />
+        </audio>
       </div>
     </div>
   );

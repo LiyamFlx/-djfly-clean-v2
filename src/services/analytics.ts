@@ -73,7 +73,7 @@ class AnalyticsEngine {
   /**
    * Calculate crowd response based on track properties and real-time data
    */
-  private calculateCrowdResponse(track: any): number {
+  private calculateCrowdResponse(track: unknown): number {
     let score = 7; // Base score
 
     // BPM influence (sweet spot around 120-130)
@@ -680,7 +680,7 @@ class AnalyticsEngine {
   /**
    * Get historical session data
    */
-  async getSessionHistory(): Promise<any[]> {
+  async getSessionHistory(): Promise<unknown[]> {
     try {
       const userId = this.getCurrentUserId();
       const sessions = await supabaseService.getUserSessions(userId);

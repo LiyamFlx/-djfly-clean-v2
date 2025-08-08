@@ -40,7 +40,7 @@ interface MoodAnalysis {
 class AIMusicEngine {
   private apiKey: string;
   private baseUrl: string;
-  private cache = new Map<string, any>();
+  private cache = new Map<string, unknown>();
   private cacheExpiry = 10 * 60 * 1000; // 10 minutes
 
   constructor() {
@@ -343,7 +343,7 @@ Create playlists that:
     return prompt;
   }
 
-  private mapAIResultToTracks(aiResult: any): AIRecommendation {
+  private mapAIResultToTracks(aiResult: unknown): AIRecommendation {
     const tracks: Track[] = [];
     const trackPool = [...MUSIC_LIBRARY];
 
@@ -378,7 +378,7 @@ Create playlists that:
   }
 
   private findBestTrackMatch(
-    suggestion: any,
+    suggestion: unknown,
     trackPool: Track[]
   ): Track | null {
     // Score tracks based on similarity to AI suggestion
@@ -574,11 +574,11 @@ Create playlists that:
     ];
   }
 
-  private generateCacheKey(type: string, data: any): string {
+  private generateCacheKey(type: string, data: unknown): string {
     return `${type}_${JSON.stringify(data)}`;
   }
 
-  private getFromCache(key: string): any {
+  private getFromCache(key: string): unknown {
     const item = this.cache.get(key);
     if (item && Date.now() - item.timestamp < this.cacheExpiry) {
       return item.data;
@@ -587,7 +587,7 @@ Create playlists that:
     return null;
   }
 
-  private setCache(key: string, data: any): void {
+  private setCache(key: string, data: unknown): void {
     this.cache.set(key, { data, timestamp: Date.now() });
   }
 }

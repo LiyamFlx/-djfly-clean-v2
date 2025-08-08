@@ -1,760 +1,502 @@
-/**
- * MagicPlayer: Universal Bulletproof Audio Engine
- * Seamless, error-free, and policy-compliant audio for every user and device
- *
- * Features:
- * - Universal format support (MP3, WAV, OGG, AAC, M4A)
- * - Audio policy compliance and gesture requirements
- * - Memory management and resource optimization
- * - Cross-device compatibility and fallback systems
- * - Real-time error handling and recovery
- * - Progressive enhancement and graceful degradation
- */
+import { Track, AudioEngineState, RealTimeAnalysis, AudioPipeline, AudioQualityMetrics } from '../types/audio';
+import { SessionUpdate, EnergyPoint } from '../types/session';
 
-export interface AudioSource {
-  id: string;
-  url: string;
-  title: string;
-  artist: string;
-  duration?: number;
-  format?: 'mp3' | 'wav' | 'ogg' | 'aac' | 'm4a';
-  quality?: 'low' | 'medium' | 'high';
+export interface DJWorkflow {
+  hotCues: Array<{
+    id: string;
+    time: number;
+    label: string;
+    color: string;
+  }>;
+  loops: Array<{
+    id: string;
+    start: number;
+    end: number;
+    active: boolean;
+  }>;
+  effects: {
+    filter: { frequency: number; resonance: number; enabled: boolean };
+    echo: { delay: number; feedback: number; enabled: boolean };
+    reverb: { roomSize: number; dampening: number; enabled: boolean };
+  };
+  transitions: {
+    type: 'crossfade' | 'cut' | 'echo' | 'filter';
+    duration: number;
+    quality: number;
+  };
 }
 
-export interface PlaybackOptions {
-  volume?: number; // 0-1
-  startTime?: number; // seconds
-  loop?: boolean;
-  preload?: boolean;
-  crossfade?: boolean;
-  fadeInDuration?: number;
-  fadeOutDuration?: number;
-}
-
-export interface AudioAnalytics {
+export interface DeckState {
+  id: 'A' | 'B';
+  track: Track | null;
+  isPlaying: boolean;
   currentTime: number;
   duration: number;
   volume: number;
-  isPlaying: boolean;
-  isLoading: boolean;
-  bufferProgress: number;
-  playbackRate: number;
-  error?: string;
+  pitch: number;
+  tempo: number;
+  eq: {
+    low: number;
+    mid: number;
+    high: number;
+  };
+  effects: {
+    filter: { frequency: number; resonance: number; enabled: boolean };
+    echo: { delay: number; feedback: number; enabled: boolean };
+    reverb: { roomSize: number; dampening: number; enabled: boolean };
+  };
+  hotCues: Array<{
+    id: string;
+    time: number;
+    label: string;
+    color: string;
+  }>;
+  loops: Array<{
+    id: string;
+    start: number;
+    end: number;
+    active: boolean;
+  }>;
+  waveform: Float32Array | null;
+  spectrum: Float32Array | null;
 }
 
-type AudioState =
-  | 'idle'
-  | 'loading'
-  | 'loaded'
-  | 'playing'
-  | 'paused'
-  | 'ended'
-  | 'error';
-type PlaybackEvent =
-  | 'play'
-  | 'pause'
-  | 'ended'
-  | 'error'
-  | 'loaded'
-  | 'progress'
-  | 'buffer';
+export interface MixerState {
+  crossfader: number; // -1 (A) to 1 (B)
+  masterVolume: number;
+  boothVolume: number;
+  headphonesVolume: number;
+  monitorSource: 'A' | 'B' | 'MASTER';
+}
 
-class MagicPlayer {
+export interface CrowdResponse {
+  energy: number;
+  engagement: number;
+  mood: string;
+  demographics: {
+    ageRange: [number, number];
+    genderDistribution: { male: number; female: number; other: number };
+    energyPreference: 'high' | 'medium' | 'low';
+  };
+  behavior: {
+    dancing: number;
+    singing: number;
+    clapping: number;
+    cheering: number;
+  };
+  predictions: {
+    nextTrackAppeal: number;
+    energyForecast: number;
+    crowdRetention: number;
+  };
+}
+
+export class MagicPlayer {
   private audioContext: AudioContext | null = null;
-  private currentAudio: HTMLAudioElement | null = null;
-  private gainNode: GainNode | null = null;
-  private analyserNode: AnalyserNode | null = null;
-  private sourceNode: MediaElementAudioSourceNode | null = null;
-
-  private state: AudioState = 'idle';
-  private currentSource: AudioSource | null = null;
-  private playbackOptions: PlaybackOptions = {};
-
-  private eventListeners = new Map<PlaybackEvent, ((data: any) => void)[]>();
-  private fadeInterval: number | null = null;
-  private retryCount = 0;
-  private maxRetries = 3;
-
-  private isUserGestureReceived = false;
-  private pendingPlay = false;
-
-  // Memory management
-  private audioCache = new Map<string, HTMLAudioElement>();
-  private maxCacheSize = 10;
-  private resourceCleanupInterval: number | null = null;
+  private deckA: DeckState;
+  private deckB: DeckState;
+  private mixer: MixerState;
+  private currentAnalysis: RealTimeAnalysis | null = null;
+  private crowdResponse: CrowdResponse | null = null;
+  private eventListeners: Map<string, Function[]> = new Map();
+  private analysisInterval: NodeJS.Timeout | null = null;
+  private crowdSimulationInterval: NodeJS.Timeout | null = null;
 
   constructor() {
-    this.initializeAudioContext();
-    this.setupEventListeners();
-    this.startResourceMonitoring();
+    this.deckA = this.createDeckState('A');
+    this.deckB = this.createDeckState('B');
+    this.mixer = this.createMixerState();
   }
 
-  /**
-   * Initialize Web Audio API context with fallback handling
-   */
-  private async initializeAudioContext(): Promise<void> {
+  // Initialization
+  async initialize(): Promise<void> {
     try {
-      // Check for Web Audio API support
-      if (typeof AudioContext !== 'undefined') {
-        this.audioContext = new AudioContext();
-      } else if (typeof (window as any).webkitAudioContext !== 'undefined') {
-        this.audioContext = new (window as any).webkitAudioContext();
-      }
-
-      if (this.audioContext) {
-        // Handle audio context state changes
-        this.audioContext.addEventListener('statechange', () => {
-          console.log(`🎵 Audio context state: ${this.audioContext?.state}`);
-          if (this.audioContext?.state === 'suspended') {
-            this.handleAudioPolicyCompliance();
-          }
-        });
-
-        // Create audio nodes
-        this.gainNode = this.audioContext.createGain();
-        this.analyserNode = this.audioContext.createAnalyser();
-
-        // Configure analyser
-        this.analyserNode.fftSize = 2048;
-        this.analyserNode.smoothingTimeConstant = 0.8;
-
-        // Connect nodes: source -> gain -> analyser -> destination
-        this.gainNode.connect(this.analyserNode);
-        this.analyserNode.connect(this.audioContext.destination);
-
-        console.log('🎵 MagicPlayer: Audio context initialized');
-      }
-    } catch {
-      console.warn(
-        '⚠️ MagicPlayer: Web Audio API not available, using HTML5 Audio fallback'
-      );
-      // HTML5 Audio fallback will be used
+      this.audioContext = new (window.AudioContext || (window as any).webkitAudioContext)();
+      await this.audioContext.resume();
+      
+      this.startRealTimeAnalysis();
+      this.startCrowdSimulation();
+      
+      this.emitEvent('player_initialized', { success: true });
+    } catch (error) {
+      console.error('Failed to initialize audio context:', error);
+      this.emitEvent('player_error', { error: 'Audio context initialization failed' });
     }
   }
 
-  /**
-   * Handle audio policy compliance (requires user gesture)
-   */
-  private async handleAudioPolicyCompliance(): Promise<void> {
+  // Deck Management
+  async loadTrack(deckId: 'A' | 'B', track: Track): Promise<void> {
+    const deck = deckId === 'A' ? this.deckA : this.deckB;
+    
+    try {
+      deck.track = track;
+      deck.currentTime = 0;
+      deck.duration = track.duration;
+      
+      // Load audio and generate waveform
+      await this.loadAudio(deckId, track);
+      await this.generateWaveform(deckId, track);
+      
+      this.emitEvent('track_loaded', { deckId, track });
+    } catch (error) {
+      console.error(`Failed to load track on deck ${deckId}:`, error);
+      this.emitEvent('player_error', { error: `Failed to load track on deck ${deckId}` });
+    }
+  }
+
+  private async loadAudio(deckId: 'A' | 'B', track: Track): Promise<void> {
+    if (!this.audioContext) throw new Error('Audio context not initialized');
+
+    const response = await fetch(track.preview_url || '');
+    const arrayBuffer = await response.arrayBuffer();
+    const audioBuffer = await this.audioContext.decodeAudioData(arrayBuffer);
+    
+    // Store audio buffer for playback
+    const deck = deckId === 'A' ? this.deckA : this.deckB;
+    (deck as any).audioBuffer = audioBuffer;
+  }
+
+  private async generateWaveform(deckId: 'A' | 'B', track: Track): Promise<void> {
+    // Generate waveform data for visualization
+    const deck = deckId === 'A' ? this.deckA : this.deckB;
+    
+    // Simulate waveform generation (in real implementation, use Web Audio API)
+    const sampleCount = Math.floor(track.duration / 1000 * 44100 / 1000); // 1 sample per ms
+    deck.waveform = new Float32Array(sampleCount);
+    
+    for (let i = 0; i < sampleCount; i++) {
+      deck.waveform[i] = Math.random() * 0.5 + 0.25; // Simulated waveform
+    }
+    
+    this.emitEvent('waveform_generated', { deckId, waveform: deck.waveform });
+  }
+
+  // Playback Control
+  play(deckId: 'A' | 'B'): void {
+    const deck = deckId === 'A' ? this.deckA : this.deckB;
+    
+    if (!deck.track) return;
+    
+    deck.isPlaying = true;
+    this.emitEvent('playback_started', { deckId, track: deck.track });
+  }
+
+  pause(deckId: 'A' | 'B'): void {
+    const deck = deckId === 'A' ? this.deckA : this.deckB;
+    
+    deck.isPlaying = false;
+    this.emitEvent('playback_paused', { deckId });
+  }
+
+  stop(deckId: 'A' | 'B'): void {
+    const deck = deckId === 'A' ? this.deckA : this.deckB;
+    
+    deck.isPlaying = false;
+    deck.currentTime = 0;
+    this.emitEvent('playback_stopped', { deckId });
+  }
+
+  seek(deckId: 'A' | 'B', time: number): void {
+    const deck = deckId === 'A' ? this.deckA : this.deckB;
+    
+    deck.currentTime = Math.max(0, Math.min(time, deck.duration));
+    this.emitEvent('seeked', { deckId, time: deck.currentTime });
+  }
+
+  // Mixing Controls
+  setCrossfader(position: number): void {
+    this.mixer.crossfader = Math.max(-1, Math.min(1, position));
+    this.emitEvent('crossfader_changed', { position: this.mixer.crossfader });
+  }
+
+  setDeckVolume(deckId: 'A' | 'B', volume: number): void {
+    const deck = deckId === 'A' ? this.deckA : this.deckB;
+    deck.volume = Math.max(0, Math.min(1, volume));
+    this.emitEvent('volume_changed', { deckId, volume: deck.volume });
+  }
+
+  setDeckPitch(deckId: 'A' | 'B', pitch: number): void {
+    const deck = deckId === 'A' ? this.deckA : this.deckB;
+    deck.pitch = Math.max(-12, Math.min(12, pitch));
+    this.emitEvent('pitch_changed', { deckId, pitch: deck.pitch });
+  }
+
+  setDeckTempo(deckId: 'A' | 'B', tempo: number): void {
+    const deck = deckId === 'A' ? this.deckA : this.deckB;
+    deck.tempo = Math.max(0.5, Math.min(2.0, tempo));
+    this.emitEvent('tempo_changed', { deckId, tempo: deck.tempo });
+  }
+
+  setDeckEQ(deckId: 'A' | 'B', band: 'low' | 'mid' | 'high', value: number): void {
+    const deck = deckId === 'A' ? this.deckA : this.deckB;
+    deck.eq[band] = Math.max(-12, Math.min(12, value));
+    this.emitEvent('eq_changed', { deckId, band, value: deck.eq[band] });
+  }
+
+  // Effects
+  toggleEffect(deckId: 'A' | 'B', effectType: 'filter' | 'echo' | 'reverb'): void {
+    const deck = deckId === 'A' ? this.deckA : this.deckB;
+    deck.effects[effectType].enabled = !deck.effects[effectType].enabled;
+    this.emitEvent('effect_toggled', { deckId, effectType, enabled: deck.effects[effectType].enabled });
+  }
+
+  setEffectParameter(deckId: 'A' | 'B', effectType: 'filter' | 'echo' | 'reverb', parameter: string, value: number): void {
+    const deck = deckId === 'A' ? this.deckA : this.deckB;
+    (deck.effects[effectType] as any)[parameter] = value;
+    this.emitEvent('effect_parameter_changed', { deckId, effectType, parameter, value });
+  }
+
+  // Hot Cues
+  setHotCue(deckId: 'A' | 'B', cueId: string, time: number, label: string, color: string): void {
+    const deck = deckId === 'A' ? this.deckA : this.deckB;
+    
+    const existingCue = deck.hotCues.find(cue => cue.id === cueId);
+    if (existingCue) {
+      existingCue.time = time;
+      existingCue.label = label;
+      existingCue.color = color;
+    } else {
+      deck.hotCues.push({ id: cueId, time, label, color });
+    }
+    
+    this.emitEvent('hot_cue_set', { deckId, cueId, time, label, color });
+  }
+
+  jumpToHotCue(deckId: 'A' | 'B', cueId: string): void {
+    const deck = deckId === 'A' ? this.deckA : this.deckB;
+    const cue = deck.hotCues.find(c => c.id === cueId);
+    
+    if (cue) {
+      this.seek(deckId, cue.time);
+      this.emitEvent('hot_cue_jumped', { deckId, cueId, time: cue.time });
+    }
+  }
+
+  // Loops
+  setLoop(deckId: 'A' | 'B', loopId: string, start: number, end: number): void {
+    const deck = deckId === 'A' ? this.deckA : this.deckB;
+    
+    const existingLoop = deck.loops.find(loop => loop.id === loopId);
+    if (existingLoop) {
+      existingLoop.start = start;
+      existingLoop.end = end;
+    } else {
+      deck.loops.push({ id: loopId, start, end, active: false });
+    }
+    
+    this.emitEvent('loop_set', { deckId, loopId, start, end });
+  }
+
+  toggleLoop(deckId: 'A' | 'B', loopId: string): void {
+    const deck = deckId === 'A' ? this.deckA : this.deckB;
+    const loop = deck.loops.find(l => l.id === loopId);
+    
+    if (loop) {
+      loop.active = !loop.active;
+      this.emitEvent('loop_toggled', { deckId, loopId, active: loop.active });
+    }
+  }
+
+  // Real-time Analysis
+  private startRealTimeAnalysis(): void {
+    this.analysisInterval = setInterval(() => {
+      this.performRealTimeAnalysis();
+    }, 100); // 10 FPS
+  }
+
+  private performRealTimeAnalysis(): void {
     if (!this.audioContext) return;
 
-    try {
-      if (this.audioContext.state === 'suspended') {
-        await this.audioContext.resume();
-        console.log('🎵 Audio context resumed after user gesture');
-
-        if (this.pendingPlay) {
-          this.pendingPlay = false;
-          this.play();
-        }
-      }
-    } catch (error) {
-      console.error('Failed to resume audio context:', error);
-    }
-  }
-
-  /**
-   * Setup global event listeners
-   */
-  private setupEventListeners(): void {
-    // Listen for user interactions to enable audio
-    const enableAudio = () => {
-      if (!this.isUserGestureReceived) {
-        this.isUserGestureReceived = true;
-        this.handleAudioPolicyCompliance();
-        console.log('🎵 User gesture received, audio enabled');
-      }
+    // Simulate real-time analysis
+    this.currentAnalysis = {
+      currentEnergy: Math.random() * 0.5 + 0.5,
+      spectralCentroid: Math.random() * 2000 + 1000,
+      spectralRolloff: Math.random() * 4000 + 2000,
+      zeroCrossingRate: Math.random() * 0.1,
+      rms: Math.random() * 0.5 + 0.1,
+      peak: Math.random() * 0.8 + 0.2,
+      beatConfidence: Math.random(),
+      nextBeatTime: Date.now() + Math.random() * 1000,
+      phaseAlignment: Math.random(),
+      currentKey: 'C',
+      harmonicStability: Math.random(),
+      analysisLatency: Math.random() * 10,
+      processingTime: Math.random() * 5
     };
 
-    // Multiple interaction types for broader compatibility
-    ['click', 'touchstart', 'keydown', 'touchend'].forEach((eventType) => {
-      document.addEventListener(eventType, enableAudio, {
-        once: true,
-        passive: true,
-      });
-    });
-
-    // Handle page visibility changes
-    document.addEventListener('visibilitychange', () => {
-      if (document.hidden && this.state === 'playing') {
-        // Pause when tab becomes hidden (mobile optimization)
-        this.pause();
-      }
-    });
-
-    // Handle network changes
-    window.addEventListener('online', () => {
-      console.log('🌐 Network restored');
-      if (this.state === 'error') {
-        this.retryPlayback();
-      }
-    });
-
-    window.addEventListener('offline', () => {
-      console.log('🌐 Network lost - switching to cached content');
-    });
+    this.emitEvent('analysis_updated', this.currentAnalysis);
   }
 
-  /**
-   * Start resource monitoring for memory management
-   */
-  private startResourceMonitoring(): void {
-    this.resourceCleanupInterval = window.setInterval(() => {
-      this.cleanupMemory();
-    }, 30000); // Clean up every 30 seconds
+  // Crowd Response Simulation
+  private startCrowdSimulation(): void {
+    this.crowdSimulationInterval = setInterval(() => {
+      this.simulateCrowdResponse();
+    }, 5000); // Every 5 seconds
   }
 
-  /**
-   * Load audio source with format detection and fallbacks
-   */
-  async load(
-    source: AudioSource,
-    options: PlaybackOptions = {}
-  ): Promise<void> {
-    try {
-      this.setState('loading');
-      this.currentSource = source;
-      this.playbackOptions = { ...options };
+  private simulateCrowdResponse(): void {
+    const currentEnergy = this.currentAnalysis?.currentEnergy || 0.5;
+    const activeDeck = this.deckA.isPlaying ? this.deckA : this.deckB.isPlaying ? this.deckB : null;
+    
+    if (!activeDeck) return;
 
-      console.log(`🎵 Loading: ${source.title} by ${source.artist}`);
+    // Simulate crowd response based on track and energy
+    const trackEnergy = activeDeck.track?.energy || 0.5;
+    const popularity = activeDeck.track?.popularity || 0.5;
+    
+    this.crowdResponse = {
+      energy: Math.min(1, currentEnergy * 1.2),
+      engagement: Math.min(1, (trackEnergy + popularity) / 2),
+      mood: this.determineCrowdMood(currentEnergy, trackEnergy),
+      demographics: {
+        ageRange: [18, 35] as [number, number],
+        genderDistribution: { male: 0.6, female: 0.4, other: 0.0 },
+        energyPreference: currentEnergy > 0.7 ? 'high' : currentEnergy > 0.4 ? 'medium' : 'low'
+      },
+      behavior: {
+        dancing: Math.min(1, currentEnergy * 1.5),
+        singing: Math.min(1, popularity * 0.8),
+        clapping: Math.min(1, currentEnergy * 0.7),
+        cheering: Math.min(1, (currentEnergy + popularity) / 2)
+      },
+             predictions: {
+         nextTrackAppeal: Math.random() * 0.3 + 0.7,
+         energyForecast: Math.min(1, currentEnergy + (Math.random() - 0.5) * 0.2),
+         crowdRetention: Math.min(1, (trackEnergy + popularity) / 2 + (Math.random() - 0.5) * 0.1)
+       }
+    };
 
-      // Check cache first
-      let audio = this.audioCache.get(source.id);
-
-      if (!audio) {
-        audio = await this.createOptimizedAudioElement(source);
-        this.cacheAudio(source.id, audio);
-      }
-
-      this.currentAudio = audio;
-      await this.setupAudioNodes();
-
-      // Configure audio element
-      if (options.volume !== undefined) {
-        this.setVolume(options.volume);
-      }
-
-      if (options.loop) {
-        audio.loop = true;
-      }
-
-      if (options.startTime) {
-        audio.currentTime = options.startTime;
-      }
-
-      this.setState('loaded');
-      this.emit('loaded', { source, duration: audio.duration });
-    } catch (error) {
-      console.error('🚨 MagicPlayer load error:', error);
-      this.setState('error');
-      const errorMessage =
-        error instanceof Error ? error.message : 'Unknown error';
-      this.emit('error', { error: errorMessage, source });
-
-      // Try fallback sources
-      await this.tryFallbackSources(source);
-    }
+    this.emitEvent('crowd_response_updated', this.crowdResponse);
   }
 
-  /**
-   * Create optimized audio element with format detection
-   */
-  private async createOptimizedAudioElement(
-    source: AudioSource
-  ): Promise<HTMLAudioElement> {
-    const audio = new Audio();
-
-    // Configure for optimal performance
-    audio.preload = this.playbackOptions.preload ? 'auto' : 'metadata';
-    audio.crossOrigin = 'anonymous';
-
-    // Set up error handling
-    return new Promise((resolve, reject) => {
-      const timeout = setTimeout(() => {
-        reject(new Error('Audio load timeout'));
-      }, 15000); // 15 second timeout
-
-      audio.addEventListener(
-        'canplaythrough',
-        () => {
-          clearTimeout(timeout);
-          resolve(audio);
-        },
-        { once: true }
-      );
-
-      audio.addEventListener(
-        'error',
-        () => {
-          clearTimeout(timeout);
-          reject(new Error(`Audio load failed: ${audio.error?.message}`));
-        },
-        { once: true }
-      );
-
-      // Try to load the audio
-      audio.src = source.url;
-      audio.load();
-    });
+  private determineCrowdMood(energy: number, trackEnergy: number): string {
+    const combinedEnergy = (energy + trackEnergy) / 2;
+    
+    if (combinedEnergy > 0.8) return 'excited';
+    if (combinedEnergy > 0.6) return 'energetic';
+    if (combinedEnergy > 0.4) return 'engaged';
+    if (combinedEnergy > 0.2) return 'chill';
+    return 'mellow';
   }
 
-  /**
-   * Setup audio nodes and connections
-   */
-  private async setupAudioNodes(): Promise<void> {
-    if (!this.currentAudio || !this.audioContext || !this.gainNode) return;
+  // Stem Separation
+  async separateStems(track: Track): Promise<{
+    vocals: AudioBuffer;
+    drums: AudioBuffer;
+    bass: AudioBuffer;
+    other: AudioBuffer;
+  }> {
+    // Simulate stem separation (in real implementation, use AI models)
+    if (!this.audioContext) throw new Error('Audio context not initialized');
 
-    try {
-      // Disconnect previous source if exists
-      if (this.sourceNode) {
-        this.sourceNode.disconnect();
+    const sampleRate = this.audioContext.sampleRate;
+    const duration = track.duration / 1000;
+    const length = Math.floor(sampleRate * duration);
+
+    const createStemBuffer = (): AudioBuffer => {
+      const buffer = this.audioContext!.createBuffer(2, length, sampleRate);
+      const data = buffer.getChannelData(0);
+      for (let i = 0; i < length; i++) {
+        data[i] = (Math.random() - 0.5) * 0.1; // Simulated stem
       }
-
-      // Create new media element source
-      this.sourceNode = this.audioContext.createMediaElementSource(
-        this.currentAudio
-      );
-      this.sourceNode.connect(this.gainNode);
-
-      console.log('🔗 Audio nodes connected');
-    } catch (error) {
-      console.warn(
-        'Audio node setup failed, using HTML5 Audio fallback:',
-        error
-      );
-      // Continue without Web Audio API features
-    }
-  }
-
-  /**
-   * Play audio with policy compliance and error handling
-   */
-  async play(): Promise<void> {
-    if (!this.currentAudio) {
-      console.warn('No audio loaded');
-      return;
-    }
-
-    try {
-      // Check audio policy compliance
-      if (this.audioContext?.state === 'suspended') {
-        if (!this.isUserGestureReceived) {
-          console.log('⏳ Waiting for user gesture to enable audio...');
-          this.pendingPlay = true;
-          return;
-        }
-        await this.audioContext.resume();
-      }
-
-      // Handle fade in
-      if (this.playbackOptions.fadeInDuration) {
-        this.fadeIn(this.playbackOptions.fadeInDuration);
-      }
-
-      // Attempt to play
-      const playPromise = this.currentAudio.play();
-
-      if (playPromise) {
-        await playPromise;
-      }
-
-      this.setState('playing');
-      this.emit('play', this.getAnalytics());
-      this.retryCount = 0; // Reset retry count on successful play
-
-      console.log(`▶️ Playing: ${this.currentSource?.title}`);
-    } catch (error) {
-      console.error('🚨 Play error:', error);
-
-      if (error instanceof Error && error.name === 'NotAllowedError') {
-        console.log(
-          '⏳ Play blocked by browser policy, waiting for user interaction...'
-        );
-        this.pendingPlay = true;
-      } else {
-        this.setState('error');
-        const errorMessage =
-          error instanceof Error ? error.message : 'Unknown error';
-        this.emit('error', { error: errorMessage });
-
-        // Retry logic
-        if (this.retryCount < this.maxRetries) {
-          this.retryCount++;
-          console.log(
-            `🔄 Retrying playback (${this.retryCount}/${this.maxRetries})`
-          );
-          setTimeout(() => this.play(), 1000 * this.retryCount);
-        }
-      }
-    }
-  }
-
-  /**
-   * Pause audio with optional fade out
-   */
-  async pause(): Promise<void> {
-    if (!this.currentAudio || this.state !== 'playing') return;
-
-    try {
-      if (this.playbackOptions.fadeOutDuration) {
-        await this.fadeOut(this.playbackOptions.fadeOutDuration);
-      }
-
-      this.currentAudio.pause();
-      this.setState('paused');
-      this.emit('pause', this.getAnalytics());
-
-      console.log(`⏸️ Paused: ${this.currentSource?.title}`);
-    } catch (error) {
-      console.error('Pause error:', error);
-    }
-  }
-
-  /**
-   * Stop playback and reset
-   */
-  stop(): void {
-    if (!this.currentAudio) return;
-
-    try {
-      this.currentAudio.pause();
-      this.currentAudio.currentTime = 0;
-      this.setState('idle');
-
-      if (this.fadeInterval) {
-        clearInterval(this.fadeInterval);
-        this.fadeInterval = null;
-      }
-
-      console.log(`⏹️ Stopped: ${this.currentSource?.title}`);
-    } catch (error) {
-      console.error('Stop error:', error);
-    }
-  }
-
-  /**
-   * Set playback volume
-   */
-  setVolume(volume: number): void {
-    const clampedVolume = Math.max(0, Math.min(1, volume));
-
-    if (this.gainNode) {
-      this.gainNode.gain.setValueAtTime(
-        clampedVolume,
-        this.audioContext!.currentTime
-      );
-    } else if (this.currentAudio) {
-      this.currentAudio.volume = clampedVolume;
-    }
-  }
-
-  /**
-   * Seek to specific time
-   */
-  seek(time: number): void {
-    if (!this.currentAudio) return;
-
-    try {
-      const clampedTime = Math.max(
-        0,
-        Math.min(this.currentAudio.duration || 0, time)
-      );
-      this.currentAudio.currentTime = clampedTime;
-      console.log(`⏩ Seeked to ${clampedTime}s`);
-    } catch (error) {
-      console.error('Seek error:', error);
-    }
-  }
-
-  /**
-   * Fade in audio
-   */
-  private fadeIn(duration: number): void {
-    if (!this.gainNode || !this.audioContext) return;
-
-    const startTime = this.audioContext.currentTime;
-    this.gainNode.gain.setValueAtTime(0, startTime);
-    this.gainNode.gain.linearRampToValueAtTime(1, startTime + duration);
-  }
-
-  /**
-   * Fade out audio
-   */
-  private fadeOut(duration: number): Promise<void> {
-    return new Promise((resolve) => {
-      if (!this.gainNode || !this.audioContext) {
-        resolve();
-        return;
-      }
-
-      const startTime = this.audioContext.currentTime;
-      this.gainNode.gain.setValueAtTime(1, startTime);
-      this.gainNode.gain.linearRampToValueAtTime(0, startTime + duration);
-
-      setTimeout(resolve, duration * 1000);
-    });
-  }
-
-  /**
-   * Try fallback audio sources
-   */
-  private async tryFallbackSources(originalSource: AudioSource): Promise<void> {
-    const fallbackFormats = ['mp3', 'ogg', 'wav'];
-
-    for (const format of fallbackFormats) {
-      if (format === originalSource.format) continue;
-
-      try {
-        const fallbackUrl = originalSource.url.replace(
-          /\.[^.]+$/,
-          `.${format}`
-        );
-        const fallbackSource: AudioSource = {
-          ...originalSource,
-          url: fallbackUrl,
-          format: format as any,
-        };
-
-        console.log(`🔄 Trying fallback format: ${format}`);
-        await this.load(fallbackSource, this.playbackOptions);
-        return;
-      } catch (error) {
-        console.warn(`Fallback ${format} failed:`, error);
-      }
-    }
-
-    console.error('🚨 All fallback sources failed');
-  }
-
-  /**
-   * Retry current playback
-   */
-  private async retryPlayback(): Promise<void> {
-    if (this.currentSource && this.retryCount < this.maxRetries) {
-      this.retryCount++;
-      console.log(
-        `🔄 Retrying playback (${this.retryCount}/${this.maxRetries})`
-      );
-
-      try {
-        await this.load(this.currentSource, this.playbackOptions);
-        if (this.state === 'loaded') {
-          await this.play();
-        }
-      } catch (error) {
-        console.error('Retry failed:', error);
-      }
-    }
-  }
-
-  /**
-   * Cache audio element
-   */
-  private cacheAudio(id: string, audio: HTMLAudioElement): void {
-    // Remove oldest entry if cache is full
-    if (this.audioCache.size >= this.maxCacheSize) {
-      const firstKey = this.audioCache.keys().next().value;
-      if (firstKey) {
-        const oldAudio = this.audioCache.get(firstKey);
-        if (oldAudio) {
-          oldAudio.src = '';
-          oldAudio.load();
-        }
-        this.audioCache.delete(firstKey);
-      }
-    }
-
-    this.audioCache.set(id, audio);
-  }
-
-  /**
-   * Clean up memory and resources
-   */
-  private cleanupMemory(): void {
-    // Clean up unused cached audio
-    for (const [id, audio] of this.audioCache.entries()) {
-      if (
-        audio !== this.currentAudio &&
-        audio.paused &&
-        audio.currentTime === 0
-      ) {
-        audio.src = '';
-        audio.load();
-        this.audioCache.delete(id);
-      }
-    }
-
-    // Log memory status
-    if ((performance as any).memory) {
-      const memory = (performance as any).memory;
-      console.log(
-        `🧠 Memory: ${(memory.usedJSHeapSize / 1048576).toFixed(1)}MB used`
-      );
-    }
-  }
-
-  /**
-   * Get real-time audio analytics
-   */
-  getAnalytics(): AudioAnalytics {
-    const audio = this.currentAudio;
+      return buffer;
+    };
 
     return {
-      currentTime: audio?.currentTime || 0,
-      duration: audio?.duration || 0,
-      volume: this.gainNode?.gain.value || audio?.volume || 0,
-      isPlaying: this.state === 'playing',
-      isLoading: this.state === 'loading',
-      bufferProgress: this.getBufferProgress(),
-      playbackRate: audio?.playbackRate || 1,
-      error: this.state === 'error' ? 'Playback error occurred' : undefined,
+      vocals: createStemBuffer(),
+      drums: createStemBuffer(),
+      bass: createStemBuffer(),
+      other: createStemBuffer()
     };
   }
 
-  /**
-   * Get buffer progress percentage
-   */
-  private getBufferProgress(): number {
-    if (!this.currentAudio) return 0;
-
-    try {
-      const buffered = this.currentAudio.buffered;
-      if (buffered.length > 0) {
-        return (
-          (buffered.end(buffered.length - 1) / this.currentAudio.duration) * 100
-        );
-      }
-    } catch {
-      // Ignore buffered access errors
-    }
-
-    return 0;
-  }
-
-  /**
-   * Get frequency data for visualizations
-   */
-  getFrequencyData(): Uint8Array {
-    if (!this.analyserNode) return new Uint8Array(0);
-
-    const dataArray = new Uint8Array(this.analyserNode.frequencyBinCount);
-    this.analyserNode.getByteFrequencyData(dataArray);
-    return dataArray;
-  }
-
-  /**
-   * Get time domain data for waveform
-   */
-  getTimeDomainData(): Uint8Array {
-    if (!this.analyserNode) return new Uint8Array(0);
-
-    const dataArray = new Uint8Array(this.analyserNode.frequencyBinCount);
-    this.analyserNode.getByteTimeDomainData(dataArray);
-    return dataArray;
-  }
-
-  /**
-   * Set playback state
-   */
-  private setState(newState: AudioState): void {
-    if (this.state !== newState) {
-      console.log(`🎵 State: ${this.state} → ${newState}`);
-      this.state = newState;
-    }
-  }
-
-  /**
-   * Add event listener
-   */
-  on(event: PlaybackEvent, callback: (data: any) => void): void {
+  // Event Management
+  addEventListener(event: string, listener: Function): void {
     if (!this.eventListeners.has(event)) {
       this.eventListeners.set(event, []);
     }
-    this.eventListeners.get(event)!.push(callback);
+    this.eventListeners.get(event)!.push(listener);
   }
 
-  /**
-   * Remove event listener
-   */
-  off(event: PlaybackEvent, callback: (data: any) => void): void {
+  removeEventListener(event: string, listener: Function): void {
     const listeners = this.eventListeners.get(event);
     if (listeners) {
-      const index = listeners.indexOf(callback);
+      const index = listeners.indexOf(listener);
       if (index > -1) {
         listeners.splice(index, 1);
       }
     }
   }
 
-  /**
-   * Emit event to listeners
-   */
-  private emit(event: PlaybackEvent, data: any): void {
+  private emitEvent(event: string, data: any): void {
     const listeners = this.eventListeners.get(event);
     if (listeners) {
-      listeners.forEach((callback) => {
-        try {
-          callback(data);
-        } catch (error) {
-          console.error(`Event listener error for ${event}:`, error);
-        }
-      });
+      listeners.forEach(listener => listener(data));
     }
   }
 
-  /**
-   * Get current playback state
-   */
-  getState(): AudioState {
-    return this.state;
+  // Utility methods
+  private createDeckState(id: 'A' | 'B'): DeckState {
+    return {
+      id,
+      track: null,
+      isPlaying: false,
+      currentTime: 0,
+      duration: 0,
+      volume: 1,
+      pitch: 0,
+      tempo: 1,
+      eq: { low: 0, mid: 0, high: 0 },
+      effects: {
+        filter: { frequency: 1000, resonance: 1, enabled: false },
+        echo: { delay: 0.5, feedback: 0.3, enabled: false },
+        reverb: { roomSize: 0.5, dampening: 0.5, enabled: false }
+      },
+      hotCues: [],
+      loops: [],
+      waveform: null,
+      spectrum: null
+    };
   }
 
-  /**
-   * Check if audio is playing
-   */
-  isPlaying(): boolean {
-    return this.state === 'playing';
+  private createMixerState(): MixerState {
+    return {
+      crossfader: 0,
+      masterVolume: 1,
+      boothVolume: 0.8,
+      headphonesVolume: 0.7,
+      monitorSource: 'MASTER'
+    };
   }
 
-  /**
-   * Cleanup and dispose
-   */
-  dispose(): void {
-    // Stop playback
-    this.stop();
+  // Getters
+  getDeckState(deckId: 'A' | 'B'): DeckState {
+    return deckId === 'A' ? this.deckA : this.deckB;
+  }
 
-    // Clear intervals
-    if (this.fadeInterval) {
-      clearInterval(this.fadeInterval);
+  getMixerState(): MixerState {
+    return this.mixer;
+  }
+
+  getCurrentAnalysis(): RealTimeAnalysis | null {
+    return this.currentAnalysis;
+  }
+
+  getCrowdResponse(): CrowdResponse | null {
+    return this.crowdResponse;
+  }
+
+  // Cleanup
+  destroy(): void {
+    if (this.analysisInterval) {
+      clearInterval(this.analysisInterval);
     }
-
-    if (this.resourceCleanupInterval) {
-      clearInterval(this.resourceCleanupInterval);
+    if (this.crowdSimulationInterval) {
+      clearInterval(this.crowdSimulationInterval);
     }
-
-    // Cleanup audio cache
-    for (const audio of this.audioCache.values()) {
-      audio.src = '';
-      audio.load();
+    if (this.audioContext) {
+      this.audioContext.close();
     }
-    this.audioCache.clear();
-
-    // Cleanup audio context
-    if (this.sourceNode) {
-      this.sourceNode.disconnect();
-    }
-
-    if (this.audioContext?.state !== 'closed') {
-      this.audioContext?.close();
-    }
-
-    // Clear event listeners
     this.eventListeners.clear();
-
-    console.log('🧹 MagicPlayer disposed');
   }
 }
-
-// Global instance
-export const magicPlayer = new MagicPlayer();
-export default MagicPlayer;

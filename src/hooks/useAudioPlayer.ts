@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState, useCallback } from 'react';
 import { magicPlayer, AudioSource } from '@/services/MagicPlayer';
+import type { AudioError } from '@/types/audio';
 
 export interface UseAudioPlayerOptions {
   volume?: number;
@@ -28,7 +29,9 @@ export function useAudioPlayer(
   const createAudioSource = useCallback((url: string): AudioSource => {
     const urlObj = new URL(url, window.location.origin);
     const filename = urlObj.pathname.split('/').pop() || 'unknown';
-    const extension = filename.split('.').pop()?.toLowerCase() as any;
+    const extension = filename.split('.').pop()?.toLowerCase() as
+      | string
+      | undefined;
 
     return {
       id: url,
@@ -51,17 +54,17 @@ export function useAudioPlayer(
       setIsPlaying(false);
     };
 
-    const handleLoaded = (data: any) => {
+    const handleLoaded = (data: { duration?: number }) => {
       setDuration(data.duration || 0);
       setIsLoading(false);
       setError(null);
     };
 
-    const handleError = (data: any) => {
-      setError(data.error || 'Playback error occurred');
+    const handleError = (data: AudioError) => {
+      setError(data.message || 'Playback error occurred');
       setIsLoading(false);
       setIsPlaying(false);
-      console.error('🚨 Audio playback error:', data.error);
+      console.error('🚨 Audio playback error:', data.message);
     };
 
     const handleEnded = () => {
@@ -147,9 +150,11 @@ export function useAudioPlayer(
           '⏳ Waiting for user interaction to enable audio playback...'
         );
       }
-    } catch (error: any) {
+    } catch (error: unknown) {
+      const errorMessage =
+        error instanceof Error ? error.message : 'Failed to play audio';
       console.error('Play failed:', error);
-      setError(error.message || 'Failed to play audio');
+      setError(errorMessage);
     }
   }, []);
 

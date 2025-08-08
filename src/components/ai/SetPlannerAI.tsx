@@ -60,7 +60,7 @@ const SetPlannerAI: React.FC<SetPlannerProps> = ({
           prompt: `${phase.description} Create ${phase.duration}-minute ${phase.name.toLowerCase()} section for ${venue} at ${timeSlot}`,
           mood: getPhaseMood(phase.targetEnergy),
           duration: phase.duration,
-          venue: venue as any,
+          venue: venue as string,
           timeOfDay: getTimeOfDay(timeSlot),
           crowdEnergy: phase.targetEnergy,
         });

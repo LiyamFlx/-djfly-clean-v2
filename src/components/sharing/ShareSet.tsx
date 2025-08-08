@@ -214,11 +214,15 @@ const ShareSet: React.FC<ShareSetProps> = ({
         {/* Quick Share URL */}
         {shareLink && (
           <div>
-            <label className="block text-sm font-medium text-gray-300 mb-2">
+            <label
+              htmlFor="share-link"
+              className="block text-sm font-medium text-gray-300 mb-2"
+            >
               Share Link
             </label>
             <div className="flex items-center gap-2">
               <input
+                id="share-link"
                 type="text"
                 value={shareLink.shortUrl}
                 readOnly
@@ -246,10 +250,16 @@ const ShareSet: React.FC<ShareSetProps> = ({
 
         {/* Social Media Buttons */}
         <div>
-          <label className="block text-sm font-medium text-gray-300 mb-2">
+          <label
+            htmlFor="social-share"
+            className="block text-sm font-medium text-gray-300 mb-2"
+          >
             Share on Social Media
           </label>
-          <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
+          <div
+            id="social-share"
+            className="grid grid-cols-2 sm:grid-cols-4 gap-2"
+          >
             <button
               onClick={() => shareToTwitter(shareLink?.shortUrl || '')}
               className="flex items-center justify-center gap-2 bg-blue-500 hover:bg-blue-600 text-white px-3 py-2 rounded-lg transition-colors text-sm"
@@ -314,11 +324,15 @@ const ShareSet: React.FC<ShareSetProps> = ({
               exit={{ opacity: 0, height: 0 }}
               className="space-y-2"
             >
-              <label className="block text-sm font-medium text-gray-300">
+              <label
+                htmlFor="embed-code"
+                className="block text-sm font-medium text-gray-300"
+              >
                 Embed Code (Copy & Paste)
               </label>
               <div className="flex items-start gap-2">
                 <textarea
+                  id="embed-code"
                   value={shareLink.embedCode}
                   readOnly
                   rows={3}

@@ -1,543 +1,487 @@
-import { Track } from '@/types';
+// import { audioAnalysisService } from './audioAnalysis';
 
-export interface AudioFeatures {
-  bpm: number;
-  key: string;
-  energy: number;
-  valence: number;
-  danceability: number;
-  loudness: number;
-  speechiness: number;
-  acousticness: number;
-  instrumentalness: number;
+interface DeckState {
+  isPlaying: boolean;
+  currentTime: number;
+  duration: number;
+  volume: number;
+  pitch: number;
+  tempo: number;
+  loopStart: number;
+  loopEnd: number;
+  isLooping: boolean;
+  hotCues: Map<number, number>;
+  waveform: Float32Array;
+  stems: {
+    vocals: Float32Array;
+    drums: Float32Array;
+    bass: Float32Array;
+    other: Float32Array;
+  } | null;
 }
 
-export interface CrossfadeSettings {
-  duration: number; // in milliseconds
-  curve: 'linear' | 'exponential' | 'logarithmic';
-  eqMatching: boolean;
-  keyMatching: boolean;
+interface MixingState {
+  crossfader: number; // 0-1 (A deck to B deck)
+  masterVolume: number;
+  eq: {
+    low: number; // -12 to +12 dB
+    mid: number;
+    high: number;
+  };
+  effects: {
+    reverb: number;
+    delay: number;
+    filter: number;
+  };
+}
+
+interface TransitionQuality {
+  score: number; // 0-100
+  factors: {
+    bpmMatch: number;
+    keyCompatibility: number;
+    energyFlow: number;
+    timing: number;
+  };
+  suggestions: string[];
 }
 
 class AdvancedAudioService {
   private audioContext: AudioContext | null = null;
-  private currentSource: AudioBufferSourceNode | null = null;
-  private nextSource: AudioBufferSourceNode | null = null;
-  private gainNode: GainNode | null = null;
-  private nextGainNode: GainNode | null = null;
-  private analyser: AnalyserNode | null = null;
-  private buffers: Map<string, AudioBuffer> = new Map();
-  private crossfadeSettings: CrossfadeSettings = {
-    duration: 3000,
-    curve: 'exponential',
-    eqMatching: true,
-    keyMatching: false,
-  };
+  private deckA: DeckState | null = null;
+  private deckB: DeckState | null = null;
+  private mixingState: MixingState;
+  private currentAnalysis: unknown = null;
+  private isInitialized = false;
 
   constructor() {
+    this.mixingState = {
+      crossfader: 0.5,
+      masterVolume: 1.0,
+      eq: { low: 0, mid: 0, high: 0 },
+      effects: { reverb: 0, delay: 0, filter: 0 },
+    };
     this.initializeAudioContext();
   }
 
-  private async initializeAudioContext() {
-    if (typeof window !== 'undefined') {
-      try {
-        this.audioContext = new (window.AudioContext ||
-          (window as any).webkitAudioContext)();
-
-        // Resume context if suspended
-        if (this.audioContext.state === 'suspended') {
-          await this.audioContext.resume();
-        }
-
-        this.setupAudioGraph();
-      } catch (error) {
-        console.error('Failed to initialize AudioContext:', error);
-      }
+  private initializeAudioContext() {
+    try {
+      this.audioContext = new (window.AudioContext ||
+        (window as unknown as { webkitAudioContext: typeof AudioContext })
+          .webkitAudioContext)();
+      this.isInitialized = true;
+      console.log('🎵 Advanced Audio Service initialized');
+    } catch (error) {
+      console.error('Failed to initialize Advanced Audio Context:', error);
     }
   }
 
-  private setupAudioGraph() {
-    if (!this.audioContext) return;
-
-    // Create main gain node
-    this.gainNode = this.audioContext.createGain();
-    this.nextGainNode = this.audioContext.createGain();
-
-    // Create analyser for real-time analysis
-    this.analyser = this.audioContext.createAnalyser();
-    this.analyser.fftSize = 2048;
-    this.analyser.smoothingTimeConstant = 0.8;
-
-    // Connect nodes
-    this.gainNode.connect(this.analyser);
-    this.nextGainNode.connect(this.analyser);
-    this.analyser.connect(this.audioContext.destination);
-
-    // Set initial volumes
-    this.gainNode.gain.value = 1.0;
-    this.nextGainNode.gain.value = 0.0;
-  }
-
   /**
-   * Load and decode audio file
+   * Load track into deck A or B
    */
-  async loadTrack(track: Track): Promise<AudioBuffer | null> {
-    if (!this.audioContext || !track.preview_url) {
-      return null;
+  async loadTrack(deck: 'A' | 'B', audioBuffer: ArrayBuffer): Promise<void> {
+    if (!this.audioContext) {
+      throw new Error('Audio context not initialized');
     }
 
     try {
-      // Check if already loaded
-      if (this.buffers.has(track.id)) {
-        return this.buffers.get(track.id)!;
+      const audioData = await this.audioContext.decodeAudioData(
+        audioBuffer.slice(0)
+      );
+      const channelData = audioData.getChannelData(0);
+
+      const deckState: DeckState = {
+        isPlaying: false,
+        currentTime: 0,
+        duration: audioData.duration,
+        volume: 1.0,
+        pitch: 1.0,
+        tempo: 1.0,
+        loopStart: 0,
+        loopEnd: audioData.duration,
+        isLooping: false,
+        hotCues: new Map(),
+        waveform: this.generateWaveform(channelData),
+        stems: await this.separateStems(channelData),
+      };
+
+      if (deck === 'A') {
+        this.deckA = deckState;
+      } else {
+        this.deckB = deckState;
       }
 
-      const response = await fetch(track.preview_url);
-      const arrayBuffer = await response.arrayBuffer();
-      const audioBuffer = await this.audioContext.decodeAudioData(arrayBuffer);
-
-      // Cache the buffer
-      this.buffers.set(track.id, audioBuffer);
-
-      return audioBuffer;
+      console.log(`🎵 Track loaded into deck ${deck}`);
     } catch (error) {
-      console.error('Failed to load track:', error);
-      return null;
+      console.error(`Failed to load track into deck ${deck}:`, error);
+      throw error;
     }
   }
 
   /**
-   * Analyze audio buffer for BPM detection
+   * Generate waveform data for visualization
    */
-  async analyzeBPM(audioBuffer: AudioBuffer): Promise<number> {
-    const channelData = audioBuffer.getChannelData(0);
-    const sampleRate = audioBuffer.sampleRate;
+  private generateWaveform(channelData: Float32Array): Float32Array {
+    const samples = 1000; // Number of waveform points
+    const blockSize = Math.floor(channelData.length / samples);
+    const waveform = new Float32Array(samples);
 
-    // Apply high-pass filter to isolate percussive content
-    const filteredData = this.highPassFilter(channelData, sampleRate, 200);
-
-    // Calculate onset detection function
-    const onsets = this.detectOnsets(filteredData, sampleRate);
-
-    // Find tempo using autocorrelation
-    const bpm = this.calculateTempo(onsets, sampleRate);
-
-    return Math.round(bpm);
-  }
-
-  private highPassFilter(
-    data: Float32Array,
-    sampleRate: number,
-    cutoff: number
-  ): Float32Array {
-    const filtered = new Float32Array(data.length);
-    const RC = 1.0 / (cutoff * 2 * Math.PI);
-    const dt = 1.0 / sampleRate;
-    const alpha = RC / (RC + dt);
-
-    filtered[0] = data[0];
-    for (let i = 1; i < data.length; i++) {
-      filtered[i] = alpha * (filtered[i - 1] + data[i] - data[i - 1]);
-    }
-
-    return filtered;
-  }
-
-  private detectOnsets(data: Float32Array, sampleRate: number): number[] {
-    const onsets: number[] = [];
-    const windowSize = Math.floor(sampleRate * 0.1); // 100ms windows
-    const hopSize = Math.floor(windowSize / 2);
-
-    let previousEnergy = 0;
-
-    for (let i = 0; i < data.length - windowSize; i += hopSize) {
-      // Calculate energy in current window
-      let energy = 0;
-      for (let j = i; j < i + windowSize; j++) {
-        energy += data[j] * data[j];
+    for (let i = 0; i < samples; i++) {
+      let sum = 0;
+      for (let j = 0; j < blockSize; j++) {
+        const index = i * blockSize + j;
+        if (index < channelData.length) {
+          sum += Math.abs(channelData[index]);
+        }
       }
-      energy = Math.sqrt(energy / windowSize);
-
-      // Detect onset if energy increase is significant
-      if (energy > previousEnergy * 1.3 && energy > 0.01) {
-        onsets.push(i / sampleRate);
-      }
-
-      previousEnergy = energy;
+      waveform[i] = sum / blockSize;
     }
 
-    return onsets;
-  }
-
-  private calculateTempo(onsets: number[], _sampleRate: number): number {
-    if (onsets.length < 2) return 120; // Default BPM
-
-    // Calculate inter-onset intervals
-    const intervals: number[] = [];
-    for (let i = 1; i < onsets.length; i++) {
-      intervals.push(onsets[i] - onsets[i - 1]);
-    }
-
-    // Find most common interval (mode)
-    const histogram: { [key: number]: number } = {};
-    intervals.forEach((interval) => {
-      const rounded = Math.round(interval * 100) / 100; // Round to nearest 10ms
-      histogram[rounded] = (histogram[rounded] || 0) + 1;
-    });
-
-    // Find the most frequent interval
-    let maxCount = 0;
-    let mostCommonInterval = 0.5; // Default to 120 BPM
-
-    for (const [interval, count] of Object.entries(histogram)) {
-      if (count > maxCount) {
-        maxCount = count;
-        mostCommonInterval = parseFloat(interval);
-      }
-    }
-
-    // Convert interval to BPM
-    const bpm = 60 / mostCommonInterval;
-
-    // Ensure BPM is in reasonable range
-    return Math.max(60, Math.min(200, bpm));
+    return waveform;
   }
 
   /**
-   * Detect musical key
+   * Separate audio into stems (vocals, drums, bass, other)
    */
-  async analyzeKey(audioBuffer: AudioBuffer): Promise<string> {
-    const channelData = audioBuffer.getChannelData(0);
+  private async separateStems(
+    channelData: Float32Array
+  ): Promise<DeckState['stems']> {
+    // Simplified stem separation using frequency analysis
+    // In production, use AI models like Spleeter or similar
 
-    // This is a simplified key detection algorithm
-    // In practice, you'd use more sophisticated methods like chromagram analysis
-    const chromaVector = this.calculateChromaVector(
-      channelData,
-      audioBuffer.sampleRate
-    );
-    const keyIndex = this.findStrongestChroma(chromaVector);
-
-    const keys = [
-      'C',
-      'C#',
-      'D',
-      'D#',
-      'E',
-      'F',
-      'F#',
-      'G',
-      'G#',
-      'A',
-      'A#',
-      'B',
-    ];
-    return keys[keyIndex];
-  }
-
-  private calculateChromaVector(
-    data: Float32Array,
-    sampleRate: number
-  ): Float32Array {
-    // Simplified chroma calculation
-    const chroma = new Float32Array(12);
     const fftSize = 2048;
-    const hopSize = 512;
+    const stems = {
+      vocals: new Float32Array(channelData.length),
+      drums: new Float32Array(channelData.length),
+      bass: new Float32Array(channelData.length),
+      other: new Float32Array(channelData.length),
+    };
 
-    for (let i = 0; i < data.length - fftSize; i += hopSize) {
-      const window = data.slice(i, i + fftSize);
-      const spectrum = this.fft(window);
+    // Process audio in chunks
+    for (let i = 0; i < channelData.length; i += fftSize) {
+      const chunk = channelData.slice(
+        i,
+        Math.min(i + fftSize, channelData.length)
+      );
+      const spectrum = this.performFFT(chunk);
 
-      // Map spectrum to chroma bins
-      for (let bin = 0; bin < spectrum.length / 2; bin++) {
-        const freq = (bin * sampleRate) / fftSize;
-        const magnitude = Math.sqrt(
-          spectrum[bin * 2] ** 2 + spectrum[bin * 2 + 1] ** 2
-        );
+      // Separate by frequency bands
+      const vocalsBand = this.extractFrequencyBand(spectrum, 80, 8000); // Human voice range
+      const drumsBand = this.extractFrequencyBand(spectrum, 20, 200); // Kick/snare range
+      const bassBand = this.extractFrequencyBand(spectrum, 20, 250); // Bass range
+      const otherBand = this.extractFrequencyBand(spectrum, 250, 8000); // Mid-high range
 
-        if (freq > 80 && freq < 5000) {
-          // Focus on musical range
-          const pitch = this.frequencyToPitch(freq);
-          chroma[pitch % 12] += magnitude;
+      // Apply separation to output
+      for (let j = 0; j < chunk.length; j++) {
+        const index = i + j;
+        if (index < channelData.length) {
+          stems.vocals[index] = vocalsBand[j] || 0;
+          stems.drums[index] = drumsBand[j] || 0;
+          stems.bass[index] = bassBand[j] || 0;
+          stems.other[index] = otherBand[j] || 0;
         }
       }
     }
 
-    return chroma;
+    return stems;
   }
 
-  private fft(data: Float32Array): Float32Array {
-    // Simplified FFT implementation (in practice, use a proper FFT library)
-    const N = data.length;
-    const result = new Float32Array(N * 2);
+  /**
+   * Perform FFT on audio data
+   */
+  private performFFT(channelData: Float32Array): Float32Array {
+    // Simplified FFT - in production, use a proper FFT library
+    const spectrum = new Float32Array(channelData.length);
+    for (let i = 0; i < channelData.length; i++) {
+      spectrum[i] = Math.abs(channelData[i]);
+    }
+    return spectrum;
+  }
 
-    for (let k = 0; k < N; k++) {
-      let realSum = 0;
-      let imagSum = 0;
+  /**
+   * Extract specific frequency band from spectrum
+   */
+  private extractFrequencyBand(
+    spectrum: Float32Array,
+    minFreq: number,
+    maxFreq: number
+  ): Float32Array {
+    const result = new Float32Array(spectrum.length);
+    const sampleRate = 44100;
 
-      for (let n = 0; n < N; n++) {
-        const angle = (-2 * Math.PI * k * n) / N;
-        realSum += data[n] * Math.cos(angle);
-        imagSum += data[n] * Math.sin(angle);
+    for (let i = 0; i < spectrum.length; i++) {
+      const frequency = (i * sampleRate) / spectrum.length;
+      if (frequency >= minFreq && frequency <= maxFreq) {
+        result[i] = spectrum[i];
       }
-
-      result[k * 2] = realSum;
-      result[k * 2 + 1] = imagSum;
     }
 
     return result;
   }
 
-  private frequencyToPitch(frequency: number): number {
-    // Convert frequency to MIDI note number
-    const A4 = 440;
-    const C0 = A4 * Math.pow(2, -4.75);
-
-    if (frequency <= 0) return 0;
-
-    const noteNumber = Math.round(12 * Math.log2(frequency / C0));
-    return Math.max(0, noteNumber);
-  }
-
-  private findStrongestChroma(chroma: Float32Array): number {
-    let maxIndex = 0;
-    let maxValue = chroma[0];
-
-    for (let i = 1; i < chroma.length; i++) {
-      if (chroma[i] > maxValue) {
-        maxValue = chroma[i];
-        maxIndex = i;
-      }
+  /**
+   * Play/pause deck
+   */
+  togglePlay(deck: 'A' | 'B'): void {
+    const deckState = deck === 'A' ? this.deckA : this.deckB;
+    if (deckState) {
+      deckState.isPlaying = !deckState.isPlaying;
+      console.log(
+        `🎵 Deck ${deck} ${deckState.isPlaying ? 'playing' : 'paused'}`
+      );
     }
-
-    return maxIndex;
   }
 
   /**
-   * Perform crossfade between two tracks
+   * Set deck volume
    */
-  async crossfade(
-    currentBuffer: AudioBuffer,
-    nextBuffer: AudioBuffer,
-    startTime: number,
-    settings: Partial<CrossfadeSettings> = {}
-  ): Promise<void> {
-    if (!this.audioContext || !this.gainNode || !this.nextGainNode) {
-      throw new Error('Audio context not initialized');
+  setDeckVolume(deck: 'A' | 'B', volume: number): void {
+    const deckState = deck === 'A' ? this.deckA : this.deckB;
+    if (deckState) {
+      deckState.volume = Math.max(0, Math.min(1, volume));
     }
-
-    const crossfadeSettings = { ...this.crossfadeSettings, ...settings };
-    const duration = crossfadeSettings.duration / 1000; // Convert to seconds
-
-    // Stop current sources if playing
-    if (this.currentSource) {
-      this.currentSource.stop();
-    }
-    if (this.nextSource) {
-      this.nextSource.stop();
-    }
-
-    // Create new sources
-    this.currentSource = this.audioContext.createBufferSource();
-    this.nextSource = this.audioContext.createBufferSource();
-
-    this.currentSource.buffer = currentBuffer;
-    this.nextSource.buffer = nextBuffer;
-
-    // Connect sources to gain nodes
-    this.currentSource.connect(this.gainNode);
-    this.nextSource.connect(this.nextGainNode);
-
-    // Set up crossfade automation
-    const now = this.audioContext.currentTime;
-    const fadeStartTime = now + startTime;
-
-    // Current track fade out
-    this.gainNode.gain.setValueAtTime(1.0, fadeStartTime);
-
-    if (crossfadeSettings.curve === 'linear') {
-      this.gainNode.gain.linearRampToValueAtTime(0.0, fadeStartTime + duration);
-    } else {
-      this.gainNode.gain.exponentialRampToValueAtTime(
-        0.001,
-        fadeStartTime + duration
-      );
-    }
-
-    // Next track fade in
-    this.nextGainNode.gain.setValueAtTime(0.0, fadeStartTime);
-
-    if (crossfadeSettings.curve === 'linear') {
-      this.nextGainNode.gain.linearRampToValueAtTime(
-        1.0,
-        fadeStartTime + duration
-      );
-    } else {
-      this.nextGainNode.gain.exponentialRampToValueAtTime(
-        1.0,
-        fadeStartTime + duration
-      );
-    }
-
-    // Start playback
-    this.currentSource.start(now);
-    this.nextSource.start(now + startTime);
-
-    // Clean up after crossfade
-    setTimeout(
-      () => {
-        if (this.currentSource) {
-          this.currentSource.disconnect();
-          this.currentSource = null;
-        }
-
-        // Swap sources
-        this.currentSource = this.nextSource;
-        this.nextSource = null;
-
-        // Swap gain nodes
-        const tempGain = this.gainNode;
-        this.gainNode = this.nextGainNode;
-        this.nextGainNode = tempGain;
-
-        // Reset gain values
-        if (this.gainNode) this.gainNode.gain.value = 1.0;
-        if (this.nextGainNode) this.nextGainNode.gain.value = 0.0;
-      },
-      (startTime + duration) * 1000
-    );
   }
 
   /**
-   * Apply EQ matching for smooth transitions
+   * Set pitch/tempo
    */
-  async applyEQMatching(
-    track1: AudioBuffer,
-    track2: AudioBuffer
-  ): Promise<{
-    eq1: number[];
-    eq2: number[];
-  }> {
-    // Analyze frequency content of both tracks
-    const spectrum1 = this.analyzeSpectrum(track1);
-    const spectrum2 = this.analyzeSpectrum(track2);
-
-    // Calculate EQ adjustments to match spectral content
-    const eqBands = 10; // Number of EQ bands
-    const eq1 = new Array(eqBands).fill(0);
-    const eq2 = new Array(eqBands).fill(0);
-
-    for (let band = 0; band < eqBands; band++) {
-      const freq1 = spectrum1[band];
-      const freq2 = spectrum2[band];
-
-      if (freq1 > freq2) {
-        eq1[band] = -Math.min(6, Math.log10(freq1 / freq2) * 20); // Reduce band 1
-        eq2[band] = Math.min(6, Math.log10(freq1 / freq2) * 20); // Boost band 2
-      } else {
-        eq1[band] = Math.min(6, Math.log10(freq2 / freq1) * 20); // Boost band 1
-        eq2[band] = -Math.min(6, Math.log10(freq2 / freq1) * 20); // Reduce band 2
-      }
+  setPitch(deck: 'A' | 'B', pitch: number): void {
+    const deckState = deck === 'A' ? this.deckA : this.deckB;
+    if (deckState) {
+      deckState.pitch = Math.max(0.5, Math.min(2.0, pitch));
     }
-
-    return { eq1, eq2 };
-  }
-
-  private analyzeSpectrum(audioBuffer: AudioBuffer): number[] {
-    const channelData = audioBuffer.getChannelData(0);
-    const fftSize = 2048;
-    const bands = 10;
-    const spectrum = new Array(bands).fill(0);
-
-    // Analyze multiple windows
-    const windows = Math.floor(channelData.length / fftSize);
-
-    for (let w = 0; w < windows; w++) {
-      const start = w * fftSize;
-      const window = channelData.slice(start, start + fftSize);
-      const fftResult = this.fft(window);
-
-      // Sum energy in frequency bands
-      const binsPerBand = Math.floor(fftSize / 2 / bands);
-
-      for (let band = 0; band < bands; band++) {
-        let bandEnergy = 0;
-        const startBin = band * binsPerBand;
-        const endBin = Math.min(startBin + binsPerBand, fftSize / 2);
-
-        for (let bin = startBin; bin < endBin; bin++) {
-          const real = fftResult[bin * 2];
-          const imag = fftResult[bin * 2 + 1];
-          bandEnergy += Math.sqrt(real * real + imag * imag);
-        }
-
-        spectrum[band] += bandEnergy / binsPerBand;
-      }
-    }
-
-    // Average across windows
-    return spectrum.map((energy) => energy / windows);
   }
 
   /**
-   * Get real-time audio analysis
+   * Set crossfader position
    */
-  getRealtimeAnalysis(): {
-    volume: number;
-    frequencies: Uint8Array;
-    waveform: Uint8Array;
-  } {
-    if (!this.analyser) {
+  setCrossfader(position: number): void {
+    this.mixingState.crossfader = Math.max(0, Math.min(1, position));
+  }
+
+  /**
+   * Set EQ bands
+   */
+  setEQ(band: 'low' | 'mid' | 'high', value: number): void {
+    this.mixingState.eq[band] = Math.max(-12, Math.min(12, value));
+  }
+
+  /**
+   * Set effects
+   */
+  setEffect(effect: 'reverb' | 'delay' | 'filter', value: number): void {
+    this.mixingState.effects[effect] = Math.max(0, Math.min(1, value));
+  }
+
+  /**
+   * Set loop points
+   */
+  setLoop(deck: 'A' | 'B', start: number, end: number): void {
+    const deckState = deck === 'A' ? this.deckA : this.deckB;
+    if (deckState) {
+      deckState.loopStart = start;
+      deckState.loopEnd = end;
+      deckState.isLooping = true;
+    }
+  }
+
+  /**
+   * Set hot cue
+   */
+  setHotCue(deck: 'A' | 'B', cueNumber: number, time: number): void {
+    const deckState = deck === 'A' ? this.deckA : this.deckB;
+    if (deckState) {
+      deckState.hotCues.set(cueNumber, time);
+    }
+  }
+
+  /**
+   * Jump to hot cue
+   */
+  jumpToHotCue(deck: 'A' | 'B', cueNumber: number): void {
+    const deckState = deck === 'A' ? this.deckA : this.deckB;
+    if (deckState) {
+      const time = deckState.hotCues.get(cueNumber);
+      if (time !== undefined) {
+        deckState.currentTime = time;
+      }
+    }
+  }
+
+  /**
+   * Analyze transition quality between decks
+   */
+  analyzeTransitionQuality(): TransitionQuality {
+    if (!this.deckA || !this.deckB) {
       return {
-        volume: 0,
-        frequencies: new Uint8Array(128),
-        waveform: new Uint8Array(128),
+        score: 0,
+        factors: { bpmMatch: 0, keyCompatibility: 0, energyFlow: 0, timing: 0 },
+        suggestions: [
+          'Load tracks into both decks to analyze transition quality',
+        ],
       };
     }
 
-    const bufferLength = this.analyser.frequencyBinCount;
-    const frequencies = new Uint8Array(bufferLength);
-    const waveform = new Uint8Array(bufferLength);
+    // Analyze BPM compatibility
+    const bpmDiff = Math.abs(
+      (this.deckA.tempo || 120) - (this.deckB.tempo || 120)
+    );
+    const bpmMatch = Math.max(0, 100 - bpmDiff * 2);
 
-    this.analyser.getByteFrequencyData(frequencies);
-    this.analyser.getByteTimeDomainData(waveform);
+    // Analyze key compatibility (simplified)
+    const keyCompatibility = 85; // Placeholder - would use actual key analysis
 
-    // Calculate volume (RMS)
-    let sum = 0;
-    for (let i = 0; i < waveform.length; i++) {
-      const sample = (waveform[i] - 128) / 128;
-      sum += sample * sample;
-    }
-    const volume = Math.sqrt(sum / waveform.length);
+    // Analyze energy flow
+    const energyFlow = this.calculateEnergyFlow();
 
-    return { volume, frequencies, waveform };
+    // Analyze timing
+    const timing = this.calculateTimingQuality();
+
+    const score = (bpmMatch + keyCompatibility + energyFlow + timing) / 4;
+
+    const suggestions = this.generateTransitionSuggestions(score, {
+      bpmMatch,
+      keyCompatibility,
+      energyFlow,
+      timing,
+    });
+
+    return {
+      score,
+      factors: { bpmMatch, keyCompatibility, energyFlow, timing },
+      suggestions,
+    };
   }
 
   /**
-   * Set crossfade settings
+   * Calculate energy flow between tracks
    */
-  setCrossfadeSettings(settings: Partial<CrossfadeSettings>) {
-    this.crossfadeSettings = { ...this.crossfadeSettings, ...settings };
+  private calculateEnergyFlow(): number {
+    if (!this.deckA || !this.deckB) return 0;
+
+    // Simplified energy flow calculation
+    const deckAEnergy =
+      this.deckA.waveform.reduce((sum, val) => sum + val, 0) /
+      this.deckA.waveform.length;
+    const deckBEnergy =
+      this.deckB.waveform.reduce((sum, val) => sum + val, 0) /
+      this.deckB.waveform.length;
+
+    const energyDiff = Math.abs(deckAEnergy - deckBEnergy);
+    return Math.max(0, 100 - energyDiff * 100);
+  }
+
+  /**
+   * Calculate timing quality
+   */
+  private calculateTimingQuality(): number {
+    if (!this.deckA || !this.deckB) return 0;
+
+    // Simplified timing analysis
+    const deckATime = this.deckA.currentTime;
+    const deckBTime = this.deckB.currentTime;
+
+    // Check if tracks are in sync
+    const timeDiff = Math.abs(deckATime - deckBTime);
+    return Math.max(0, 100 - timeDiff * 10);
+  }
+
+  /**
+   * Generate transition suggestions
+   */
+  private generateTransitionSuggestions(
+    score: number,
+    factors: {
+      bpmMatch: number;
+      keyCompatibility: number;
+      energyFlow: number;
+      timing: number;
+    }
+  ): string[] {
+    const suggestions: string[] = [];
+
+    if (score < 50) {
+      suggestions.push('Consider adjusting BPM to match tracks');
+      suggestions.push('Check key compatibility for smoother transitions');
+    } else if (score < 75) {
+      suggestions.push('Good transition potential - fine-tune timing');
+      suggestions.push('Consider energy flow for optimal crowd response');
+    } else {
+      suggestions.push('Excellent transition quality!');
+      suggestions.push('Ready for seamless mixing');
+    }
+
+    if (factors.bpmMatch < 70) {
+      suggestions.push('Use pitch control to match BPM');
+    }
+
+    if (factors.energyFlow < 60) {
+      suggestions.push('Consider energy progression for better flow');
+    }
+
+    return suggestions;
+  }
+
+  /**
+   * Get current deck states
+   */
+  getDeckStates(): { deckA: DeckState | null; deckB: DeckState | null } {
+    return {
+      deckA: this.deckA,
+      deckB: this.deckB,
+    };
+  }
+
+  /**
+   * Get mixing state
+   */
+  getMixingState(): MixingState {
+    return this.mixingState;
+  }
+
+  /**
+   * Get real-time analytics
+   */
+  getAnalytics(): unknown {
+    return {
+      deckA: this.deckA
+        ? {
+            isPlaying: this.deckA.isPlaying,
+            currentTime: this.deckA.currentTime,
+            volume: this.deckA.volume,
+            pitch: this.deckA.pitch,
+            energy:
+              this.deckA.waveform.reduce((sum, val) => sum + val, 0) /
+              this.deckA.waveform.length,
+          }
+        : null,
+      deckB: this.deckB
+        ? {
+            isPlaying: this.deckB.isPlaying,
+            currentTime: this.deckB.currentTime,
+            volume: this.deckB.volume,
+            pitch: this.deckB.pitch,
+            energy:
+              this.deckB.waveform.reduce((sum, val) => sum + val, 0) /
+              this.deckB.waveform.length,
+          }
+        : null,
+      mixing: this.mixingState,
+      transitionQuality: this.analyzeTransitionQuality(),
+    };
   }
 
   /**
    * Clean up resources
    */
-  dispose() {
-    if (this.currentSource) {
-      this.currentSource.stop();
-      this.currentSource.disconnect();
-    }
-
-    if (this.nextSource) {
-      this.nextSource.stop();
-      this.nextSource.disconnect();
-    }
-
-    if (this.audioContext && this.audioContext.state !== 'closed') {
+  dispose(): void {
+    if (this.audioContext) {
       this.audioContext.close();
+      this.audioContext = null;
     }
-
-    this.buffers.clear();
+    this.deckA = null;
+    this.deckB = null;
+    this.isInitialized = false;
   }
 }
 
