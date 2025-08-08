@@ -89,7 +89,7 @@ const getNumberEnv = (key: string, defaultValue: number): number => {
 };
 
 // Validation functions
-const validateApiKey = (key: string | undefined, _service: string): boolean => {
+const validateApiKey = (key: string | undefined): boolean => {
   if (!key) return false;
 
   // Check for placeholder/demo values
