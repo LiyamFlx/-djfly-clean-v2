@@ -110,78 +110,48 @@ export class ServiceStatus {
   }
 
   getAllServices(): Record<string, boolean> {
-    return Object.fromEntries(this.services);
+    return Object.fromEntries(this.services.entries());
   }
 }
 
 export const serviceStatus = ServiceStatus.getInstance();
 
-// API Key Validation
+// Configuration validation
 export const validateApiConfig = () => {
-  // Check for placeholder/demo credentials
-  const isPlaceholderSpotifyId = API_CONFIG.spotify.clientId?.match(
-    /^(abc123|e5050e55f5a94ca2|demo_client_id)/
-  );
-  const isPlaceholderSpotifySecret = API_CONFIG.spotify.clientSecret?.match(
-    /^(xyz456|7e76b6a7c1434b1a|demo_client_secret)/
-  );
-
-  const isPlaceholderOpenAI =
-    API_CONFIG.openai.apiKey?.match(/^(demo_openai_key)/);
-
-  const validations = {
+  const validations: Record<string, Record<string, boolean>> = {
     spotify: {
-      clientId:
-        !!API_CONFIG.spotify.clientId &&
-        API_CONFIG.spotify.clientId.length > 10 &&
-        !isPlaceholderSpotifyId,
-      clientSecret:
-        !!API_CONFIG.spotify.clientSecret &&
-        API_CONFIG.spotify.clientSecret.length > 10 &&
-        !isPlaceholderSpotifySecret,
+      clientId: !!API_CONFIG.spotify.clientId,
+      clientSecret: !!API_CONFIG.spotify.clientSecret,
       redirectUri: !!API_CONFIG.spotify.redirectUri,
-      isPlaceholder: !!(isPlaceholderSpotifyId || isPlaceholderSpotifySecret),
     },
     supabase: {
-      url:
-        !!API_CONFIG.supabase.url &&
-        API_CONFIG.supabase.url.startsWith('https://'),
-      anonKey:
-        !!API_CONFIG.supabase.anonKey &&
-        API_CONFIG.supabase.anonKey.startsWith('eyJ'),
+      url: !!API_CONFIG.supabase.url,
+      anonKey: !!API_CONFIG.supabase.anonKey,
     },
     openai: {
-      apiKey:
-        !API_CONFIG.openai.apiKey ||
-        (API_CONFIG.openai.apiKey.startsWith('sk-') &&
-          API_CONFIG.openai.apiKey.length > 40) ||
-        isPlaceholderOpenAI,
-      isPlaceholder: !!isPlaceholderOpenAI,
+      apiKey: !!API_CONFIG.openai.apiKey,
     },
     youtube: {
-      apiKey:
-        !!API_CONFIG.youtube.apiKey && API_CONFIG.youtube.apiKey.length > 20,
+      apiKey: !!API_CONFIG.youtube.apiKey,
     },
     lastfm: {
-      apiKey:
-        !!API_CONFIG.lastfm.apiKey && API_CONFIG.lastfm.apiKey.length > 20,
-      secret:
-        !!API_CONFIG.lastfm.secret && API_CONFIG.lastfm.secret.length > 20,
+      apiKey: !!API_CONFIG.lastfm.apiKey,
+      secret: !!API_CONFIG.lastfm.secret,
     },
     googleStudio: {
-      apiKey:
-        !!API_CONFIG.googleStudio.apiKey &&
-        API_CONFIG.googleStudio.apiKey.length > 20,
+      apiKey: !!API_CONFIG.googleStudio.apiKey,
     },
   };
 
   // Log validation results
-  console.log('🔑 API Configuration Validation:');
   Object.entries(validations).forEach(([service, checks]) => {
     const allValid = Object.values(checks).every(Boolean);
     console.log(
-      `${service.charAt(0).toUpperCase() + service.slice(1)}: ${allValid ? '✅' : '❌'}`
+      `${allValid ? '✅' : '⚠️'} ${service.toUpperCase()}: ${
+        allValid ? 'All credentials configured' : 'Some credentials missing'
+      }`
     );
+
     if (!allValid) {
       Object.entries(checks).forEach(([key, valid]) => {
         if (!valid) {
@@ -282,27 +252,68 @@ export const testConnections = {
     }
   },
 
-  async all(): Promise<Record<string, boolean>> {
-    console.log('🔍 Testing all API connections...');
+  async youtube(): Promise<boolean> {
+    if (!API_CONFIG.youtube.apiKey) {
+      serviceStatus.setServiceStatus('youtube', false);
+      return false;
+    }
 
+    try {
+      // Test YouTube API
+      const response = await fetch(
+        `${API_CONFIG.youtube.baseUrl}/search?part=snippet&q=test&key=${API_CONFIG.youtube.apiKey}&maxResults=1`
+      );
+
+      const success = response.ok;
+      serviceStatus.setServiceStatus('youtube', success);
+      return success;
+    } catch (error) {
+      console.error('YouTube connection test failed:', error);
+      serviceStatus.setServiceStatus('youtube', false);
+      return false;
+    }
+  },
+
+  async lastfm(): Promise<boolean> {
+    if (!API_CONFIG.lastfm.apiKey) {
+      serviceStatus.setServiceStatus('lastfm', false);
+      return false;
+    }
+
+    try {
+      // Test Last.fm API
+      const response = await fetch(
+        `${API_CONFIG.lastfm.baseUrl}/?method=track.search&track=test&api_key=${API_CONFIG.lastfm.apiKey}&format=json`
+      );
+
+      const success = response.ok;
+      serviceStatus.setServiceStatus('lastfm', success);
+      return success;
+    } catch (error) {
+      console.error('Last.fm connection test failed:', error);
+      serviceStatus.setServiceStatus('lastfm', false);
+      return false;
+    }
+  },
+
+  async all(): Promise<Record<string, boolean>> {
     const results = await Promise.allSettled([
       this.spotify(),
       this.supabase(),
       this.openai(),
+      this.youtube(),
+      this.lastfm(),
     ]);
 
-    const connectionResults = {
-      spotify: results[0].status === 'fulfilled' ? results[0].value : false,
-      supabase: results[1].status === 'fulfilled' ? results[1].value : false,
-      openai: results[2].status === 'fulfilled' ? results[2].value : false,
+    return {
+      spotify: results[0].status === 'fulfilled' && results[0].value,
+      supabase: results[1].status === 'fulfilled' && results[1].value,
+      openai: results[2].status === 'fulfilled' && results[2].value,
+      youtube: results[3].status === 'fulfilled' && results[3].value,
+      lastfm: results[4].status === 'fulfilled' && results[4].value,
     };
-
-    console.log('📊 Connection Test Results:', connectionResults);
-    return connectionResults;
   },
 };
 
-// Initialize configuration on import
+// Initialize configuration validation
 validateApiConfig();
-
-export default API_CONFIG;

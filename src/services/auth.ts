@@ -225,6 +225,11 @@ export class AuthService {
         .single();
 
       if (error) {
+        console.error('❌ Supabase query error:', error);
+        // If it's a schema error, we'll handle it gracefully
+        if (error.code === 'PGRST116') {
+          throw new Error('Database schema not found. Please deploy the database schema first.');
+        }
         throw error;
       }
 

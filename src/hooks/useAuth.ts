@@ -108,11 +108,11 @@ export function useAuth(): UseAuthReturn {
       setError(null);
 
       try {
-              const result = await authService.updatePreferences(updates);
+        const result = await authService.updatePreferences(updates);
       if (result.success) {
-        setUser(authService.getCurrentUser());
+          setUser(authService.getCurrentUser());
       } else {
-        throw new Error(result.error || 'Profile update failed');
+          throw new Error(result.error || 'Profile update failed');
       }
       } catch (err) {
         const errorMessage =

@@ -12,7 +12,7 @@ export interface Track {
   genre?: string | null;    // some components expect this
   image?: string;           // album artwork
   energy?: number;          // energy level 0-1
-  source?: 'spotify' | 'youtube' | 'demo' | 'local';
+  source?: 'spotify' | 'youtube' | 'demo' | 'local' | 'lastfm';
   spotify_url?: string;
   popularity?: number;
   valence?: number;

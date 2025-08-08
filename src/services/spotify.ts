@@ -48,6 +48,10 @@ export class SpotifyService {
     
     if (!this.clientId || !this.clientSecret) {
       console.error('❌ Spotify credentials not configured');
+    } else {
+      console.log('✅ Spotify credentials configured');
+      // Try to load stored token on initialization
+      this.loadStoredToken();
     }
   }
 
@@ -166,7 +170,7 @@ export class SpotifyService {
     try {
       const token = await this.getValidToken();
       if (!token) {
-        throw new Error('No valid Spotify token');
+        throw new Error('Spotify not authenticated. Please authenticate first.');
       }
 
       const response = await fetch(

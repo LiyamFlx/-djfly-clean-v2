@@ -50,6 +50,8 @@ class AIMusicEngine {
       console.warn(
         '⚠️ OpenAI API key not configured. AI features will use fallback logic.'
       );
+    } else {
+      console.log('✅ OpenAI API key configured');
     }
   }
 
@@ -65,6 +67,9 @@ class AIMusicEngine {
 
     try {
       if (!this.apiKey) {
+        console.warn(
+          '⚠️ OpenAI API key not configured, using fallback playlist'
+        );
         return this.generateFallbackPlaylist(request);
       }
 

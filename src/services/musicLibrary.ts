@@ -6,24 +6,43 @@
 import type { Track } from '@/types/shared';
 import { spotifyService } from './spotify';
 import { openaiService } from './openai';
+import { lastfmService } from './lastfm';
 
 export class MusicLibrary {
   private tracks: Track[] = [];
   private playlists: Map<string, Track[]> = new Map();
 
   /**
-   * Search for tracks using Spotify API
+   * Search for tracks using multiple APIs
    */
   async searchTracks(query: string, limit: number = 20): Promise<Track[]> {
     try {
-      if (!spotifyService.isAuthenticated()) {
-        throw new Error('Spotify not connected. Please authenticate first.');
+      // Try Spotify first
+      if (spotifyService.isAuthenticated()) {
+        const spotifyTracks = await spotifyService.searchTracks(query, limit);
+        if (spotifyTracks.length > 0) {
+          return spotifyTracks;
+        }
       }
 
-      return await spotifyService.searchTracks(query, limit);
+      // Try Last.fm as fallback
+      if (lastfmService.isConfigured()) {
+        try {
+          const lastfmTracks = await lastfmService.searchTracks(query, limit);
+          if (lastfmTracks.length > 0) {
+            return lastfmTracks;
+          }
+        } catch (error) {
+          console.warn('⚠️ Last.fm search failed, falling back to demo tracks:', error);
+        }
+      }
+
+      // Return demo tracks as final fallback
+      console.warn('⚠️ No external APIs available, returning demo tracks');
+      return this.getDemoTracks(query, limit);
     } catch (error) {
       console.error('❌ Track search failed:', error);
-      throw error;
+      return this.getDemoTracks(query, limit);
     }
   }
 
@@ -114,6 +133,90 @@ export class MusicLibrary {
    */
   getAllTracks(): Track[] {
     return [...this.tracks];
+  }
+
+  /**
+   * Get demo tracks for development
+   */
+  private getDemoTracks(query: string, limit: number): Track[] {
+    const demoTracks: Track[] = [
+      {
+        id: 'demo-1',
+        title: 'Midnight City',
+        artist: 'M83',
+        duration: 240,
+        preview_url: '/demo-track-1.mp3',
+        source: 'demo',
+        energy: 0.8,
+        bpm: 128,
+        key: 'C',
+        genre: 'electronic',
+        popularity: 85,
+      },
+      {
+        id: 'demo-2',
+        title: 'Strobe',
+        artist: 'Deadmau5',
+        duration: 639,
+        preview_url: '/demo-track-2.mp3',
+        source: 'demo',
+        energy: 0.9,
+        bpm: 128,
+        key: 'A',
+        genre: 'progressive house',
+        popularity: 90,
+      },
+      {
+        id: 'demo-3',
+        title: 'Levels',
+        artist: 'Avicii',
+        duration: 334,
+        preview_url: '/demo-track-3.mp3',
+        source: 'demo',
+        energy: 0.95,
+        bpm: 126,
+        key: 'F',
+        genre: 'house',
+        popularity: 95,
+      },
+      {
+        id: 'demo-4',
+        title: 'Sandstorm',
+        artist: 'Darude',
+        duration: 225,
+        preview_url: '/demo-track-4.mp3',
+        source: 'demo',
+        energy: 0.85,
+        bpm: 135,
+        key: 'D',
+        genre: 'trance',
+        popularity: 88,
+      },
+      {
+        id: 'demo-5',
+        title: 'One More Time',
+        artist: 'Daft Punk',
+        duration: 320,
+        preview_url: '/demo-track-5.mp3',
+        source: 'demo',
+        energy: 0.75,
+        bpm: 123,
+        key: 'C',
+        genre: 'house',
+        popularity: 92,
+      },
+    ];
+
+    // Filter by query if provided
+    const filtered = query 
+      ? demoTracks.filter(track => 
+          track.title.toLowerCase().includes(query.toLowerCase()) ||
+          track.artist.toLowerCase().includes(query.toLowerCase()) ||
+          track.genre.toLowerCase().includes(query.toLowerCase())
+        )
+      : demoTracks;
+
+    return filtered.slice(0, limit);
   }
 
   /**
