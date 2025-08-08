@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { authService } from '@/services/auth';
+import { secureAuthService, validateEmail, validatePassword } from '@/services/secureAuth';
+import { sanitizeError, validatePasswordStrength } from '@/utils/security';
 
 const SignupPage = () => {
   const [formData, setFormData] = useState({
@@ -12,29 +13,68 @@ const SignupPage = () => {
   });
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState('');
+  const [validationErrors, setValidationErrors] = useState<{ 
+    name?: string; 
+    email?: string; 
+    password?: string; 
+    confirmPassword?: string;
+    passwordStrength?: string[];
+  }>({});
+  const [passwordStrength, setPasswordStrength] = useState<{ score: number; feedback: string[] }>({ score: 0, feedback: [] });
   const navigate = useNavigate();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
+    setValidationErrors({});
 
+    // Input validation
+    const errors: { 
+      name?: string; 
+      email?: string; 
+      password?: string; 
+      confirmPassword?: string;
+    } = {};
+    
+    if (formData.name.length < 2 || formData.name.length > 50) {
+      errors.name = 'Name must be between 2 and 50 characters';
+    }
+    
+    if (!validateEmail(formData.email)) {
+      errors.email = 'Please enter a valid email address';
+    }
+    
+    if (!validatePassword(formData.password)) {
+      errors.password = 'Password must be at least 8 characters with uppercase, lowercase, number, and special character';
+    }
+    
     if (formData.password !== formData.confirmPassword) {
-      setError('Passwords do not match');
-      return;
+      errors.confirmPassword = 'Passwords do not match';
     }
 
-    if (formData.password.length < 8) {
-      setError('Password must be at least 8 characters long');
+    // Password strength validation
+    const strength = validatePasswordStrength(formData.password);
+    if (!strength.isValid) {
+      errors.passwordStrength = strength.feedback;
+    }
+    
+    if (Object.keys(errors).length > 0) {
+      setValidationErrors(errors);
       return;
     }
 
     setIsLoading(true);
 
     try {
-      await authService.mockLogin(formData.email);
+      await secureAuthService.signup({
+        name: formData.name,
+        email: formData.email,
+        password: formData.password,
+      });
       navigate('/');
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Signup failed');
+      const errorMessage = sanitizeError(err, 'Signup');
+      setError(errorMessage);
     } finally {
       setIsLoading(false);
     }
@@ -73,13 +113,21 @@ const SignupPage = () => {
                 type="text"
                 id="name"
                 value={formData.name}
-                onChange={(e) =>
-                  setFormData({ ...formData, name: e.target.value })
-                }
-                className="w-full px-4 py-3 bg-gray-700 border border-gray-600 rounded-lg focus:border-blue-500 focus:outline-none transition-colors"
+                onChange={(e) => {
+                  setFormData({ ...formData, name: e.target.value });
+                  if (validationErrors.name) {
+                    setValidationErrors({ ...validationErrors, name: undefined });
+                  }
+                }}
+                className={`w-full px-4 py-3 bg-gray-700 border rounded-lg focus:outline-none transition-colors ${
+                  validationErrors.name ? 'border-red-500' : 'border-gray-600 focus:border-blue-500'
+                }`}
                 placeholder="Your full name"
                 required
               />
+              {validationErrors.name && (
+                <p className="text-red-400 text-sm mt-1">{validationErrors.name}</p>
+              )}
             </div>
 
             <div>
@@ -90,13 +138,21 @@ const SignupPage = () => {
                 type="email"
                 id="email"
                 value={formData.email}
-                onChange={(e) =>
-                  setFormData({ ...formData, email: e.target.value })
-                }
-                className="w-full px-4 py-3 bg-gray-700 border border-gray-600 rounded-lg focus:border-blue-500 focus:outline-none transition-colors"
+                onChange={(e) => {
+                  setFormData({ ...formData, email: e.target.value });
+                  if (validationErrors.email) {
+                    setValidationErrors({ ...validationErrors, email: undefined });
+                  }
+                }}
+                className={`w-full px-4 py-3 bg-gray-700 border rounded-lg focus:outline-none transition-colors ${
+                  validationErrors.email ? 'border-red-500' : 'border-gray-600 focus:border-blue-500'
+                }`}
                 placeholder="your@email.com"
                 required
               />
+              {validationErrors.email && (
+                <p className="text-red-400 text-sm mt-1">{validationErrors.email}</p>
+              )}
             </div>
 
             <div>
@@ -110,13 +166,53 @@ const SignupPage = () => {
                 type="password"
                 id="password"
                 value={formData.password}
-                onChange={(e) =>
-                  setFormData({ ...formData, password: e.target.value })
-                }
-                className="w-full px-4 py-3 bg-gray-700 border border-gray-600 rounded-lg focus:border-blue-500 focus:outline-none transition-colors"
+                onChange={(e) => {
+                  setFormData({ ...formData, password: e.target.value });
+                  if (validationErrors.password) {
+                    setValidationErrors({ ...validationErrors, password: undefined });
+                  }
+                  // Update password strength
+                  const strength = validatePasswordStrength(e.target.value);
+                  setPasswordStrength(strength);
+                }}
+                className={`w-full px-4 py-3 bg-gray-700 border rounded-lg focus:outline-none transition-colors ${
+                  validationErrors.password ? 'border-red-500' : 'border-gray-600 focus:border-blue-500'
+                }`}
                 placeholder="Create a strong password"
                 required
               />
+              {validationErrors.password && (
+                <p className="text-red-400 text-sm mt-1">{validationErrors.password}</p>
+              )}
+              {formData.password && (
+                <div className="mt-2">
+                  <div className="flex items-center space-x-2">
+                    <div className="flex-1 bg-gray-600 rounded-full h-2">
+                      <div 
+                        className={`h-2 rounded-full transition-all ${
+                          passwordStrength.score <= 2 ? 'bg-red-500' :
+                          passwordStrength.score <= 3 ? 'bg-yellow-500' :
+                          passwordStrength.score <= 4 ? 'bg-blue-500' : 'bg-green-500'
+                        }`}
+                        style={{ width: `${(passwordStrength.score / 5) * 100}%` }}
+                      />
+                    </div>
+                    <span className="text-xs text-gray-400">
+                      {passwordStrength.score}/5
+                    </span>
+                  </div>
+                  {passwordStrength.feedback.length > 0 && (
+                    <ul className="text-xs text-gray-400 mt-1 space-y-1">
+                      {passwordStrength.feedback.map((feedback, index) => (
+                        <li key={index} className="flex items-center">
+                          <span className="w-1 h-1 bg-gray-400 rounded-full mr-2" />
+                          {feedback}
+                        </li>
+                      ))}
+                    </ul>
+                  )}
+                </div>
+              )}
             </div>
 
             <div>
@@ -130,13 +226,21 @@ const SignupPage = () => {
                 type="password"
                 id="confirmPassword"
                 value={formData.confirmPassword}
-                onChange={(e) =>
-                  setFormData({ ...formData, confirmPassword: e.target.value })
-                }
-                className="w-full px-4 py-3 bg-gray-700 border border-gray-600 rounded-lg focus:border-blue-500 focus:outline-none transition-colors"
+                onChange={(e) => {
+                  setFormData({ ...formData, confirmPassword: e.target.value });
+                  if (validationErrors.confirmPassword) {
+                    setValidationErrors({ ...validationErrors, confirmPassword: undefined });
+                  }
+                }}
+                className={`w-full px-4 py-3 bg-gray-700 border rounded-lg focus:outline-none transition-colors ${
+                  validationErrors.confirmPassword ? 'border-red-500' : 'border-gray-600 focus:border-blue-500'
+                }`}
                 placeholder="Confirm your password"
                 required
               />
+              {validationErrors.confirmPassword && (
+                <p className="text-red-400 text-sm mt-1">{validationErrors.confirmPassword}</p>
+              )}
             </div>
 
             <div className="flex items-start">
