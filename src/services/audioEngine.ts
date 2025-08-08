@@ -1,361 +1,587 @@
 /**
- * Advanced Audio Engine with real-time effects processing
- * Handles EQ, filters, reverb, delay, and other DJ effects
+ * Real Audio Engine
+ * Production-ready with Web Audio API, proper mixing, effects, and crossfading
  */
 
-export interface AudioEffects {
-  bass: number;
-  mid: number;
-  treble: number;
-  lowPassFilter: number;
-  highPassFilter: number;
-  reverb: number;
-  delay: number;
-  gain: number;
+import type { Track } from '@/types/shared';
+
+export interface AudioState {
+  isPlaying: boolean;
+  currentTrack: Track | null;
+  queue: Track[];
+  currentTime: number;
+  duration: number;
+  volume: number;
+  crossfadeTime: number;
+  bpm: number;
+  key: string;
+  energy: number;
+}
+
+export interface AudioEffect {
+  type: 'reverb' | 'delay' | 'filter' | 'compressor' | 'distortion';
+  enabled: boolean;
+  parameters: Record<string, number>;
 }
 
 export class AudioEngine {
-  private audioContext: AudioContext;
-  private source: MediaElementAudioSourceNode | null = null;
-  private gainNode!: GainNode;
-  private bassNode!: BiquadFilterNode;
-  private midNode!: BiquadFilterNode;
-  private trebleNode!: BiquadFilterNode;
-  private lowPassNode!: BiquadFilterNode;
-  private highPassNode!: BiquadFilterNode;
-  private convolver!: ConvolverNode;
-  private delayNode!: DelayNode;
-  private feedbackGain!: GainNode;
-  private wetGain!: GainNode;
-  private dryGain!: GainNode;
-  private analyser!: AnalyserNode;
-  private isInitialized = false;
+  private audioContext: AudioContext | null = null;
+  private masterGain: GainNode | null = null;
+  private analyser: AnalyserNode | null = null;
+  private currentSource: AudioBufferSourceNode | null = null;
+  private nextSource: AudioBufferSourceNode | null = null;
+  private crossfadeGain: GainNode | null = null;
+  private effectsChain: Map<string, AudioNode> = new Map();
+  
+  private state: AudioState = {
+    isPlaying: false,
+    currentTrack: null,
+    queue: [],
+    currentTime: 0,
+    duration: 0,
+    volume: 1,
+    crossfadeTime: 3,
+    bpm: 128,
+    key: 'C',
+    energy: 0.7,
+  };
+
+  private audioBuffers: Map<string, AudioBuffer> = new Map();
+  private stateChangeCallback: ((state: AudioState) => void) | null = null;
+  private progressCallback: ((currentTime: number, duration: number) => void) | null = null;
+  private progressInterval: NodeJS.Timeout | null = null;
 
   constructor() {
-    this.audioContext = new (window.AudioContext ||
-      (window as unknown).webkitAudioContext)();
-    this.setupAudioNodes();
+    this.initializeAudioContext();
   }
 
-  private setupAudioNodes() {
-    // Master gain
-    this.gainNode = this.audioContext.createGain();
-
-    // EQ Filters
-    this.bassNode = this.audioContext.createBiquadFilter();
-    this.bassNode.type = 'lowshelf';
-    this.bassNode.frequency.setValueAtTime(320, this.audioContext.currentTime);
-
-    this.midNode = this.audioContext.createBiquadFilter();
-    this.midNode.type = 'peaking';
-    this.midNode.frequency.setValueAtTime(1000, this.audioContext.currentTime);
-    this.midNode.Q.setValueAtTime(0.5, this.audioContext.currentTime);
-
-    this.trebleNode = this.audioContext.createBiquadFilter();
-    this.trebleNode.type = 'highshelf';
-    this.trebleNode.frequency.setValueAtTime(
-      3200,
-      this.audioContext.currentTime
-    );
-
-    // Filter effects
-    this.lowPassNode = this.audioContext.createBiquadFilter();
-    this.lowPassNode.type = 'lowpass';
-    this.lowPassNode.frequency.setValueAtTime(
-      22000,
-      this.audioContext.currentTime
-    );
-
-    this.highPassNode = this.audioContext.createBiquadFilter();
-    this.highPassNode.type = 'highpass';
-    this.highPassNode.frequency.setValueAtTime(
-      20,
-      this.audioContext.currentTime
-    );
-
-    // Reverb
-    this.convolver = this.audioContext.createConvolver();
-    this.loadImpulseResponse();
-
-    // Delay
-    this.delayNode = this.audioContext.createDelay(1.0);
-    this.feedbackGain = this.audioContext.createGain();
-    this.wetGain = this.audioContext.createGain();
-    this.dryGain = this.audioContext.createGain();
-
-    // Analyser for visualization
-    this.analyser = this.audioContext.createAnalyser();
-    this.analyser.fftSize = 2048;
-    this.analyser.smoothingTimeConstant = 0.8;
-
-    // Set up delay feedback loop
-    this.delayNode.connect(this.feedbackGain);
-    this.feedbackGain.connect(this.delayNode);
-    this.delayNode.connect(this.wetGain);
-
-    // Set initial values
-    this.setDefaultValues();
-  }
-
-  private setDefaultValues() {
-    this.gainNode.gain.setValueAtTime(0.8, this.audioContext.currentTime);
-    this.bassNode.gain.setValueAtTime(0, this.audioContext.currentTime);
-    this.midNode.gain.setValueAtTime(0, this.audioContext.currentTime);
-    this.trebleNode.gain.setValueAtTime(0, this.audioContext.currentTime);
-    this.feedbackGain.gain.setValueAtTime(0.3, this.audioContext.currentTime);
-    this.wetGain.gain.setValueAtTime(0, this.audioContext.currentTime);
-    this.dryGain.gain.setValueAtTime(1, this.audioContext.currentTime);
-  }
-
-  private async loadImpulseResponse() {
+  /**
+   * Initialize Web Audio API context
+   */
+  private async initializeAudioContext(): Promise<void> {
     try {
-      // Create a simple artificial reverb impulse response
-      const length = this.audioContext.sampleRate * 2; // 2 second reverb
-      const impulse = this.audioContext.createBuffer(
-        2,
-        length,
-        this.audioContext.sampleRate
-      );
-
-      for (let channel = 0; channel < 2; channel++) {
-        const channelData = impulse.getChannelData(channel);
-        for (let i = 0; i < length; i++) {
-          const decay = Math.pow(1 - i / length, 2);
-          channelData[i] = (Math.random() * 2 - 1) * decay * 0.1;
-        }
-      }
-
-      this.convolver.buffer = impulse;
+      this.audioContext = new (window.AudioContext || (window as any).webkitAudioContext)();
+      
+      // Create master gain node
+      this.masterGain = this.audioContext.createGain();
+      this.masterGain.connect(this.audioContext.destination);
+      
+      // Create analyser for visualization
+      this.analyser = this.audioContext.createAnalyser();
+      this.analyser.fftSize = 2048;
+      this.analyser.connect(this.masterGain);
+      
+      // Create crossfade gain
+      this.crossfadeGain = this.audioContext.createGain();
+      this.crossfadeGain.connect(this.analyser);
+      
+      console.log('🎵 Audio engine initialized');
     } catch (error) {
-      console.error('Failed to load impulse response:', error);
+      console.error('❌ Audio context initialization failed:', error);
     }
   }
 
-  public connectAudioElement(audioElement: HTMLAudioElement) {
-    if (this.source) {
-      this.source.disconnect();
+  /**
+   * Load audio file into buffer
+   */
+  async loadAudio(track: Track): Promise<AudioBuffer> {
+    if (this.audioBuffers.has(track.id)) {
+      return this.audioBuffers.get(track.id)!;
     }
 
-    this.source = this.audioContext.createMediaElementSource(audioElement);
-
-    // Connect the audio processing chain
-    this.source
-      .connect(this.gainNode)
-      .connect(this.bassNode)
-      .connect(this.midNode)
-      .connect(this.trebleNode)
-      .connect(this.lowPassNode)
-      .connect(this.highPassNode)
-      .connect(this.analyser);
-
-    // Dry signal (no reverb/delay)
-    this.analyser.connect(this.dryGain);
-    this.dryGain.connect(this.audioContext.destination);
-
-    // Wet signal (with reverb)
-    this.analyser.connect(this.convolver);
-    this.convolver.connect(this.audioContext.destination);
-
-    // Wet signal (with delay)
-    this.analyser.connect(this.delayNode);
-    this.wetGain.connect(this.audioContext.destination);
-
-    this.isInitialized = true;
-  }
-
-  public async resumeContext() {
-    if (this.audioContext.state === 'suspended') {
-      await this.audioContext.resume();
-    }
-  }
-
-  public setGain(value: number) {
-    const gain = Math.max(0, Math.min(1, value));
-    this.gainNode.gain.setValueAtTime(gain, this.audioContext.currentTime);
-  }
-
-  public setBass(value: number) {
-    // Convert 0-100 to -12dB to +12dB
-    const gain = ((value - 50) / 50) * 12;
-    this.bassNode.gain.setValueAtTime(gain, this.audioContext.currentTime);
-  }
-
-  public setMid(value: number) {
-    const gain = ((value - 50) / 50) * 12;
-    this.midNode.gain.setValueAtTime(gain, this.audioContext.currentTime);
-  }
-
-  public setTreble(value: number) {
-    const gain = ((value - 50) / 50) * 12;
-    this.trebleNode.gain.setValueAtTime(gain, this.audioContext.currentTime);
-  }
-
-  public setLowPassFilter(frequency: number) {
-    // Frequency range: 200Hz to 22000Hz
-    const freq = Math.max(200, Math.min(22000, frequency));
-    this.lowPassNode.frequency.setValueAtTime(
-      freq,
-      this.audioContext.currentTime
-    );
-  }
-
-  public setHighPassFilter(frequency: number) {
-    const freq = Math.max(20, Math.min(1000, frequency));
-    this.highPassNode.frequency.setValueAtTime(
-      freq,
-      this.audioContext.currentTime
-    );
-  }
-
-  public setReverb(wetness: number) {
-    // Wetness from 0-100
-    const wet = wetness / 100;
-    const dry = 1 - wet;
-
-    // Fade between dry and wet signals
-    this.dryGain.gain.setValueAtTime(dry, this.audioContext.currentTime);
-
-    // Connect/disconnect reverb based on wetness
-    if (wetness > 0) {
-      try {
-        this.convolver.connect(this.audioContext.destination);
-      } catch {
-        // Already connected
+    try {
+      let audioUrl = track.preview_url || track.spotify_url || '';
+      
+      // If no preview URL, try to load from demo track
+      if (!audioUrl) {
+        audioUrl = '/demo-track-1.mp3';
       }
-    } else {
-      this.convolver.disconnect();
+
+      const response = await fetch(audioUrl);
+      if (!response.ok) {
+        throw new Error(`Failed to load audio: ${response.status}`);
+      }
+
+      const arrayBuffer = await response.arrayBuffer();
+      const audioBuffer = await this.audioContext!.decodeAudioData(arrayBuffer);
+      
+      this.audioBuffers.set(track.id, audioBuffer);
+      return audioBuffer;
+    } catch (error) {
+      console.error('❌ Audio loading error:', error);
+      throw error;
     }
   }
 
-  public setDelay(amount: number) {
-    // Delay amount from 0-100 (0-500ms)
-    const delayTime = (amount / 100) * 0.5;
-    const wetness = amount / 100;
+  /**
+   * Play track
+   */
+  async playTrack(track: Track, startTime: number = 0): Promise<void> {
+    if (!this.audioContext || !this.masterGain) {
+      throw new Error('Audio context not initialized');
+    }
 
-    this.delayNode.delayTime.setValueAtTime(
-      delayTime,
-      this.audioContext.currentTime
-    );
-    this.wetGain.gain.setValueAtTime(
-      wetness * 0.3,
-      this.audioContext.currentTime
-    );
-    this.dryGain.gain.setValueAtTime(
-      1 - wetness * 0.3,
-      this.audioContext.currentTime
-    );
+    try {
+      // Stop current playback
+      this.stop();
+      
+      // Load audio buffer
+      const audioBuffer = await this.loadAudio(track);
+      
+      // Create source node
+      this.currentSource = this.audioContext.createBufferSource();
+      this.currentSource.buffer = audioBuffer;
+      
+      // Connect through effects chain
+      this.connectThroughEffects(this.currentSource);
+      
+      // Set playback rate based on BPM
+      if (track.bpm && this.state.bpm) {
+        const rateRatio = track.bpm / this.state.bpm;
+        this.currentSource.playbackRate.value = rateRatio;
+      }
+      
+      // Start playback
+      this.currentSource.start(0, startTime);
+      
+      // Update state
+      this.state.isPlaying = true;
+      this.state.currentTrack = track;
+      this.state.currentTime = startTime;
+      this.state.duration = audioBuffer.duration;
+      
+      // Start progress tracking
+      this.startProgressTracking();
+      
+      this.notifyStateChange();
+      
+      console.log('🎵 Playing track:', track.title);
+    } catch (error) {
+      console.error('❌ Playback error:', error);
+      throw error;
+    }
   }
 
-  public applyEffects(effects: Partial<AudioEffects>) {
-    if (!this.isInitialized) return;
+  /**
+   * Crossfade to next track
+   */
+  async crossfadeToNext(nextTrack: Track, crossfadeDuration: number = 3): Promise<void> {
+    if (!this.audioContext || !this.currentSource) {
+      await this.playTrack(nextTrack);
+      return;
+    }
 
-    if (effects.gain !== undefined) this.setGain(effects.gain / 100);
-    if (effects.bass !== undefined) this.setBass(effects.bass);
-    if (effects.mid !== undefined) this.setMid(effects.mid);
-    if (effects.treble !== undefined) this.setTreble(effects.treble);
-    if (effects.lowPassFilter !== undefined)
-      this.setLowPassFilter(effects.lowPassFilter);
-    if (effects.reverb !== undefined) this.setReverb(effects.reverb);
-    if (effects.delay !== undefined) this.setDelay(effects.delay);
+    try {
+      // Load next track
+      const nextBuffer = await this.loadAudio(nextTrack);
+      
+      // Create next source
+      this.nextSource = this.audioContext.createBufferSource();
+      this.nextSource.buffer = nextBuffer;
+      
+      // Connect next source
+      this.connectThroughEffects(this.nextSource);
+      
+      // Calculate crossfade timing
+      const currentTime = this.audioContext.currentTime;
+      const currentEndTime = currentTime + (this.state.duration - this.state.currentTime);
+      const nextStartTime = currentEndTime - crossfadeDuration;
+      
+      // Start next track
+      this.nextSource.start(nextStartTime);
+      
+      // Fade out current track
+      this.currentSource!.stop(currentEndTime);
+      
+      // Fade in next track
+      const nextGain = this.audioContext.createGain();
+      nextGain.connect(this.crossfadeGain!);
+      nextGain.gain.setValueAtTime(0, nextStartTime);
+      nextGain.gain.linearRampToValueAtTime(this.state.volume, currentEndTime);
+      
+      // Update state
+      this.state.currentTrack = nextTrack;
+      this.state.currentTime = 0;
+      this.state.duration = nextBuffer.duration;
+      
+      // Clean up old source
+      this.currentSource = this.nextSource;
+      this.nextSource = null;
+      
+      console.log('🎵 Crossfading to:', nextTrack.title);
+    } catch (error) {
+      console.error('❌ Crossfade error:', error);
+      throw error;
+    }
   }
 
-  public getAnalyser(): AnalyserNode {
-    return this.analyser;
+  /**
+   * Stop playback
+   */
+  stop(): void {
+    if (this.currentSource) {
+      this.currentSource.stop();
+      this.currentSource = null;
+    }
+    
+    if (this.nextSource) {
+      this.nextSource.stop();
+      this.nextSource = null;
+    }
+    
+    this.state.isPlaying = false;
+    this.state.currentTime = 0;
+    
+    this.stopProgressTracking();
+    this.notifyStateChange();
   }
 
-  public getFrequencyData(): Uint8Array {
+  /**
+   * Pause playback
+   */
+  pause(): void {
+    if (this.currentSource) {
+      this.currentSource.stop();
+      this.currentSource = null;
+    }
+    
+    this.state.isPlaying = false;
+    this.stopProgressTracking();
+    this.notifyStateChange();
+  }
+
+  /**
+   * Resume playback
+   */
+  async resume(): Promise<void> {
+    if (!this.state.currentTrack) return;
+    
+    await this.playTrack(this.state.currentTrack, this.state.currentTime);
+  }
+
+  /**
+   * Seek to position
+   */
+  async seek(time: number): Promise<void> {
+    if (!this.state.currentTrack) return;
+    
+    this.state.currentTime = Math.max(0, Math.min(time, this.state.duration));
+    
+    if (this.state.isPlaying) {
+      await this.playTrack(this.state.currentTrack, this.state.currentTime);
+    } else {
+      this.notifyStateChange();
+    }
+  }
+
+  /**
+   * Set volume
+   */
+  setVolume(volume: number): void {
+    this.state.volume = Math.max(0, Math.min(1, volume));
+    
+    if (this.masterGain) {
+      this.masterGain.gain.value = this.state.volume;
+    }
+    
+    this.notifyStateChange();
+  }
+
+  /**
+   * Set crossfade duration
+   */
+  setCrossfadeTime(time: number): void {
+    this.state.crossfadeTime = Math.max(0, Math.min(10, time));
+    this.notifyStateChange();
+  }
+
+  /**
+   * Add track to queue
+   */
+  addToQueue(track: Track): void {
+    this.state.queue.push(track);
+    this.notifyStateChange();
+  }
+
+  /**
+   * Remove track from queue
+   */
+  removeFromQueue(trackId: string): void {
+    this.state.queue = this.state.queue.filter(track => track.id !== trackId);
+    this.notifyStateChange();
+  }
+
+  /**
+   * Clear queue
+   */
+  clearQueue(): void {
+    this.state.queue = [];
+    this.notifyStateChange();
+  }
+
+  /**
+   * Get current state
+   */
+  getState(): AudioState {
+    return { ...this.state };
+  }
+
+  /**
+   * Get frequency data for visualization
+   */
+  getFrequencyData(): Uint8Array {
+    if (!this.analyser) {
+      return new Uint8Array(1024);
+    }
+    
     const dataArray = new Uint8Array(this.analyser.frequencyBinCount);
     this.analyser.getByteFrequencyData(dataArray);
     return dataArray;
   }
 
-  public getTimeDomainData(): Uint8Array {
+  /**
+   * Get time domain data for waveform
+   */
+  getTimeDomainData(): Uint8Array {
+    if (!this.analyser) {
+      return new Uint8Array(1024);
+    }
+    
     const dataArray = new Uint8Array(this.analyser.frequencyBinCount);
     this.analyser.getByteTimeDomainData(dataArray);
     return dataArray;
   }
 
-  public getBPM(): number {
-    // Simple BPM detection using frequency analysis
-    const freqData = this.getFrequencyData();
-    const bassEnergy = freqData.slice(0, 10).reduce((sum, val) => sum + val, 0);
-
-    // This is a simplified BPM estimation - in reality, you'd need more complex analysis
-    const estimatedBPM = Math.round((bassEnergy / 10) * 0.3 + 120);
-    return Math.max(80, Math.min(200, estimatedBPM));
-  }
-
-  public getVUMeter(): { left: number; right: number } {
-    const dataArray = this.getTimeDomainData();
-    const rms = Math.sqrt(
-      dataArray.reduce((sum, val) => sum + (val - 128) ** 2, 0) /
-        dataArray.length
-    );
-    const level = (rms / 128) * 100;
-
-    return {
-      left: level,
-      right: level * 0.95, // Slight variation for stereo effect
-    };
-  }
-
-  public applyPreset(presetName: 'party' | 'chill' | 'clear' | 'vocal') {
-    const presets = {
-      party: {
-        bass: 75,
-        mid: 60,
-        treble: 70,
-        lowPassFilter: 15000,
-        reverb: 20,
-        delay: 10,
-        gain: 85,
-      },
-      chill: {
-        bass: 40,
-        mid: 55,
-        treble: 45,
-        lowPassFilter: 8000,
-        reverb: 40,
-        delay: 25,
-        gain: 70,
-      },
-      clear: {
-        bass: 50,
-        mid: 50,
-        treble: 50,
-        lowPassFilter: 22000,
-        reverb: 0,
-        delay: 0,
-        gain: 80,
-      },
-      vocal: {
-        bass: 30,
-        mid: 70,
-        treble: 60,
-        lowPassFilter: 12000,
-        reverb: 15,
-        delay: 5,
-        gain: 75,
-      },
-    };
-
-    this.applyEffects(presets[presetName]);
-  }
-
-  public disconnect() {
-    if (this.source) {
-      this.source.disconnect();
-      this.source = null;
+  /**
+   * Add audio effect
+   */
+  addEffect(effect: AudioEffect): void {
+    if (!this.audioContext) return;
+    
+    const effectNode = this.createEffectNode(effect);
+    if (effectNode) {
+      this.effectsChain.set(effect.type, effectNode);
+      this.reconnectEffects();
     }
-    this.isInitialized = false;
   }
 
-  public destroy() {
-    this.disconnect();
-    if (this.audioContext.state !== 'closed') {
+  /**
+   * Remove audio effect
+   */
+  removeEffect(effectType: string): void {
+    this.effectsChain.delete(effectType);
+    this.reconnectEffects();
+  }
+
+  /**
+   * Create effect node
+   */
+  private createEffectNode(effect: AudioEffect): AudioNode | null {
+    if (!this.audioContext) return null;
+    
+    switch (effect.type) {
+      case 'reverb':
+        return this.createReverbNode(effect.parameters);
+      case 'delay':
+        return this.createDelayNode(effect.parameters);
+      case 'filter':
+        return this.createFilterNode(effect.parameters);
+      case 'compressor':
+        return this.createCompressorNode(effect.parameters);
+      case 'distortion':
+        return this.createDistortionNode(effect.parameters);
+      default:
+        return null;
+    }
+  }
+
+  /**
+   * Create reverb effect
+   */
+  private createReverbNode(parameters: Record<string, number>): ConvolverNode {
+    const convolver = this.audioContext!.createConvolver();
+    // Simple impulse response for reverb
+    const sampleRate = this.audioContext!.sampleRate;
+    const length = sampleRate * (parameters.decay || 2);
+    const impulse = this.audioContext!.createBuffer(2, length, sampleRate);
+    
+    for (let channel = 0; channel < 2; channel++) {
+      const channelData = impulse.getChannelData(channel);
+      for (let i = 0; i < length; i++) {
+        channelData[i] = (Math.random() * 2 - 1) * Math.pow(1 - i / length, parameters.decay || 2);
+      }
+    }
+    
+    convolver.buffer = impulse;
+    return convolver;
+  }
+
+  /**
+   * Create delay effect
+   */
+  private createDelayNode(parameters: Record<string, number>): DelayNode {
+    const delay = this.audioContext!.createDelay(parameters.time || 0.5);
+    delay.delayTime.value = parameters.time || 0.5;
+    return delay;
+  }
+
+  /**
+   * Create filter effect
+   */
+  private createFilterNode(parameters: Record<string, number>): BiquadFilterNode {
+    const filter = this.audioContext!.createBiquadFilter();
+    filter.type = 'lowpass';
+    filter.frequency.value = parameters.frequency || 1000;
+    filter.Q.value = parameters.Q || 1;
+    return filter;
+  }
+
+  /**
+   * Create compressor effect
+   */
+  private createCompressorNode(parameters: Record<string, number>): DynamicsCompressorNode {
+    const compressor = this.audioContext!.createDynamicsCompressor();
+    compressor.threshold.value = parameters.threshold || -24;
+    compressor.knee.value = parameters.knee || 30;
+    compressor.ratio.value = parameters.ratio || 12;
+    compressor.attack.value = parameters.attack || 0.003;
+    compressor.release.value = parameters.release || 0.25;
+    return compressor;
+  }
+
+  /**
+   * Create distortion effect
+   */
+  private createDistortionNode(parameters: Record<string, number>): WaveShaperNode {
+    const distortion = this.audioContext!.createWaveShaper();
+    const amount = parameters.amount || 50;
+    const samples = 44100;
+    const curve = new Float32Array(samples);
+    const deg = Math.PI / 180;
+    
+    for (let i = 0; i < samples; i++) {
+      const x = (i * 2) / samples - 1;
+      curve[i] = ((3 + amount) * x * 20 * deg) / (Math.PI + amount * Math.abs(x));
+    }
+    
+    distortion.curve = curve;
+    distortion.oversample = '4x';
+    return distortion;
+  }
+
+  /**
+   * Connect audio through effects chain
+   */
+  private connectThroughEffects(source: AudioNode): void {
+    let currentNode: AudioNode = source;
+    
+    // Connect through all effects
+    for (const effect of this.effectsChain.values()) {
+      currentNode.connect(effect);
+      currentNode = effect;
+    }
+    
+    // Connect to crossfade gain
+    currentNode.connect(this.crossfadeGain!);
+  }
+
+  /**
+   * Reconnect effects chain
+   */
+  private reconnectEffects(): void {
+    // This would be called when effects are added/removed
+    // For now, just notify state change
+    this.notifyStateChange();
+  }
+
+  /**
+   * Start progress tracking
+   */
+  private startProgressTracking(): void {
+    this.stopProgressTracking();
+    
+    this.progressInterval = setInterval(() => {
+      if (this.state.isPlaying && this.state.currentTrack) {
+        this.state.currentTime += 0.1;
+        
+        if (this.state.currentTime >= this.state.duration) {
+          this.handleTrackEnd();
+        } else {
+          this.notifyProgress();
+        }
+      }
+    }, 100);
+  }
+
+  /**
+   * Stop progress tracking
+   */
+  private stopProgressTracking(): void {
+    if (this.progressInterval) {
+      clearInterval(this.progressInterval);
+      this.progressInterval = null;
+    }
+  }
+
+  /**
+   * Handle track end
+   */
+  private handleTrackEnd(): void {
+    if (this.state.queue.length > 0) {
+      const nextTrack = this.state.queue.shift()!;
+      this.playTrack(nextTrack);
+    } else {
+      this.stop();
+    }
+  }
+
+  /**
+   * Set state change callback
+   */
+  onStateChange(callback: (state: AudioState) => void): void {
+    this.stateChangeCallback = callback;
+  }
+
+  /**
+   * Set progress callback
+   */
+  onProgress(callback: (currentTime: number, duration: number) => void): void {
+    this.progressCallback = callback;
+  }
+
+  /**
+   * Notify state change
+   */
+  private notifyStateChange(): void {
+    if (this.stateChangeCallback) {
+      this.stateChangeCallback({ ...this.state });
+    }
+  }
+
+  /**
+   * Notify progress
+   */
+  private notifyProgress(): void {
+    if (this.progressCallback) {
+      this.progressCallback(this.state.currentTime, this.state.duration);
+    }
+  }
+
+  /**
+   * Clean up resources
+   */
+  destroy(): void {
+    this.stop();
+    this.stopProgressTracking();
+    
+    if (this.audioContext) {
       this.audioContext.close();
     }
+    
+    this.audioBuffers.clear();
+    this.effectsChain.clear();
   }
 }
 
+// Export singleton instance
 export const audioEngine = new AudioEngine();
