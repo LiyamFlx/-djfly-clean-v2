@@ -71,14 +71,7 @@ class SpotifyService {
    * Get access token using Client Credentials flow
    */
   private async getAccessToken(): Promise<string> {
-    // Check if we're using demo credentials
-    if (
-      this.clientId === 'demo_client_id' ||
-      this.clientSecret === 'demo_client_secret'
-    ) {
-      console.info('🎵 Spotify: Using demo mode, returning mock token');
-      return 'demo_access_token';
-    }
+
 
     // Check if we have a valid cached token
     if (this.accessToken && Date.now() < this.tokenExpiry) {
@@ -139,11 +132,7 @@ class SpotifyService {
     try {
       const token = await this.getAccessToken();
 
-      // Return demo tracks for demo mode
-      if (token === 'demo_access_token') {
-        console.info('🎵 Spotify: Returning demo search results for:', query);
-        return this.getDemoTracks(query, limit);
-      }
+      
 
       const response = await fetch(
         `https://api.spotify.com/v1/search?q=${encodeURIComponent(query)}&type=track&limit=${limit}`,

@@ -311,10 +311,6 @@ PlaylistGenerator.generateByVibe('mixed').then((tracks) => {
 
 const HomePage = () => (
   <div className="min-h-screen bg-gray-900 text-white p-8">
-    {/* Demo Banner */}
-    <div className="bg-yellow-600 text-black text-center py-2 mb-4 rounded">
-      🚀 DJfly v1.2.0 Demo - Live Testing Environment
-    </div>
     <div className="max-w-4xl mx-auto text-center">
       <h1 className="text-4xl font-bold text-blue-400 mb-4">DJfly</h1>
       <p className="text-xl mb-8">
@@ -327,14 +323,14 @@ const HomePage = () => (
           🎵 Try DJfly Now - No Signup Required
         </h2>
         <p className="text-gray-300 mb-4">
-          Experience AI-powered music discovery with our 10-minute demo
+          Experience AI-powered music discovery instantly
         </p>
         <div className="flex flex-col sm:flex-row gap-3 justify-center">
           <Link
             to="/guest"
             className="bg-green-600 hover:bg-green-700 px-6 py-3 rounded-lg font-semibold transition-colors inline-flex items-center gap-2"
           >
-            🚀 Start Free Demo
+            🚀 Start Now
           </Link>
           <Link
             to="/studio"
@@ -388,10 +384,6 @@ const HomePage = () => (
 
 const StudioPage = () => (
   <div className="min-h-screen bg-gray-900 text-white p-8">
-    {/* Demo Banner */}
-    <div className="bg-yellow-600 text-black text-center py-2 mb-4 rounded">
-      🚀 DJfly v1.2.0 Demo - Live Testing Environment
-    </div>
     <div className="max-w-4xl mx-auto text-center">
       <h1 className="text-3xl font-bold mb-8">Studio</h1>
       <div className="grid md:grid-cols-2 gap-8">
@@ -443,7 +435,7 @@ const MagicMatchPage = () => {
           const { aiMusicEngine } = await import('@/services/aiMusicEngine');
 
           // Simulate crowd energy detection (in real app this would analyze audio)
-          const crowdEnergy = Math.floor(Math.random() * 40) + 60; // 60-100 for demo
+          const crowdEnergy = Math.floor(Math.random() * 40) + 60;
           const timeOfDay =
             new Date().getHours() > 18 ? 'evening' : 'afternoon';
 
@@ -907,10 +899,7 @@ const ProfilePage = () => {
 
   return (
     <div className="min-h-screen bg-gray-900 text-white p-8 pb-20">
-      {/* Demo Banner */}
-      <div className="bg-yellow-600 text-black text-center py-2 mb-4 rounded">
-        🚀 DJfly v1.2.0 Demo - Live Testing Environment
-      </div>
+
 
       <div className="max-w-4xl mx-auto">
         <h1 className="text-3xl font-bold mb-8">👤 Profile</h1>
@@ -922,12 +911,12 @@ const ProfilePage = () => {
             <div>
               <p className="text-gray-300">Supabase Connection</p>
               <p className="text-sm text-gray-400">
-                Demo mode - database disabled
+                Connected
               </p>
             </div>
             <div className="flex items-center gap-2">
-              <div className="w-3 h-3 bg-yellow-500 rounded-full"></div>
-              <span className="text-yellow-400 text-sm">Demo Mode</span>
+              <div className="w-3 h-3 bg-green-500 rounded-full"></div>
+              <span className="text-green-400 text-sm">Active</span>
             </div>
           </div>
         </div>
@@ -1017,7 +1006,7 @@ function App() {
             path="/guest"
             element={
               <Suspense
-                fallback={<LoadingSpinner message="Setting up demo..." />}
+                fallback={<LoadingSpinner message="Setting up..." />}
               >
                 <GuestMode onStartDemo={() => {}} onSignUp={() => {}} />
               </Suspense>

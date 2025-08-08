@@ -24,12 +24,9 @@ const getEnvVar = (
 export const API_CONFIG = {
   // Spotify Configuration
   spotify: {
-    clientId: getEnvVar('VITE_SPOTIFY_CLIENT_ID') || 'demo_client_id',
-    clientSecret:
-      getEnvVar('VITE_SPOTIFY_CLIENT_SECRET') || 'demo_client_secret',
-    redirectUri:
-      getEnvVar('VITE_SPOTIFY_REDIRECT_URI') ||
-      'http://localhost:5173/auth/spotify/callback',
+    clientId: getEnvVar('VITE_SPOTIFY_CLIENT_ID'),
+    clientSecret: getEnvVar('VITE_SPOTIFY_CLIENT_SECRET'),
+    redirectUri: getEnvVar('VITE_SPOTIFY_REDIRECT_URI'),
     scopes: [
       'user-read-private',
       'user-read-email',
@@ -41,41 +38,43 @@ export const API_CONFIG = {
     ].join(' '),
     baseUrl: 'https://api.spotify.com/v1',
     authUrl: 'https://accounts.spotify.com',
+    tokenUrl: 'https://accounts.spotify.com/api/token',
   },
 
   // Supabase Configuration
   supabase: {
-    url: getEnvVar('VITE_SUPABASE_URL') || 'https://demo.supabase.co',
-    anonKey: getEnvVar('VITE_SUPABASE_ANON_KEY') || 'demo_anon_key',
+    url: getEnvVar('VITE_SUPABASE_URL'),
+    anonKey: getEnvVar('VITE_SUPABASE_ANON_KEY'),
   },
 
   // OpenAI Configuration
   openai: {
-    apiKey: getEnvVar('VITE_OPENAI_API_KEY', false) || 'demo_openai_key',
+    apiKey: getEnvVar('VITE_OPENAI_API_KEY'),
     baseUrl: 'https://api.openai.com/v1',
+    modelsUrl: 'https://api.openai.com/v1/models',
   },
 
   // YouTube Configuration
   youtube: {
-    apiKey: getEnvVar('VITE_YOUTUBE_API_KEY', false),
+    apiKey: getEnvVar('VITE_YOUTUBE_API_KEY'),
     baseUrl: 'https://www.googleapis.com/youtube/v3',
   },
 
   // Last.fm Configuration
   lastfm: {
-    apiKey: getEnvVar('VITE_LASTFM_API_KEY', false),
-    secret: getEnvVar('VITE_LASTFM_SECRET', false),
+    apiKey: getEnvVar('VITE_LASTFM_API_KEY'),
+    secret: getEnvVar('VITE_LASTFM_SECRET'),
     baseUrl: 'https://ws.audioscrobbler.com/2.0',
   },
 
   // Google Studio Configuration
   googleStudio: {
-    apiKey: getEnvVar('VITE_GOOGLE_STUDIO_API_KEY', false),
+    apiKey: getEnvVar('VITE_GOOGLE_STUDIO_API_KEY'),
   },
 
   // App Configuration
   app: {
-    environment: getEnvVar('VITE_APP_ENVIRONMENT') || 'development',
+    environment: getEnvVar('VITE_APP_ENVIRONMENT'),
     magicMatch: getEnvVar('VITE_MAGIC_MATCH_ENABLED') === 'true',
     magicSet: getEnvVar('VITE_MAGIC_SET_ENABLED') === 'true',
   },

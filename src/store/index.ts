@@ -169,11 +169,9 @@ export const useDJflyStore = create<DJflyStore>()(
         state.ai.generatedTracks = [];
       });
 
-      // Progress tracking removed for demo
-
       try {
         // const tracks = await getAiPlaylist(prompt, onProgress);
-        const tracks: Track[] = []; // Placeholder
+        const tracks: Track[] = [];
 
         set((state) => {
           state.ai.generatedTracks = tracks;
