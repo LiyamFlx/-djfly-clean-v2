@@ -92,9 +92,9 @@ export class AudioEngine {
     try {
       let audioUrl = track.preview_url || track.spotify_url || '';
       
-      // If no preview URL, try to load from demo track
+      // If no preview URL, throw error
       if (!audioUrl) {
-        audioUrl = '/demo-track-1.mp3';
+        throw new Error('No audio URL available for this track');
       }
 
       const response = await fetch(audioUrl);

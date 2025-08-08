@@ -318,29 +318,29 @@ const HomePage = () => (
         AI-powered DJ platform that reads any room instantly
       </p>
 
-      {/* Quick Demo Access */}
-      <div className="bg-gradient-to-r from-blue-900/30 to-purple-900/30 border border-blue-600/30 rounded-xl p-6 mb-8">
-        <h2 className="text-2xl font-bold mb-3">
-          🎵 Try DJfly Now - No Signup Required
-        </h2>
-        <p className="text-gray-300 mb-4">
-          Experience AI-powered music discovery instantly
-        </p>
-        <div className="flex flex-col sm:flex-row gap-3 justify-center">
-          <Link
-            to="/guest"
-            className="bg-green-600 hover:bg-green-700 px-6 py-3 rounded-lg font-semibold transition-colors inline-flex items-center gap-2"
-          >
-            🚀 Start Now
-          </Link>
-          <Link
-            to="/studio"
-            className="bg-blue-600 hover:bg-blue-700 px-6 py-3 rounded-lg font-semibold transition-colors"
-          >
-            🎛️ Full Studio
-          </Link>
+              {/* Get Started */}
+        <div className="bg-gradient-to-r from-blue-900/30 to-purple-900/30 border border-blue-600/30 rounded-xl p-6 mb-8">
+          <h2 className="text-2xl font-bold mb-3">
+            🎵 Get Started with DJfly
+          </h2>
+          <p className="text-gray-300 mb-4">
+            Experience AI-powered music discovery instantly
+          </p>
+          <div className="flex flex-col sm:flex-row gap-3 justify-center">
+            <Link
+              to="/auth/login"
+              className="bg-green-600 hover:bg-green-700 px-6 py-3 rounded-lg font-semibold transition-colors inline-flex items-center gap-2"
+            >
+              🚀 Sign In
+            </Link>
+            <Link
+              to="/auth/signup"
+              className="bg-blue-600 hover:bg-blue-700 px-6 py-3 rounded-lg font-semibold transition-colors"
+            >
+              🎛️ Create Account
+            </Link>
+          </div>
         </div>
-      </div>
 
       {/* Feature Highlights */}
       <div className="grid md:grid-cols-3 gap-6 mb-8">
@@ -1002,20 +1002,12 @@ function App() {
           />
           <Route path="/profile" element={<ProfilePage />} />
           
-          {/* Spotify Callback Route */}
+          {/* Authentication Routes */}
+          <Route path="/auth/login" element={<LoginPage />} />
+          <Route path="/auth/signup" element={<SignupPage />} />
+          <Route path="/auth/forgot-password" element={<ForgotPasswordPage />} />
+          <Route path="/auth/reset-password" element={<ResetPasswordPage />} />
           <Route path="/auth/spotify/callback" element={<SpotifyCallbackPage />} />
-
-          {/* Guest Mode Route */}
-          <Route
-            path="/guest"
-            element={
-              <Suspense
-                fallback={<LoadingSpinner message="Setting up..." />}
-              >
-                <GuestMode onStartDemo={() => {}} onSignUp={() => {}} />
-              </Suspense>
-            }
-          />
 
           {/* Authentication Routes */}
           <Route
