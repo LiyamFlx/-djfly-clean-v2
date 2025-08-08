@@ -1,10 +1,10 @@
 import { useState, useEffect, useCallback } from 'react';
 import {
-  authService,
-  type User,
+  secureAuthService,
+  type SecureUser as User,
   type LoginCredentials,
   type SignupData,
-} from '@/services/auth';
+} from '@/services/secureAuth';
 
 export interface UseAuthReturn {
   user: User | null;
@@ -29,7 +29,7 @@ export function useAuth(): UseAuthReturn {
   useEffect(() => {
     const initAuth = async () => {
       try {
-        const currentUser = await authService.getCurrentUser();
+        const currentUser = await secureAuthService.getCurrentUser();
         setUser(currentUser);
       } catch (err) {
         console.error('Auth initialization error:', err);
@@ -46,12 +46,8 @@ export function useAuth(): UseAuthReturn {
     setError(null);
 
     try {
-      // Use mock login for development if no backend is available
-      const isDevelopment = import.meta.env.DEV;
-      const result = isDevelopment
-        ? await authService.mockLogin(credentials.email)
-        : await authService.login(credentials);
-
+      // Use secure auth service
+      const result = await secureAuthService.login(credentials);
       setUser(result.user);
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : 'Login failed';
@@ -67,12 +63,8 @@ export function useAuth(): UseAuthReturn {
     setError(null);
 
     try {
-      // Use mock login for development if no backend is available
-      const isDevelopment = import.meta.env.DEV;
-      const result = isDevelopment
-        ? await authService.mockLogin(userData.email)
-        : await authService.signup(userData);
-
+      // Use secure auth service
+      const result = await secureAuthService.signup(userData);
       setUser(result.user);
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : 'Signup failed';
@@ -88,7 +80,7 @@ export function useAuth(): UseAuthReturn {
     setError(null);
 
     try {
-      await authService.logout();
+      await secureAuthService.logout();
       setUser(null);
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : 'Logout failed';
@@ -108,7 +100,7 @@ export function useAuth(): UseAuthReturn {
       setError(null);
 
       try {
-        const updatedUser = await authService.updateProfile(updates);
+        const updatedUser = await secureAuthService.updateProfile(updates);
         setUser(updatedUser);
       } catch (err) {
         const errorMessage =
@@ -127,7 +119,7 @@ export function useAuth(): UseAuthReturn {
     setError(null);
 
     try {
-      await authService.requestPasswordReset(email);
+      await secureAuthService.requestPasswordReset(email);
     } catch (err) {
       const errorMessage =
         err instanceof Error ? err.message : 'Password reset request failed';
@@ -144,7 +136,7 @@ export function useAuth(): UseAuthReturn {
       setError(null);
 
       try {
-        await authService.resetPassword(token, newPassword);
+        await secureAuthService.resetPassword(token, newPassword);
       } catch (err) {
         const errorMessage =
           err instanceof Error ? err.message : 'Password reset failed';
