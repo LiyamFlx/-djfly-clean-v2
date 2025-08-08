@@ -120,7 +120,7 @@ class CollaborationService {
     }
   }
 
-  private handleMessage(data: unknown) {
+  private handleMessage(data: any) {
     switch (data.type) {
       case 'session_updated':
         this.currentSession = data.session;

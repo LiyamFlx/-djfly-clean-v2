@@ -409,7 +409,15 @@ const StudioPage = () => (
 interface AIAnalysis {
   crowdEnergy: number;
   timeOfDay: 'morning' | 'afternoon' | 'evening' | 'late-night';
-  recommendation: AIRecommendation;
+  recommendation: {
+    tracks: Track[];
+    energy: number;
+    mood: string;
+    reasoning?: string;
+    mixingTips?: string[];
+    nextTrackSuggestions?: Track[];
+    energyCurve?: number[];
+  };
 }
 
 const MagicMatchPage = () => {
@@ -678,7 +686,7 @@ const MagicSetPage = () => {
               <textarea
                 value={prompt}
                 onChange={(e) => setPrompt(e.target.value)}
-                placeholder="e.g., 'Create an upbeat electronic playlist for a beach party with progressive house and tech house tracks that build energy throughout the night...'"
+                placeholder="Describe your perfect playlist - mood, energy, genre, venue..."
                 className="w-full h-32 p-4 bg-gray-700 border border-gray-600 rounded-lg text-white placeholder-gray-400 focus:border-blue-500 focus:outline-none resize-none"
                 maxLength={500}
               />
@@ -698,7 +706,7 @@ const MagicSetPage = () => {
             </div>
 
             <div className="bg-gray-800 p-6 rounded-xl">
-              <h3 className="text-lg font-semibold mb-4">💡 Example Prompts</h3>
+                              <h3 className="text-lg font-semibold mb-4">💡 Try These Prompts</h3>
               <div className="grid md:grid-cols-2 gap-4">
                 <button
                   onClick={() =>

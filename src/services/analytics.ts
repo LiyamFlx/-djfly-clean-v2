@@ -73,7 +73,7 @@ class AnalyticsEngine {
   /**
    * Calculate crowd response based on track properties and real-time data
    */
-  private calculateCrowdResponse(track: unknown): number {
+  private calculateCrowdResponse(track: any): number {
     let score = 7; // Base score
 
     // BPM influence (sweet spot around 120-130)

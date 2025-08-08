@@ -69,7 +69,7 @@ const MagicSetPage: React.FC = () => {
               id="prompt"
               value={prompt}
               onChange={(e) => setPrompt(e.target.value)}
-              placeholder="e.g., 'Upbeat electronic music for a summer pool party, starting mellow and building to high energy'"
+                              placeholder="Describe your perfect playlist - mood, energy, genre, venue..."
               className="w-full px-4 py-3 bg-rich-black/50 border border-white/20 rounded-lg text-white placeholder-gray-400 focus:border-electric-blue focus:ring-1 focus:ring-electric-blue focus:outline-none resize-none"
               rows={4}
             />
@@ -238,7 +238,7 @@ const MagicSetPage: React.FC = () => {
           <div className="flex gap-2">
             <input
               type="text"
-              placeholder="Search for tracks..."
+                              placeholder="Search tracks by title, artist, or genre..."
               className="flex-1 px-4 py-2 bg-rich-black/50 border border-white/20 rounded-lg text-white placeholder-gray-400 focus:border-electric-blue focus:ring-1 focus:ring-electric-blue focus:outline-none"
             />
             <button className="px-4 py-2 bg-white/10 hover:bg-white/20 rounded-lg transition-colors">

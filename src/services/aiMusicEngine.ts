@@ -20,13 +20,7 @@ interface AIPlaylistRequest {
   venue?: 'club' | 'lounge' | 'festival' | 'radio' | 'workout';
 }
 
-interface AIRecommendation {
-  tracks: Track[];
-  reasoning: string;
-  energyCurve: number[];
-  mixingTips: string[];
-  nextTrackSuggestions: Track[];
-}
+import type { AIRecommendation } from '@/types/shared';
 
 interface MoodAnalysis {
   energy: number; // 0-100
@@ -369,6 +363,8 @@ Create playlists that:
 
     return {
       tracks,
+      energy: 75,
+      mood: 'energetic',
       reasoning:
         aiResult.reasoning || 'Curated playlist based on your preferences',
       energyCurve: aiResult.energyCurve || tracks.map((_, i) => 40 + i * 8), // Default ascending curve
@@ -482,6 +478,8 @@ Create playlists that:
 
     return {
       tracks,
+      energy: 75,
+      mood: 'energetic',
       reasoning:
         'Curated playlist based on your preferences using intelligent fallback selection',
       energyCurve: tracks.map((_, i) => 40 + i * 7),

@@ -76,9 +76,9 @@ class PerformanceService {
 
   private autoOptimizeSettings() {
     // Detect device capabilities
-    const memory = (navigator as unknown).deviceMemory || 4; // GB
+    const memory = (navigator as any).deviceMemory || 4; // GB
     const hardwareConcurrency = navigator.hardwareConcurrency || 4;
-    const connection = (navigator as unknown).connection;
+    const connection = (navigator as any).connection;
 
     // Adjust settings based on device capabilities
     if (memory < 4) {
@@ -266,7 +266,7 @@ class PerformanceService {
 
     // Monitor memory usage
     if ('memory' in performance) {
-      const memory = (performance as unknown).memory;
+      const memory = (performance as any).memory;
       this.metrics.memoryUsage = memory.usedJSHeapSize / (1024 * 1024); // Convert to MB
 
       this.memoryHistory.push(this.metrics.memoryUsage);
@@ -308,7 +308,7 @@ class PerformanceService {
 
       // Use Web Audio API to decode
       const audioContext = new (window.AudioContext ||
-        (window as unknown).webkitAudioContext)();
+        (window as any).webkitAudioContext)();
       const audioBuffer = await audioContext.decodeAudioData(
         arrayBuffer.slice(0)
       );
@@ -407,7 +407,7 @@ class PerformanceService {
 
     // Force garbage collection if available
     if ('gc' in window) {
-      (window as unknown).gc();
+      (window as any).gc();
     }
   }
 
@@ -466,7 +466,7 @@ class PerformanceService {
    * Check if device is low-end
    */
   isLowEndDevice(): boolean {
-    const memory = (navigator as unknown).deviceMemory || 4;
+    const memory = (navigator as any).deviceMemory || 4;
     const cores = navigator.hardwareConcurrency || 4;
 
     return memory < 4 || cores < 4 || this.metrics.fps < 30;

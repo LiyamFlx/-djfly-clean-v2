@@ -74,7 +74,7 @@ export class AudioFallbackService {
   /**
    * Preload and validate audio URLs
    */
-  static async preloadTrackAudio(tracks: unknown[]): Promise<unknown[]> {
+  static async preloadTrackAudio(tracks: any[]): Promise<any[]> {
     const validatedTracks = await Promise.all(
       tracks.map(async (track) => {
         const workingUrl = await this.getWorkingAudioUrl(track.previewUrl);
