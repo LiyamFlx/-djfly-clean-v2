@@ -10,6 +10,7 @@ import { motion } from 'framer-motion';
 import { PlaylistGenerator } from '@/services/musicLibrary';
 import type { Track, AIRecommendation } from '@/types/shared';
 import ApiStatusIndicator from '@/components/ApiStatusIndicator';
+import SpotifyCallbackPage from '@/pages/auth/SpotifyCallbackPage';
 
 // Lazy load heavy components for better performance
 const LoginPage = lazy(() => import('@/pages/auth/LoginPage'));
@@ -1000,6 +1001,9 @@ function App() {
             }
           />
           <Route path="/profile" element={<ProfilePage />} />
+          
+          {/* Spotify Callback Route */}
+          <Route path="/auth/spotify/callback" element={<SpotifyCallbackPage />} />
 
           {/* Guest Mode Route */}
           <Route
