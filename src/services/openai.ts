@@ -373,7 +373,7 @@ export class OpenAIService {
           title: title?.trim() || 'Unknown Track',
           artist: artist?.trim() || 'Unknown Artist',
           duration: 180,
-          source: 'recommendation' as const,
+          source: 'spotify' as const,
         };
       });
     } catch (error) {

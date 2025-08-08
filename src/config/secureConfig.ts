@@ -196,7 +196,7 @@ export const validateSecureConfig = (): {
   const warnings: string[] = [];
 
   // Required validations
-  if (!validateApiKey(secureConfig.openai.apiKey, 'OpenAI')) {
+  if (!validateApiKey(secureConfig.openai.apiKey)) {
     if (isProduction) {
       errors.push('OpenAI API key is required in production');
     } else {
@@ -206,7 +206,7 @@ export const validateSecureConfig = (): {
     }
   }
 
-  if (!validateApiKey(secureConfig.spotify.clientId, 'Spotify')) {
+  if (!validateApiKey(secureConfig.spotify.clientId)) {
     if (isProduction) {
       errors.push('Spotify Client ID is required in production');
     } else {

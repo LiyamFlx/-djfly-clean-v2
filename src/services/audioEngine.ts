@@ -67,8 +67,8 @@ export class AudioEngine {
       this.masterGain.connect(this.audioContext.destination);
       
       // Create analyser for visualization
-      this.analyser = this.audioContext.createAnalyser();
-      this.analyser.fftSize = 2048;
+    this.analyser = this.audioContext.createAnalyser();
+    this.analyser.fftSize = 2048;
       this.analyser.connect(this.masterGain);
       
       // Create crossfade gain

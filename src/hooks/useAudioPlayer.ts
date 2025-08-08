@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState, useCallback } from 'react';
 import { MagicPlayer } from '@/services/MagicPlayer';
-import type { Track } from '@/types/shared';
+import type { Track } from '@/types/audio';
 
 export interface UseAudioPlayerOptions {
   volume?: number;
@@ -24,6 +24,22 @@ export function useAudioPlayer(
 
   const currentTrackRef = useRef<Track | null>(null);
   const progressIntervalRef = useRef<number | null>(null);
+  const magicPlayerRef = useRef<MagicPlayer>(new MagicPlayer());
+
+  // Initialize MagicPlayer instance
+  useEffect(() => {
+    if (!magicPlayerRef.current) {
+      magicPlayerRef.current = new MagicPlayer();
+      magicPlayerRef.current.initialize().catch(console.error);
+    }
+
+    return () => {
+      if (magicPlayerRef.current) {
+        magicPlayerRef.current.destroy();
+        magicPlayerRef.current = null;
+      }
+    };
+  }, []);
 
   // Create track from URL
   const createTrackFromUrl = useCallback((url: string): Track => {
@@ -36,12 +52,18 @@ export function useAudioPlayer(
       title,
       artist: 'Unknown Artist',
       duration: 0,
+      image: '/default-album-art.jpg',
+      source: 'upload',
       preview_url: url,
     };
   }, []);
 
   // Setup MagicPlayer event listeners
   useEffect(() => {
+    if (!magicPlayerRef.current) return;
+
+    const player = magicPlayerRef.current;
+
     const handlePlay = () => {
       setIsPlaying(true);
       setIsLoading(false);
@@ -71,25 +93,25 @@ export function useAudioPlayer(
     };
 
     // Add event listeners
-    MagicPlayer.addEventListener('play', handlePlay);
-    MagicPlayer.addEventListener('pause', handlePause);
-    MagicPlayer.addEventListener('loaded', handleLoaded);
-    MagicPlayer.addEventListener('error', handleError);
-    MagicPlayer.addEventListener('ended', handleEnded);
+    player.addEventListener('play', handlePlay);
+    player.addEventListener('pause', handlePause);
+    player.addEventListener('loaded', handleLoaded);
+    player.addEventListener('error', handleError);
+    player.addEventListener('ended', handleEnded);
 
     return () => {
       // Remove event listeners
-      MagicPlayer.removeEventListener('play', handlePlay);
-      MagicPlayer.removeEventListener('pause', handlePause);
-      MagicPlayer.removeEventListener('loaded', handleLoaded);
-      MagicPlayer.removeEventListener('error', handleError);
-      MagicPlayer.removeEventListener('ended', handleEnded);
+      player.removeEventListener('play', handlePlay);
+      player.removeEventListener('pause', handlePause);
+      player.removeEventListener('loaded', handleLoaded);
+      player.removeEventListener('error', handleError);
+      player.removeEventListener('ended', handleEnded);
     };
   }, []);
 
   // Load new source when src changes
   useEffect(() => {
-    if (src) {
+    if (src && magicPlayerRef.current) {
       const track = createTrackFromUrl(src);
 
       // Only load if it's a different source
@@ -99,7 +121,7 @@ export function useAudioPlayer(
         currentTrackRef.current = track;
 
         // Load track into deck A
-        MagicPlayer.loadTrack('A', track).catch((err) => {
+        magicPlayerRef.current.loadTrack('A', track).catch((err) => {
           setError(err.message || 'Failed to load track');
           setIsLoading(false);
         });
@@ -109,9 +131,9 @@ export function useAudioPlayer(
 
   // Progress tracking
   useEffect(() => {
-    if (isPlaying) {
+    if (isPlaying && magicPlayerRef.current) {
       progressIntervalRef.current = window.setInterval(() => {
-        const deckA = MagicPlayer.getDeckState('A');
+        const deckA = magicPlayerRef.current!.getDeckState('A');
         if (deckA) {
           setCurrentTime(deckA.currentTime);
           setDuration(deckA.duration);
@@ -131,7 +153,9 @@ export function useAudioPlayer(
     try {
       setIsLoading(true);
       setError(null);
-      MagicPlayer.play('A');
+      if (magicPlayerRef.current) {
+        magicPlayerRef.current.play('A');
+      }
     } catch (err) {
       setError('Failed to start playback');
       setIsLoading(false);
@@ -140,37 +164,51 @@ export function useAudioPlayer(
 
   // Pause function
   const pause = useCallback(() => {
-    MagicPlayer.pause('A');
+    if (magicPlayerRef.current) {
+      magicPlayerRef.current.pause('A');
+    }
   }, []);
 
   // Stop function
   const stop = useCallback(() => {
-    MagicPlayer.stop('A');
+    if (magicPlayerRef.current) {
+      magicPlayerRef.current.stop('A');
+    }
     setCurrentTime(0);
   }, []);
 
   // Seek function
   const seek = useCallback((time: number) => {
-    MagicPlayer.seek('A', time);
+    if (magicPlayerRef.current) {
+      magicPlayerRef.current.seek('A', time);
+    }
   }, []);
 
   // Volume control
   const setVolume = useCallback((newVolume: number) => {
     const clampedVolume = Math.max(0, Math.min(1, newVolume));
     setVolumeState(clampedVolume);
-    MagicPlayer.setDeckVolume('A', clampedVolume);
+    if (magicPlayerRef.current) {
+      magicPlayerRef.current.setDeckVolume('A', clampedVolume);
+    }
   }, []);
 
   // Get frequency data for visualization
   const getFrequencyData = useCallback(() => {
-    const analysis = MagicPlayer.getCurrentAnalysis();
-    return analysis?.spectrum || new Uint8Array(128);
+    if (magicPlayerRef.current) {
+      const analysis = magicPlayerRef.current.getCurrentAnalysis();
+      return new Uint8Array(128); // Placeholder - implement actual frequency data
+    }
+    return new Uint8Array(128);
   }, []);
 
   // Get time domain data for visualization
   const getTimeDomainData = useCallback(() => {
-    const analysis = MagicPlayer.getCurrentAnalysis();
-    return analysis?.waveform || new Uint8Array(128);
+    if (magicPlayerRef.current) {
+      const analysis = magicPlayerRef.current.getCurrentAnalysis();
+      return new Uint8Array(128); // Placeholder - implement actual time domain data
+    }
+    return new Uint8Array(128);
   }, []);
 
   return {

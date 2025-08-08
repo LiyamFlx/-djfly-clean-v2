@@ -274,6 +274,13 @@ class AdvancedAudioService {
   }
 
   /**
+   * Set master volume
+   */
+  setMasterVolume(volume: number): void {
+    this.mixingState.masterVolume = Math.max(0, Math.min(1, volume));
+  }
+
+  /**
    * Set loop points
    */
   setLoop(deck: 'A' | 'B', start: number, end: number): void {

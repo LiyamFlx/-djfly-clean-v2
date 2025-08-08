@@ -219,7 +219,7 @@ export class AuthService {
   private async loadUserProfile(userId: string): Promise<void> {
     try {
       const { data, error } = await supabase
-        .from('user_profiles')
+        .from('users')
         .select('*')
         .eq('id', userId)
         .single();
@@ -233,16 +233,16 @@ export class AuthService {
           user: {
             id: data.id,
             email: data.email,
-            username: data.username,
-            avatar: data.avatar,
-            isPro: data.is_pro,
+            username: data.full_name || '',
+            avatar: data.avatar_url,
+            isPro: false, // Default to false, can be updated based on user preferences
             createdAt: data.created_at,
-            lastLogin: data.last_login || new Date().toISOString(),
+            lastLogin: data.updated_at,
             preferences: data.preferences || {
               defaultGenre: 'electronic',
               energyPreference: 0.7,
-              autoMix: false,
-              crossfadeDuration: 3,
+              autoMix: true,
+              crossfadeDuration: 4,
             },
           },
           accessToken: '', // Will be set by Supabase
@@ -263,8 +263,8 @@ export class AuthService {
   private async updateLastLogin(userId: string): Promise<void> {
     try {
       await supabase
-        .from('user_profiles')
-        .update({ last_login: new Date().toISOString() })
+        .from('users')
+        .update({ updated_at: new Date().toISOString() })
         .eq('id', userId);
     } catch (error) {
       console.error('❌ Update last login error:', error);

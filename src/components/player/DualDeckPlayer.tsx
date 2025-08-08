@@ -200,7 +200,7 @@ const DualDeckPlayer: React.FC<DualDeckPlayerProps> = ({ className = '' }) => {
 
   const setMasterVolume = (volume: number) => {
     try {
-      advancedAudioService.setMasterVolume?.(volume);
+      // advancedAudioService.setMasterVolume?.(volume);
       setMixingState(prev => ({ ...prev, masterVolume: volume }));
     } catch (error) {
       console.error('Failed to set master volume:', error);

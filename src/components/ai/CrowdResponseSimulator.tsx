@@ -17,7 +17,6 @@ import {
   Activity,
   BarChart3,
 } from 'lucide-react';
-// import { audioAnalysisService } from '@/services/audioAnalysis';
 import { advancedAudioService } from '@/services/advancedAudio';
 
 interface CrowdResponseSimulatorProps {
@@ -115,37 +114,16 @@ const CrowdResponseSimulator: React.FC<CrowdResponseSimulatorProps> = ({
     },
   ]);
 
-  // const [currentTrack, setCurrentTrack] = useState<unknown>(null);
-  // const [previousTracks, setPreviousTracks] = useState<unknown[]>([]);
   const [showAdvancedAnalytics, setShowAdvancedAnalytics] = useState(false);
   const [isSimulating, setIsSimulating] = useState(false);
-  const simulationInterval = useRef<ReturnType<typeof setInterval> | null>(
-    null
-  );
-
-  useEffect(() => {
-    // Start crowd simulation
-    if (isSimulating) {
-      simulationInterval.current = setInterval(() => {
-        updateCrowdEnergy();
-        updateCrowdSegments();
-      }, 2000);
-    }
-
-    return () => {
-      if (simulationInterval.current) {
-        clearInterval(simulationInterval.current);
-      }
-    };
-  }, [isSimulating, updateCrowdEnergy, updateCrowdSegments]);
+  const simulationInterval = useRef<ReturnType<typeof setInterval> | null>(null);
 
   const updateCrowdEnergy = useCallback(() => {
-    const analytics = advancedAudioService.getAnalytics();
-    // const audioAnalysis = audioAnalysisService.getMockAnalysis();
+    const analytics = advancedAudioService.getAnalytics() as any;
 
     // Calculate new energy based on audio and crowd factors
     const audioEnergy =
-      (analytics.deckA?.energy || 0) + (analytics.deckB?.energy || 0);
+      ((analytics as any).deckA?.energy || 0) + ((analytics as any).deckB?.energy || 0);
     const crowdDensity = Math.random() * 0.3 + 0.7; // Simulated crowd density
     const motionActivity = Math.random() * 0.4 + 0.5; // Simulated motion
     const vocalResponse = Math.random() * 0.5 + 0.3; // Simulated vocal response
@@ -244,6 +222,25 @@ const CrowdResponseSimulator: React.FC<CrowdResponseSimulatorProps> = ({
     );
   }, []);
 
+  useEffect(() => {
+    if (isSimulating) {
+      simulationInterval.current = setInterval(() => {
+        updateCrowdEnergy();
+        updateCrowdSegments();
+      }, 2000);
+    } else {
+      if (simulationInterval.current) {
+        clearInterval(simulationInterval.current);
+      }
+    }
+
+    return () => {
+      if (simulationInterval.current) {
+        clearInterval(simulationInterval.current);
+      }
+    };
+  }, [isSimulating]);
+
   const getEnergyColor = (energy: number): string => {
     if (energy > 80) return 'text-red-400';
     if (energy > 60) return 'text-yellow-400';
@@ -285,28 +282,39 @@ const CrowdResponseSimulator: React.FC<CrowdResponseSimulatorProps> = ({
           <Users className="w-6 h-6 text-blue-400" />
           <h2 className="text-2xl font-bold">Crowd Response Simulator</h2>
         </div>
-        <div className="flex items-center gap-4">
+        <div className="flex items-center gap-3">
           <button
             onClick={() => setIsSimulating(!isSimulating)}
-            className={`flex items-center gap-2 px-3 py-2 rounded-lg transition-colors ${
-              isSimulating ? 'bg-green-600' : 'bg-gray-700 hover:bg-gray-600'
+            className={`flex items-center gap-2 px-4 py-2 rounded-lg transition-colors ${
+              isSimulating
+                ? 'bg-red-600 hover:bg-red-700'
+                : 'bg-green-600 hover:bg-green-700'
             }`}
           >
-            <Activity className="w-4 h-4" />
-            {isSimulating ? 'Stop' : 'Start'} Simulation
+            {isSimulating ? (
+              <>
+                <Activity className="w-4 h-4" />
+                Stop Simulation
+              </>
+            ) : (
+              <>
+                <Zap className="w-4 h-4" />
+                Start Simulation
+              </>
+            )}
           </button>
           <button
             onClick={() => setShowAdvancedAnalytics(!showAdvancedAnalytics)}
             className="flex items-center gap-2 px-3 py-2 rounded-lg bg-gray-700 hover:bg-gray-600 transition-colors"
           >
             <BarChart3 className="w-4 h-4" />
-            Advanced
+            Analytics
           </button>
         </div>
       </div>
 
-      {/* Main Crowd Energy Display */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-6">
+      {/* Main Content */}
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {/* Overall Energy */}
         <div className="bg-gray-800 p-4 rounded-lg">
           <div className="flex items-center justify-between mb-4">
@@ -315,166 +323,104 @@ const CrowdResponseSimulator: React.FC<CrowdResponseSimulatorProps> = ({
           </div>
 
           <div className="text-center mb-4">
-            <div
-              className={`text-4xl font-bold ${getEnergyColor(crowdEnergy.level)}`}
-            >
+            <div className={`text-4xl font-bold ${getEnergyColor(crowdEnergy.level)}`}>
               {Math.round(crowdEnergy.level)}%
             </div>
             <div className="text-sm text-gray-400 capitalize">
-              {crowdEnergy.trend}
+              {crowdEnergy.trend} energy
             </div>
           </div>
 
-          {/* Energy Bar */}
-          <div className="w-full bg-gray-700 rounded-full h-3 mb-4">
-            <div
-              className="bg-gradient-to-r from-blue-500 to-green-500 h-3 rounded-full transition-all duration-500"
-              style={{ width: `${crowdEnergy.level}%` }}
-            />
+          <div className="space-y-2">
+            <div className="flex justify-between text-sm">
+              <span>Audio Energy:</span>
+              <span>{Math.round(crowdEnergy.factors.audioEnergy * 100)}%</span>
+            </div>
+            <div className="flex justify-between text-sm">
+              <span>Crowd Density:</span>
+              <span>{Math.round(crowdEnergy.factors.crowdDensity * 100)}%</span>
+            </div>
+            <div className="flex justify-between text-sm">
+              <span>Motion Activity:</span>
+              <span>{Math.round(crowdEnergy.factors.motionActivity * 100)}%</span>
+            </div>
+            <div className="flex justify-between text-sm">
+              <span>Vocal Response:</span>
+              <span>{Math.round(crowdEnergy.factors.vocalResponse * 100)}%</span>
+            </div>
           </div>
+        </div>
 
-          {/* Predictions */}
-          <div className="space-y-2 text-sm">
-            <div className="flex justify-between">
-              <span className="text-gray-400">Next minute:</span>
-              <span
-                className={getEnergyColor(crowdEnergy.predictions.nextMinute)}
+        {/* Crowd Segments */}
+        <div className="lg:col-span-2 bg-gray-800 p-4 rounded-lg">
+          <h3 className="text-lg font-semibold mb-4">Crowd Segments</h3>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            {crowdSegments.map((segment) => (
+              <div
+                key={segment.id}
+                className="bg-gray-700 p-3 rounded-lg"
               >
-                {Math.round(crowdEnergy.predictions.nextMinute)}%
-              </span>
-            </div>
-            <div className="flex justify-between">
-              <span className="text-gray-400">Peak energy:</span>
-              <span className="text-green-400">
-                {Math.round(crowdEnergy.predictions.peakTime)}%
-              </span>
-            </div>
-          </div>
-        </div>
+                <div className="flex items-center justify-between mb-2">
+                  <span className="text-sm font-medium capitalize">
+                    {segment.id.replace('-', ' ')}
+                  </span>
+                  {getMoodIcon(segment.mood)}
+                </div>
 
-        {/* Energy Factors */}
-        <div className="bg-gray-800 p-4 rounded-lg">
-          <h3 className="text-lg font-semibold mb-4">Energy Factors</h3>
+                <div className={`text-2xl font-bold ${getEnergyColor(segment.energy)}`}>
+                  {Math.round(segment.energy)}%
+                </div>
 
-          <div className="space-y-3">
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-2">
-                <Music className="w-4 h-4 text-blue-400" />
-                <span className="text-sm">Audio Energy</span>
+                <div className="space-y-1 mt-2">
+                  <div className="flex justify-between text-xs">
+                    <span>Dancing:</span>
+                    <span>{Math.round(segment.behavior.dancing * 100)}%</span>
+                  </div>
+                  <div className="flex justify-between text-xs">
+                    <span>Singing:</span>
+                    <span>{Math.round(segment.behavior.singing * 100)}%</span>
+                  </div>
+                  <div className="flex justify-between text-xs">
+                    <span>Clapping:</span>
+                    <span>{Math.round(segment.behavior.clapping * 100)}%</span>
+                  </div>
+                  <div className="flex justify-between text-xs">
+                    <span>Recording:</span>
+                    <span>{Math.round(segment.behavior.phoneRecording * 100)}%</span>
+                  </div>
+                </div>
+
+                <div className="mt-2 text-xs text-gray-400">
+                  {segment.demographics.age} • {segment.demographics.groupSize} people
+                </div>
               </div>
-              <span className="text-sm">
-                {Math.round(crowdEnergy.factors.audioEnergy * 100)}%
-              </span>
-            </div>
-
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-2">
-                <Users className="w-4 h-4 text-green-400" />
-                <span className="text-sm">Crowd Density</span>
-              </div>
-              <span className="text-sm">
-                {Math.round(crowdEnergy.factors.crowdDensity * 100)}%
-              </span>
-            </div>
-
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-2">
-                <Activity className="w-4 h-4 text-yellow-400" />
-                <span className="text-sm">Motion Activity</span>
-              </div>
-              <span className="text-sm">
-                {Math.round(crowdEnergy.factors.motionActivity * 100)}%
-              </span>
-            </div>
-
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-2">
-                <Mic className="w-4 h-4 text-red-400" />
-                <span className="text-sm">Vocal Response</span>
-              </div>
-              <span className="text-sm">
-                {Math.round(crowdEnergy.factors.vocalResponse * 100)}%
-              </span>
-            </div>
-          </div>
-        </div>
-
-        {/* AI Recommendations */}
-        <div className="bg-gray-800 p-4 rounded-lg">
-          <h3 className="text-lg font-semibold mb-4">AI Recommendations</h3>
-
-          <div className="space-y-3">
-            {crowdEnergy.level < 50 && (
-              <div className="text-sm text-yellow-400 bg-yellow-900/20 p-2 rounded">
-                ⚡ Increase energy with higher BPM tracks
-              </div>
-            )}
-
-            {crowdEnergy.level > 80 && (
-              <div className="text-sm text-green-400 bg-green-900/20 p-2 rounded">
-                🎉 Perfect energy! Maintain with similar tracks
-              </div>
-            )}
-
-            {crowdEnergy.trend === 'falling' && (
-              <div className="text-sm text-red-400 bg-red-900/20 p-2 rounded">
-                📉 Energy dropping - switch to crowd favorites
-              </div>
-            )}
-
-            <div className="text-sm text-blue-400 bg-blue-900/20 p-2 rounded">
-              🎵 Next track suggestion:{' '}
-              {crowdEnergy.level > 70 ? 'High energy' : 'Build up'} track
-            </div>
+            ))}
           </div>
         </div>
       </div>
 
-      {/* Crowd Segments */}
-      <div className="bg-gray-800 p-4 rounded-lg mb-6">
-        <h3 className="text-lg font-semibold mb-4">Crowd Segments</h3>
-
+      {/* Predictions */}
+      <div className="mt-6 bg-gray-800 p-4 rounded-lg">
+        <h3 className="text-lg font-semibold mb-4">Energy Predictions</h3>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-          {crowdSegments.map((segment) => (
-            <div key={segment.id} className="bg-gray-700 p-3 rounded-lg">
-              <div className="flex items-center justify-between mb-2">
-                <h4 className="text-sm font-medium capitalize">
-                  {segment.id.replace('-', ' ')}
-                </h4>
-                {getMoodIcon(segment.mood)}
-              </div>
-
-              <div className="space-y-2">
-                <div className="flex justify-between text-xs">
-                  <span className="text-gray-400">Energy:</span>
-                  <span className={getEnergyColor(segment.energy)}>
-                    {Math.round(segment.energy)}%
-                  </span>
-                </div>
-
-                <div className="flex justify-between text-xs">
-                  <span className="text-gray-400">Mood:</span>
-                  <span className="capitalize">{segment.mood}</span>
-                </div>
-
-                <div className="flex justify-between text-xs">
-                  <span className="text-gray-400">Size:</span>
-                  <span>{segment.demographics.groupSize} people</span>
-                </div>
-
-                <div className="space-y-1">
-                  <div className="flex justify-between text-xs">
-                    <span className="text-gray-400">Dancing:</span>
-                    <span>{Math.round(segment.behavior.dancing * 100)}%</span>
-                  </div>
-                  <div className="flex justify-between text-xs">
-                    <span className="text-gray-400">Singing:</span>
-                    <span>{Math.round(segment.behavior.singing * 100)}%</span>
-                  </div>
-                </div>
-              </div>
+          <div className="text-center">
+            <div className="text-sm text-gray-400 mb-1">Next Minute</div>
+            <div className={`text-2xl font-bold ${getEnergyColor(crowdEnergy.predictions.nextMinute)}`}>
+              {Math.round(crowdEnergy.predictions.nextMinute)}%
             </div>
-          ))}
+          </div>
+          <div className="text-center">
+            <div className="text-sm text-gray-400 mb-1">Peak Time</div>
+            <div className={`text-2xl font-bold ${getEnergyColor(crowdEnergy.predictions.peakTime)}`}>
+              {Math.round(crowdEnergy.predictions.peakTime)}%
+            </div>
+          </div>
+          <div className="text-center">
+            <div className="text-sm text-gray-400 mb-1">Drop Time</div>
+            <div className={`text-2xl font-bold ${getEnergyColor(crowdEnergy.predictions.dropTime)}`}>
+              {Math.round(crowdEnergy.predictions.dropTime)}%
+            </div>
+          </div>
         </div>
       </div>
 
@@ -485,7 +431,7 @@ const CrowdResponseSimulator: React.FC<CrowdResponseSimulatorProps> = ({
             initial={{ opacity: 0, height: 0 }}
             animate={{ opacity: 1, height: 'auto' }}
             exit={{ opacity: 0, height: 0 }}
-            className="bg-gray-800 p-4 rounded-lg"
+            className="bg-gray-800 p-4 rounded-lg mt-6"
           >
             <h3 className="text-lg font-semibold mb-4">Advanced Analytics</h3>
 

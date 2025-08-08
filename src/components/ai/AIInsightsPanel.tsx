@@ -29,15 +29,40 @@ interface InsightCard {
   category: 'crowd' | 'personal' | 'prediction' | 'vision';
 }
 
+interface PersonalizedInsights {
+  recommendations: string[];
+  topGenres: string[];
+  energyProfile: string;
+  peakTimes: string[];
+}
+
+interface ComputerVisionFeatures {
+  motionDetection: {
+    motionVectors: Array<{ x: number; y: number }>;
+    crowdFlow: string;
+  };
+  densityMapping: {
+    hotspots: Array<{ x: number; y: number; density: number }>;
+    capacityUtilization: number;
+  };
+}
+
+interface CrowdVisionData {
+  demographics: {
+    ageGroups: Record<string, number>;
+    genderDistribution: Record<string, number>;
+  };
+}
+
 const AIInsightsPanel: React.FC<AIInsightsPanelProps> = ({
   userId,
   className = '',
 }) => {
   const [insights, setInsights] = useState<InsightCard[]>([]);
-  const [personalizedInsights, setPersonalizedInsights] = useState<unknown>(null);
-  const [crowdVisionData, setCrowdVisionData] = useState<unknown>(null);
+  const [personalizedInsights, setPersonalizedInsights] = useState<PersonalizedInsights | null>(null);
+  const [crowdVisionData, setCrowdVisionData] = useState<CrowdVisionData | null>(null);
   const [computerVisionFeatures, setComputerVisionFeatures] =
-    useState<unknown>(null);
+    useState<ComputerVisionFeatures | null>(null);
   const [isAnalyzing, setIsAnalyzing] = useState(false);
   const [showAdvancedAnalytics, setShowAdvancedAnalytics] = useState(false);
 
@@ -442,7 +467,7 @@ const AIInsightsPanel: React.FC<AIInsightsPanelProps> = ({
                             className="flex justify-between text-xs"
                           >
                             <span>{age}</span>
-                            <span>{Math.round(percentage * 100)}%</span>
+                            <span>{Math.round((percentage as number) * 100)}%</span>
                           </div>
                         ))}
                       </div>
@@ -461,7 +486,7 @@ const AIInsightsPanel: React.FC<AIInsightsPanelProps> = ({
                             className="flex justify-between text-xs"
                           >
                             <span className="capitalize">{gender}</span>
-                            <span>{Math.round(percentage * 100)}%</span>
+                            <span>{Math.round((percentage as number) * 100)}%</span>
                           </div>
                         ))}
                       </div>

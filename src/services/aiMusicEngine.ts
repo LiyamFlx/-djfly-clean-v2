@@ -31,10 +31,15 @@ interface MoodAnalysis {
   description: string;
 }
 
+interface CacheItem {
+  data: AIRecommendation | MoodAnalysis;
+  timestamp: number;
+}
+
 class AIMusicEngine {
   private apiKey: string;
   private baseUrl: string;
-  private cache = new Map<string, unknown>();
+  private cache = new Map<string, CacheItem>();
   private cacheExpiry = 10 * 60 * 1000; // 10 minutes
 
   constructor() {
@@ -56,7 +61,7 @@ class AIMusicEngine {
   ): Promise<AIRecommendation> {
     const cacheKey = this.generateCacheKey('playlist', request);
     const cached = this.getFromCache(cacheKey);
-    if (cached) return cached;
+    if (cached && 'tracks' in cached) return cached as AIRecommendation;
 
     try {
       if (!this.apiKey) {
@@ -141,7 +146,7 @@ class AIMusicEngine {
   async analyzeMood(input: string): Promise<MoodAnalysis> {
     const cacheKey = this.generateCacheKey('mood', { input });
     const cached = this.getFromCache(cacheKey);
-    if (cached) return cached;
+    if (cached && 'energy' in cached && 'valence' in cached) return cached as MoodAnalysis;
 
     try {
       if (!this.apiKey) {
@@ -337,12 +342,12 @@ Create playlists that:
     return prompt;
   }
 
-  private mapAIResultToTracks(aiResult: unknown): AIRecommendation {
+  private mapAIResultToTracks(aiResult: any): AIRecommendation {
     const tracks: Track[] = [];
     const trackPool = [...musicLibrary.getAllTracks()];
 
     // Map AI suggestions to closest matches in our library
-    for (const suggestion of aiResult.tracks || []) {
+    for (const suggestion of (aiResult as any).tracks || []) {
       const match = this.findBestTrackMatch(suggestion, trackPool);
       if (match) {
         tracks.push(match);
@@ -366,15 +371,15 @@ Create playlists that:
       energy: 75,
       mood: 'energetic',
       reasoning:
-        aiResult.reasoning || 'Curated playlist based on your preferences',
-      energyCurve: aiResult.energyCurve || tracks.map((_, i) => 40 + i * 8), // Default ascending curve
-      mixingTips: aiResult.mixingTips || this.generateDefaultMixingTips(tracks),
+        (aiResult as any).reasoning || 'Curated playlist based on your preferences',
+      energyCurve: (aiResult as any).energyCurve || tracks.map((_, i) => 40 + i * 8), // Default ascending curve
+      mixingTips: (aiResult as any).mixingTips || this.generateDefaultMixingTips(tracks),
       nextTrackSuggestions: trackPool.slice(0, 5),
     };
   }
 
   private findBestTrackMatch(
-    suggestion: unknown,
+    suggestion: any,
     trackPool: Track[]
   ): Track | null {
     // Score tracks based on similarity to AI suggestion
@@ -386,12 +391,12 @@ Create playlists that:
         track.genre &&
         track.genre
           .toLowerCase()
-          .includes(suggestion.genre?.toLowerCase() || '')
+          .includes((suggestion as any).genre?.toLowerCase() || '')
       )
         score += 30;
 
       // BPM proximity
-      const bpmDiff = Math.abs((track.bpm || 120) - (suggestion.bpm || 120));
+      const bpmDiff = Math.abs((track.bpm || 120) - ((suggestion as any).bpm || 120));
       score += Math.max(0, 20 - bpmDiff);
 
       // Energy match
@@ -400,11 +405,11 @@ Create playlists that:
       const trackEnergy =
         trackEnergyValue > 0.7 ? 3 : trackEnergyValue < 0.4 ? 1 : 2;
       const suggestionEnergy =
-        energyMap[suggestion.energy as keyof typeof energyMap] || 2;
+        energyMap[(suggestion as any).energy as keyof typeof energyMap] || 2;
       if (trackEnergy === suggestionEnergy) score += 25;
 
       // Key compatibility (simplified)
-      if (track.key === suggestion.key) score += 15;
+      if (track.key === (suggestion as any).key) score += 15;
 
       return { track, score };
     });
@@ -576,16 +581,16 @@ Create playlists that:
     return `${type}_${JSON.stringify(data)}`;
   }
 
-  private getFromCache(key: string): unknown {
+  private getFromCache(key: string): AIRecommendation | MoodAnalysis | null {
     const item = this.cache.get(key);
-    if (item && Date.now() - item.timestamp < this.cacheExpiry) {
-      return item.data;
+    if (item && Date.now() - (item as any).timestamp < this.cacheExpiry) {
+      return (item as any).data;
     }
     this.cache.delete(key);
     return null;
   }
 
-  private setCache(key: string, data: unknown): void {
+  private setCache(key: string, data: AIRecommendation | MoodAnalysis): void {
     this.cache.set(key, { data, timestamp: Date.now() });
   }
 }
