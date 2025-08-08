@@ -8,7 +8,7 @@ import {
 } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { PlaylistGenerator } from '@/services/musicLibrary';
-import type { Track } from '@/types/api';
+import type { Track, AIRecommendation } from '@/types/shared';
 import ApiStatusIndicator from '@/components/ApiStatusIndicator';
 
 // Lazy load heavy components for better performance
@@ -416,12 +416,8 @@ const StudioPage = () => (
 
 interface AIAnalysis {
   crowdEnergy: number;
-  timeOfDay: string;
-  recommendation: {
-    tracks: Track[];
-    energy: number;
-    mood: string;
-  };
+  timeOfDay: 'morning' | 'afternoon' | 'evening' | 'late-night';
+  recommendation: AIRecommendation;
 }
 
 const MagicMatchPage = () => {
@@ -462,7 +458,7 @@ const MagicMatchPage = () => {
                     ? 'progressive'
                     : 'mixed',
               crowdEnergy,
-              timeOfDay: timeOfDay as string,
+              timeOfDay: timeOfDay as 'morning' | 'afternoon' | 'evening' | 'late-night',
               venue: 'club',
               duration: 45,
             });
@@ -894,39 +890,12 @@ const MagicSetPage = () => {
   );
 };
 
+// Import the new mobile navigation component
+import MobileNav from '@/components/Layout/MobileNav';
+
 const Navigation = () => {
-  return (
-    <nav className="fixed bottom-0 left-0 right-0 bg-gray-900 border-t border-gray-800 z-10">
-      <div className="max-w-lg mx-auto px-4">
-        <div className="flex justify-around">
-          <Link
-            to="/"
-            className="flex-1 py-4 text-center hover:bg-gray-800 transition-colors"
-          >
-            🏠 Home
-          </Link>
-          <Link
-            to="/studio"
-            className="flex-1 py-4 text-center hover:bg-gray-800 transition-colors"
-          >
-            🎛️ Studio
-          </Link>
-          <Link
-            to="/player"
-            className="flex-1 py-4 text-center hover:bg-gray-800 transition-colors"
-          >
-            🎧 Player
-          </Link>
-          <Link
-            to="/profile"
-            className="flex-1 py-4 text-center hover:bg-gray-800 transition-colors"
-          >
-            👤 Profile
-          </Link>
-        </div>
-      </div>
-    </nav>
-  );
+  // Use the enhanced mobile navigation
+  return <MobileNav />;
 };
 
 const ProfilePage = () => {

@@ -5,7 +5,7 @@
 
 // Add fetch API types
 declare global {
-  interface RequestInit {
+  interface SafeRequestInit {
     method?: string;
     headers?: Record<string, string> | string[][];
     body?: string | FormData | URLSearchParams | ReadableStream | null;

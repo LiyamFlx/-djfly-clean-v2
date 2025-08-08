@@ -1,3 +1,6 @@
+// Voice command service for hands-free DJ control
+// Only available in browser environments
+
 interface VoiceCommand {
   id: string;
   phrase: string;
@@ -16,14 +19,16 @@ interface VoiceRecognitionResult {
 
 class VoiceCommandService {
   private isListening = false;
-  private recognition: SpeechRecognition | null = null;
+  private recognition: any = null;
   private commands: VoiceCommand[] = [];
   private onCommandCallback: ((command: VoiceCommand) => void) | null = null;
   private isInitialized = false;
 
   constructor() {
-    this.initializeVoiceRecognition();
-    this.setupCommands();
+    if (typeof window !== "undefined") {
+      this.initializeVoiceRecognition();
+      this.setupCommands();
+    }
   }
 
   private initializeVoiceRecognition() {
@@ -34,7 +39,7 @@ class VoiceCommandService {
         'SpeechRecognition' in window
       ) {
         const SpeechRecognition =
-          window.SpeechRecognition || (window as any).webkitSpeechRecognition;
+          (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
         this.recognition = new SpeechRecognition();
 
         this.recognition.continuous = true;
@@ -60,9 +65,9 @@ class VoiceCommandService {
       this.isListening = true;
     };
 
-    this.recognition.onresult = (event) => {
+    this.recognition.onresult = (event: any) => {
       const transcript = Array.from(event.results)
-        .map((result) => result[0].transcript)
+        .map((result: any) => result[0].transcript)
         .join(' ')
         .toLowerCase();
 
@@ -71,7 +76,7 @@ class VoiceCommandService {
       }
     };
 
-    this.recognition.onerror = (event) => {
+    this.recognition.onerror = (event: any) => {
       console.error('Voice recognition error:', event.error);
       this.isListening = false;
     };
@@ -102,154 +107,28 @@ class VoiceCommandService {
         category: 'playback',
       },
       {
-        id: 'pause-deck-a',
-        phrase: 'pause deck a',
-        action: 'pauseDeck',
-        parameters: { deck: 'A' },
-        confidence: 0.9,
-        category: 'playback',
-      },
-      {
-        id: 'pause-deck-b',
-        phrase: 'pause deck b',
-        action: 'pauseDeck',
-        parameters: { deck: 'B' },
-        confidence: 0.9,
-        category: 'playback',
-      },
-      {
-        id: 'stop-all',
-        phrase: 'stop all',
-        action: 'stopAll',
+        id: 'pause',
+        phrase: 'pause',
+        action: 'pause',
         parameters: {},
-        confidence: 0.9,
+        confidence: 0.95,
         category: 'playback',
       },
-
-      // Mixing Commands
       {
-        id: 'crossfade-left',
-        phrase: 'crossfade left',
-        action: 'setCrossfader',
-        parameters: { position: 0.2 },
-        confidence: 0.8,
-        category: 'mixing',
+        id: 'stop',
+        phrase: 'stop',
+        action: 'stop',
+        parameters: {},
+        confidence: 0.95,
+        category: 'playback',
       },
-      {
-        id: 'crossfade-center',
-        phrase: 'crossfade center',
-        action: 'setCrossfader',
-        parameters: { position: 0.5 },
-        confidence: 0.8,
-        category: 'mixing',
-      },
-      {
-        id: 'crossfade-right',
-        phrase: 'crossfade right',
-        action: 'setCrossfader',
-        parameters: { position: 0.8 },
-        confidence: 0.8,
-        category: 'mixing',
-      },
-      {
-        id: 'volume-up',
-        phrase: 'volume up',
-        action: 'adjustVolume',
-        parameters: { direction: 'up', amount: 0.1 },
-        confidence: 0.8,
-        category: 'mixing',
-      },
-      {
-        id: 'volume-down',
-        phrase: 'volume down',
-        action: 'adjustVolume',
-        parameters: { direction: 'down', amount: 0.1 },
-        confidence: 0.8,
-        category: 'mixing',
-      },
-      {
-        id: 'master-volume',
-        phrase: 'master volume',
-        action: 'setMasterVolume',
-        parameters: { volume: 0.8 },
-        confidence: 0.7,
-        category: 'mixing',
-      },
-
-      // Effects Commands
-      {
-        id: 'add-reverb',
-        phrase: 'add reverb',
-        action: 'setEffect',
-        parameters: { effect: 'reverb', value: 0.5 },
-        confidence: 0.8,
-        category: 'effects',
-      },
-      {
-        id: 'remove-reverb',
-        phrase: 'remove reverb',
-        action: 'setEffect',
-        parameters: { effect: 'reverb', value: 0 },
-        confidence: 0.8,
-        category: 'effects',
-      },
-      {
-        id: 'add-delay',
-        phrase: 'add delay',
-        action: 'setEffect',
-        parameters: { effect: 'delay', value: 0.3 },
-        confidence: 0.8,
-        category: 'effects',
-      },
-      {
-        id: 'remove-delay',
-        phrase: 'remove delay',
-        action: 'setEffect',
-        parameters: { effect: 'delay', value: 0 },
-        confidence: 0.8,
-        category: 'effects',
-      },
-      {
-        id: 'eq-low-up',
-        phrase: 'boost bass',
-        action: 'setEQ',
-        parameters: { band: 'low', value: 6 },
-        confidence: 0.8,
-        category: 'effects',
-      },
-      {
-        id: 'eq-low-down',
-        phrase: 'cut bass',
-        action: 'setEQ',
-        parameters: { band: 'low', value: -6 },
-        confidence: 0.8,
-        category: 'effects',
-      },
-      {
-        id: 'eq-high-up',
-        phrase: 'boost treble',
-        action: 'setEQ',
-        parameters: { band: 'high', value: 6 },
-        confidence: 0.8,
-        category: 'effects',
-      },
-      {
-        id: 'eq-high-down',
-        phrase: 'cut treble',
-        action: 'setEQ',
-        parameters: { band: 'high', value: -6 },
-        confidence: 0.8,
-        category: 'effects',
-      },
-
-      // Navigation Commands
       {
         id: 'next-track',
         phrase: 'next track',
         action: 'nextTrack',
         parameters: {},
         confidence: 0.9,
-        category: 'navigation',
+        category: 'playback',
       },
       {
         id: 'previous-track',
@@ -257,132 +136,152 @@ class VoiceCommandService {
         action: 'previousTrack',
         parameters: {},
         confidence: 0.9,
+        category: 'playback',
+      },
+
+      // Mixing Commands
+      {
+        id: 'crossfade',
+        phrase: 'crossfade',
+        action: 'crossfade',
+        parameters: {},
+        confidence: 0.85,
+        category: 'mixing',
+      },
+      {
+        id: 'beat-match',
+        phrase: 'beat match',
+        action: 'beatMatch',
+        parameters: {},
+        confidence: 0.8,
+        category: 'mixing',
+      },
+      {
+        id: 'sync-bpm',
+        phrase: 'sync bpm',
+        action: 'syncBPM',
+        parameters: {},
+        confidence: 0.8,
+        category: 'mixing',
+      },
+
+      // Effects Commands
+      {
+        id: 'add-reverb',
+        phrase: 'add reverb',
+        action: 'addEffect',
+        parameters: { effect: 'reverb' },
+        confidence: 0.85,
+        category: 'effects',
+      },
+      {
+        id: 'add-delay',
+        phrase: 'add delay',
+        action: 'addEffect',
+        parameters: { effect: 'delay' },
+        confidence: 0.85,
+        category: 'effects',
+      },
+      {
+        id: 'add-filter',
+        phrase: 'add filter',
+        action: 'addEffect',
+        parameters: { effect: 'filter' },
+        confidence: 0.85,
+        category: 'effects',
+      },
+      {
+        id: 'remove-effects',
+        phrase: 'remove effects',
+        action: 'removeEffects',
+        parameters: {},
+        confidence: 0.9,
+        category: 'effects',
+      },
+
+      // Navigation Commands
+      {
+        id: 'go-to-studio',
+        phrase: 'go to studio',
+        action: 'navigate',
+        parameters: { page: 'studio' },
+        confidence: 0.9,
         category: 'navigation',
       },
       {
-        id: 'jump-to-cue',
-        phrase: 'jump to cue',
-        action: 'jumpToCue',
-        parameters: { cueNumber: 1 },
-        confidence: 0.7,
+        id: 'go-to-player',
+        phrase: 'go to player',
+        action: 'navigate',
+        parameters: { page: 'player' },
+        confidence: 0.9,
         category: 'navigation',
       },
       {
-        id: 'set-cue',
-        phrase: 'set cue',
-        action: 'setCue',
-        parameters: { cueNumber: 1 },
-        confidence: 0.7,
+        id: 'go-to-analytics',
+        phrase: 'go to analytics',
+        action: 'navigate',
+        parameters: { page: 'analytics' },
+        confidence: 0.9,
         category: 'navigation',
       },
 
       // Analytics Commands
       {
-        id: 'show-analytics',
-        phrase: 'show analytics',
+        id: 'show-energy',
+        phrase: 'show energy',
         action: 'showAnalytics',
-        parameters: {},
-        confidence: 0.9,
+        parameters: { metric: 'energy' },
+        confidence: 0.85,
         category: 'analytics',
       },
       {
-        id: 'hide-analytics',
-        phrase: 'hide analytics',
-        action: 'hideAnalytics',
-        parameters: {},
-        confidence: 0.9,
+        id: 'show-crowd',
+        phrase: 'show crowd',
+        action: 'showAnalytics',
+        parameters: { metric: 'crowd' },
+        confidence: 0.85,
         category: 'analytics',
       },
       {
-        id: 'crowd-energy',
-        phrase: 'crowd energy',
-        action: 'getCrowdEnergy',
-        parameters: {},
-        confidence: 0.8,
+        id: 'show-performance',
+        phrase: 'show performance',
+        action: 'showAnalytics',
+        parameters: { metric: 'performance' },
+        confidence: 0.85,
         category: 'analytics',
-      },
-      {
-        id: 'transition-quality',
-        phrase: 'transition quality',
-        action: 'getTransitionQuality',
-        parameters: {},
-        confidence: 0.8,
-        category: 'analytics',
-      },
-
-      // Advanced Commands
-      {
-        id: 'auto-mix',
-        phrase: 'auto mix',
-        action: 'enableAutoMix',
-        parameters: { enabled: true },
-        confidence: 0.8,
-        category: 'mixing',
-      },
-      {
-        id: 'stop-auto-mix',
-        phrase: 'stop auto mix',
-        action: 'enableAutoMix',
-        parameters: { enabled: false },
-        confidence: 0.8,
-        category: 'mixing',
-      },
-      {
-        id: 'energy-build',
-        phrase: 'energy build',
-        action: 'energyBuild',
-        parameters: { duration: 30 },
-        confidence: 0.7,
-        category: 'mixing',
-      },
-      {
-        id: 'drop-track',
-        phrase: 'drop track',
-        action: 'dropTrack',
-        parameters: { deck: 'A' },
-        confidence: 0.8,
-        category: 'playback',
       },
     ];
   }
 
   private processTranscript(transcript: string): VoiceRecognitionResult {
     const matchedCommands: VoiceCommand[] = [];
+    let highestConfidence = 0;
 
-    // Find matching commands
     for (const command of this.commands) {
-      if (transcript.includes(command.phrase)) {
-        const matchConfidence = this.calculateMatchConfidence(
-          transcript,
-          command.phrase
-        );
-        if (matchConfidence > 0.6) {
-          matchedCommands.push({
-            ...command,
-            confidence: matchConfidence,
-          });
-        }
+      const confidence = this.calculateMatchConfidence(transcript, command.phrase);
+      if (confidence > 0.7) {
+        matchedCommands.push({
+          ...command,
+          confidence: Math.max(command.confidence, confidence),
+        });
+        highestConfidence = Math.max(highestConfidence, confidence);
       }
     }
 
-    // Sort by confidence
-    matchedCommands.sort((a, b) => b.confidence - a.confidence);
-
     const result: VoiceRecognitionResult = {
       transcript,
-      confidence:
-        matchedCommands.length > 0 ? matchedCommands[0].confidence : 0,
-      commands: matchedCommands,
+      confidence: highestConfidence,
+      commands: matchedCommands.sort((a, b) => b.confidence - a.confidence),
       timestamp: new Date(),
     };
 
-    // Execute the best match
+    // Execute the best matching command
     if (matchedCommands.length > 0) {
-      const bestMatch = matchedCommands[0];
-      console.log(`🎤 Voice command: "${transcript}" -> ${bestMatch.action}`);
-
+      const bestCommand = matchedCommands[0];
+      console.log(`🎤 Voice command executed: ${bestCommand.phrase}`);
+      
       if (this.onCommandCallback) {
-        this.onCommandCallback(bestMatch);
+        this.onCommandCallback(bestCommand);
       }
     }
 
@@ -390,96 +289,67 @@ class VoiceCommandService {
   }
 
   private calculateMatchConfidence(transcript: string, phrase: string): number {
-    const words = transcript.split(' ');
-    const phraseWords = phrase.split(' ');
-
+    const transcriptWords = transcript.toLowerCase().split(' ');
+    const phraseWords = phrase.toLowerCase().split(' ');
+    
     let matches = 0;
     for (const word of phraseWords) {
-      if (words.some((w) => w.includes(word) || word.includes(w))) {
+      if (transcriptWords.includes(word)) {
         matches++;
       }
     }
-
+    
     return matches / phraseWords.length;
   }
 
-  /**
-   * Start listening for voice commands
-   */
   startListening(): void {
-    if (!this.recognition || !this.isInitialized) {
-      console.warn('Voice recognition not available');
-      return;
-    }
-
-    try {
-      this.recognition.start();
-    } catch (error) {
-      console.error('Failed to start voice recognition:', error);
+    if (this.recognition && !this.isListening) {
+      try {
+        this.recognition.start();
+      } catch (error) {
+        console.error('Failed to start voice recognition:', error);
+      }
     }
   }
 
-  /**
-   * Stop listening for voice commands
-   */
   stopListening(): void {
-    if (this.recognition) {
-      this.recognition.stop();
+    if (this.recognition && this.isListening) {
+      try {
+        this.recognition.stop();
+      } catch (error) {
+        console.error('Failed to stop voice recognition:', error);
+      }
     }
   }
 
-  /**
-   * Set callback for when commands are recognized
-   */
   onCommand(callback: (command: VoiceCommand) => void): void {
     this.onCommandCallback = callback;
   }
 
-  /**
-   * Get available commands
-   */
   getCommands(): VoiceCommand[] {
-    return this.commands;
+    return [...this.commands];
   }
 
-  /**
-   * Get commands by category
-   */
   getCommandsByCategory(category: string): VoiceCommand[] {
-    return this.commands.filter((cmd) => cmd.category === category);
+    return this.commands.filter(cmd => cmd.category === category);
   }
 
-  /**
-   * Add custom command
-   */
   addCommand(command: VoiceCommand): void {
     this.commands.push(command);
   }
 
-  /**
-   * Remove command by ID
-   */
   removeCommand(commandId: string): void {
-    this.commands = this.commands.filter((cmd) => cmd.id !== commandId);
+    this.commands = this.commands.filter(cmd => cmd.id !== commandId);
   }
 
-  /**
-   * Get listening status
-   */
   isListeningForCommands(): boolean {
     return this.isListening;
   }
 
-  /**
-   * Get initialization status
-   */
   isServiceInitialized(): boolean {
     return this.isInitialized;
   }
 
-  /**
-   * Get voice recognition status
-   */
   getStatus(): {
     isInitialized: boolean;
     isListening: boolean;
@@ -490,14 +360,10 @@ class VoiceCommandService {
       isInitialized: this.isInitialized,
       isListening: this.isListening,
       commandsCount: this.commands.length,
-      supported:
-        'webkitSpeechRecognition' in window || 'SpeechRecognition' in window,
+      supported: typeof window !== "undefined" && ('webkitSpeechRecognition' in window || 'SpeechRecognition' in window),
     };
   }
 
-  /**
-   * Clean up resources
-   */
   dispose(): void {
     if (this.recognition) {
       this.recognition.stop();
@@ -505,9 +371,8 @@ class VoiceCommandService {
     }
     this.isListening = false;
     this.isInitialized = false;
-    this.onCommandCallback = null;
   }
 }
 
+// Export singleton instance
 export const voiceCommandService = new VoiceCommandService();
-export default voiceCommandService;

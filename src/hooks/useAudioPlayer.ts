@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState, useCallback } from 'react';
-import { magicPlayer, AudioSource } from '@/services/MagicPlayer';
+import { MagicPlayer } from '@/services/MagicPlayer';
 import type { AudioError } from '@/types/audio';
 
 export interface UseAudioPlayerOptions {
@@ -73,19 +73,19 @@ export function useAudioPlayer(
     };
 
     // Add event listeners
-    magicPlayer.on('play', handlePlay);
-    magicPlayer.on('pause', handlePause);
-    magicPlayer.on('loaded', handleLoaded);
-    magicPlayer.on('error', handleError);
-    magicPlayer.on('ended', handleEnded);
+    MagicPlayer.on('play', handlePlay);
+    MagicPlayer.on('pause', handlePause);
+    MagicPlayer.on('loaded', handleLoaded);
+    MagicPlayer.on('error', handleError);
+    MagicPlayer.on('ended', handleEnded);
 
     return () => {
       // Remove event listeners
-      magicPlayer.off('play', handlePlay);
-      magicPlayer.off('pause', handlePause);
-      magicPlayer.off('loaded', handleLoaded);
-      magicPlayer.off('error', handleError);
-      magicPlayer.off('ended', handleEnded);
+      MagicPlayer.off('play', handlePlay);
+      MagicPlayer.off('pause', handlePause);
+      MagicPlayer.off('loaded', handleLoaded);
+      MagicPlayer.off('error', handleError);
+      MagicPlayer.off('ended', handleEnded);
     };
   }, []);
 
@@ -100,7 +100,7 @@ export function useAudioPlayer(
         setError(null);
         currentSourceRef.current = audioSource;
 
-        magicPlayer
+        MagicPlayer
           .load(audioSource, {
             volume: options.volume,
             loop: options.loop,
@@ -121,7 +121,7 @@ export function useAudioPlayer(
   useEffect(() => {
     if (isPlaying) {
       progressIntervalRef.current = window.setInterval(() => {
-        const analytics = magicPlayer.getAnalytics();
+        const analytics = MagicPlayer.getAnalytics();
         setCurrentTime(analytics.currentTime);
         setBufferProgress(analytics.bufferProgress);
       }, 100); // Update every 100ms for smooth progress
@@ -142,10 +142,10 @@ export function useAudioPlayer(
   const play = useCallback(async () => {
     try {
       setError(null);
-      await magicPlayer.play();
+      await MagicPlayer.play();
 
       // Auto-play may require user interaction
-      if (!magicPlayer.isPlaying()) {
+      if (!MagicPlayer.isPlaying()) {
         console.log(
           '⏳ Waiting for user interaction to enable audio playback...'
         );
@@ -159,33 +159,33 @@ export function useAudioPlayer(
   }, []);
 
   const pause = useCallback(() => {
-    magicPlayer.pause();
+    MagicPlayer.pause();
   }, []);
 
   const stop = useCallback(() => {
-    magicPlayer.stop();
+    MagicPlayer.stop();
     setCurrentTime(0);
   }, []);
 
   const seek = useCallback((time: number) => {
-    magicPlayer.seek(time);
+    MagicPlayer.seek(time);
     setCurrentTime(time);
   }, []);
 
   const setVolume = useCallback((newVolume: number) => {
     const clampedVolume = Math.max(0, Math.min(1, newVolume));
-    magicPlayer.setVolume(clampedVolume);
+    MagicPlayer.setVolume(clampedVolume);
     setVolumeState(clampedVolume);
   }, []);
 
   // Get frequency data for visualizations
   const getFrequencyData = useCallback(() => {
-    return magicPlayer.getFrequencyData();
+    return MagicPlayer.getFrequencyData();
   }, []);
 
   // Get time domain data for waveform
   const getTimeDomainData = useCallback(() => {
-    return magicPlayer.getTimeDomainData();
+    return MagicPlayer.getTimeDomainData();
   }, []);
 
   // Cleanup on unmount

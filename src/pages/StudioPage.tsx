@@ -1,233 +1,226 @@
 import React, { useState } from 'react';
-import { Outlet, Link, useLocation, Navigate } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { Sparkles, Mic, Settings, HelpCircle } from 'lucide-react';
+import {
+  Sparkles,
+  Target,
+  Music,
+  Zap,
+  Brain,
+  Users,
+  TrendingUp,
+  Clock,
+  Star,
+} from 'lucide-react';
 import { ROUTES } from '@/constants/routes';
 
 const StudioPage: React.FC = () => {
-  const location = useLocation();
-  const [showHelp, setShowHelp] = useState(false);
+  const [selectedFeature, setSelectedFeature] = useState<string | null>(null);
 
-  const isSetActive = location.pathname.includes('/set');
-  const isMatchActive = location.pathname.includes('/match');
-
-  // If we're on the main studio route, redirect to match (most popular)
-  if (location.pathname === ROUTES.STUDIO) {
-    return <Navigate to={ROUTES.STUDIO_MATCH} replace />;
-  }
+  const features = [
+    {
+      id: 'magic-match',
+      title: 'Magic Match',
+      subtitle: 'AI Crowd Analysis',
+      icon: Target,
+      color: 'from-blue-500 to-cyan-500',
+      description: 'Record crowd noise to get AI-powered track recommendations',
+      benefits: [
+        'Real-time crowd energy analysis',
+        'Instant playlist generation',
+        'Perfect for live events',
+        'No manual track selection needed',
+      ],
+      timeEstimate: '30 seconds',
+      difficulty: 'Beginner',
+      bestFor: 'Live DJing & Events',
+      route: '/studio/match',
+    },
+    {
+      id: 'magic-set',
+      title: 'Magic Set',
+      subtitle: 'Custom Playlist Creator',
+      icon: Music,
+      color: 'from-purple-500 to-pink-500',
+      description: 'Create custom playlists with AI assistance',
+      benefits: [
+        'Custom mood and venue selection',
+        'Advanced track filtering',
+        'BPM and key matching',
+        'Professional set planning',
+      ],
+      timeEstimate: '2-3 minutes',
+      difficulty: 'Intermediate',
+      bestFor: 'Set Planning & Preparation',
+      route: '/studio/set',
+    },
+  ];
 
   return (
-    <div className="min-h-screen bg-club-gradient">
-      {/* Header */}
-      <div className="sticky top-16 z-40 glass-card border-b border-white/10">
-        <div className="max-w-6xl mx-auto px-6 py-8">
-          <div className="text-center space-y-6">
-            {/* Title */}
-            <motion.h1
-              className="text-4xl md:text-5xl font-bold gradient-text"
-              initial={{ opacity: 0, y: -20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.6 }}
-            >
+    <div className="min-h-screen bg-club-gradient text-white p-8">
+      {/* Demo Banner */}
+      <div className="bg-yellow-600 text-black text-center py-2 mb-6 rounded-lg">
+        🚀 DJfly v1.2.0 Demo - Live Testing Environment
+      </div>
+
+      <div className="max-w-6xl mx-auto">
+        {/* Header */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="text-center mb-12"
+        >
+          <h1 className="text-4xl font-bold mb-4">
+            <span className="bg-gradient-to-r from-electric-blue to-bright-turquoise bg-clip-text text-transparent">
               Magic Studio
-            </motion.h1>
+            </span>
+          </h1>
+          <p className="text-xl text-gray-300 max-w-2xl mx-auto">
+            Choose your AI-powered music creation method. Both tools use advanced 
+            machine learning to deliver perfect mixes for any situation.
+          </p>
+        </motion.div>
 
-            {/* Subtitle */}
-            <motion.p
-              className="text-gray-300 text-lg max-w-2xl mx-auto"
-              initial={{ opacity: 0, y: -20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.6, delay: 0.1 }}
-            >
-              Feel the crowd, react in real time, and flow between creation and
-              performance—with AI speed and human style
-            </motion.p>
+        {/* Feature Comparison */}
+        <div className="grid lg:grid-cols-2 gap-8 mb-12">
+          {features.map((feature, index) => {
+            const Icon = feature.icon;
+            const isSelected = selectedFeature === feature.id;
 
-            {/* Tab Navigation */}
-            <motion.div
-              className="flex flex-col items-center space-y-3"
-              initial={{ opacity: 0, y: -20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.6, delay: 0.2 }}
-            >
-              <div className="text-center mb-4">
-                <p className="text-lg text-white font-semibold mb-2">
-                  What&apos;s your situation right now?
-                </p>
-                <p className="text-sm text-gray-400">
-                  Choose the approach that fits your current needs
-                </p>
-              </div>
+            return (
+              <motion.div
+                key={feature.id}
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: index * 0.2 }}
+                className={`relative group cursor-pointer ${
+                  isSelected ? 'ring-2 ring-electric-blue' : ''
+                }`}
+                onClick={() => setSelectedFeature(feature.id)}
+              >
+                <div className="bg-gray-800/50 backdrop-blur-sm border border-gray-700 rounded-2xl p-8 h-full transition-all duration-300 hover:bg-gray-800/70 hover:border-gray-600">
+                  {/* Header */}
+                  <div className="flex items-start justify-between mb-6">
+                    <div className="flex items-center space-x-4">
+                      <div className={`w-16 h-16 rounded-xl bg-gradient-to-r ${feature.color} flex items-center justify-center`}>
+                        <Icon className="w-8 h-8 text-white" />
+                      </div>
+                      <div>
+                        <h3 className="text-2xl font-bold">{feature.title}</h3>
+                        <p className="text-gray-400">{feature.subtitle}</p>
+                      </div>
+                    </div>
+                    <div className="flex items-center space-x-2">
+                      <Clock className="w-4 h-4 text-gray-400" />
+                      <span className="text-sm text-gray-400">{feature.timeEstimate}</span>
+                    </div>
+                  </div>
 
-              <div className="glass-card rounded-2xl p-2 border border-white/20 relative">
-                {/* Active tab background */}
-                <motion.div
-                  className={`absolute top-2 h-16 rounded-xl ${
-                    isMatchActive
-                      ? 'bg-gradient-to-r from-electric-blue to-bright-turquoise shadow-lg shadow-electric-blue/25'
-                      : 'bg-gradient-to-r from-laser-pink to-electric-blue shadow-lg shadow-laser-pink/25'
-                  }`}
-                  initial={false}
-                  animate={{
-                    x: isMatchActive ? 0 : '100%',
-                    width: '50%',
-                  }}
-                  transition={{
-                    type: 'spring',
-                    stiffness: 300,
-                    damping: 30,
-                  }}
-                />
+                  {/* Description */}
+                  <p className="text-gray-300 mb-6 leading-relaxed">
+                    {feature.description}
+                  </p>
 
-                <div className="flex space-x-2 relative z-10">
-                  <Link
-                    to={ROUTES.STUDIO_MATCH}
-                    className={`relative px-8 py-4 rounded-xl font-semibold text-sm transition-all duration-300 flex items-center gap-3 ${
-                      isMatchActive
-                        ? 'text-rich-black'
-                        : 'text-gray-400 hover:text-white'
-                    }`}
-                  >
-                    <Mic className="w-5 h-5" />
-                    <div className="flex flex-col items-start">
-                      <span className="text-base">🎯 Read the Room</span>
-                      <span className="text-xs opacity-75 font-normal">
-                        I need to adapt to the crowd
+                  {/* Benefits */}
+                  <div className="space-y-3 mb-6">
+                    {feature.benefits.map((benefit, i) => (
+                      <motion.div
+                        key={i}
+                        initial={{ opacity: 0, x: -10 }}
+                        animate={{ opacity: 1, x: 0 }}
+                        transition={{ delay: index * 0.2 + i * 0.1 }}
+                        className="flex items-center space-x-3"
+                      >
+                        <div className="w-2 h-2 bg-electric-blue rounded-full"></div>
+                        <span className="text-sm text-gray-300">{benefit}</span>
+                      </motion.div>
+                    ))}
+                  </div>
+
+                  {/* Metadata */}
+                  <div className="flex items-center justify-between text-sm text-gray-400 mb-6">
+                    <div className="flex items-center space-x-4">
+                      <span className="flex items-center space-x-1">
+                        <Star className="w-4 h-4" />
+                        <span>{feature.difficulty}</span>
+                      </span>
+                      <span className="flex items-center space-x-1">
+                        <Users className="w-4 h-4" />
+                        <span>{feature.bestFor}</span>
                       </span>
                     </div>
-                  </Link>
+                  </div>
 
+                  {/* CTA Button */}
                   <Link
-                    to={ROUTES.STUDIO_SET}
-                    className={`relative px-8 py-4 rounded-xl font-semibold text-sm transition-all duration-300 flex items-center gap-3 ${
-                      isSetActive
-                        ? 'text-rich-black'
-                        : 'text-gray-400 hover:text-white'
+                    to={feature.route}
+                    className={`block w-full py-4 px-6 rounded-xl text-center font-semibold transition-all duration-300 ${
+                      isSelected
+                        ? 'bg-gradient-to-r from-electric-blue to-bright-turquoise text-rich-black'
+                        : 'bg-gray-700 hover:bg-gray-600 text-white'
                     }`}
                   >
-                    <Sparkles className="w-5 h-5" />
-                    <div className="flex flex-col items-start">
-                      <span className="text-base">🎵 Plan My Set</span>
-                      <span className="text-xs opacity-75 font-normal">
-                        I know what I want to play
-                      </span>
-                    </div>
+                    {isSelected ? 'Selected - Click to Continue' : `Try ${feature.title}`}
                   </Link>
                 </div>
-              </div>
-            </motion.div>
 
-            {/* Context Descriptions */}
-            <motion.div
-              className="text-center max-w-md mx-auto"
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              transition={{ duration: 0.6, delay: 0.3 }}
-            >
-              {isMatchActive && (
-                <motion.div
-                  key="match-description"
-                  initial={{ opacity: 0, y: 10 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  className="text-gray-400 text-sm glass-card rounded-lg p-4"
-                >
-                  <div className="text-electric-blue font-semibold mb-2">
-                    ✨ Most Popular Choice
-                  </div>
-                  <strong className="text-gray-300">Perfect for:</strong> Live
-                  events, parties, reading crowd energy, adapting to the vibe.
-                  Just point your phone and get instant playlists.
-                </motion.div>
-              )}
-              {isSetActive && (
-                <motion.div
-                  key="set-description"
-                  initial={{ opacity: 0, y: 10 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  className="text-gray-400 text-sm glass-card rounded-lg p-4"
-                >
-                  <div className="text-laser-pink font-semibold mb-2">
-                    🎨 For Planned Performances
-                  </div>
-                  <strong className="text-gray-300">Perfect for:</strong>{' '}
-                  Curated experiences, specific themes, wedding playlists,
-                  podcast mixes. Full creative control.
-                </motion.div>
-              )}
-            </motion.div>
-
-            {/* Quick Actions */}
-            <motion.div
-              className="flex justify-center space-x-4"
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              transition={{ duration: 0.6, delay: 0.4 }}
-            >
-              <button className="p-2 text-gray-400 hover:text-white hover:bg-white/10 rounded-lg transition-all duration-200">
-                <Settings className="w-4 h-4" />
-              </button>
-              <button
-                onClick={() => setShowHelp(!showHelp)}
-                className="p-2 text-gray-400 hover:text-white hover:bg-white/10 rounded-lg transition-all duration-200"
-              >
-                <HelpCircle className="w-4 h-4" />
-              </button>
-            </motion.div>
-          </div>
+                {/* Selection Indicator */}
+                {isSelected && (
+                  <motion.div
+                    initial={{ scale: 0 }}
+                    animate={{ scale: 1 }}
+                    className="absolute -top-2 -right-2 w-8 h-8 bg-electric-blue rounded-full flex items-center justify-center"
+                  >
+                    <Sparkles className="w-4 h-4 text-rich-black" />
+                  </motion.div>
+                )}
+              </motion.div>
+            );
+          })}
         </div>
-      </div>
 
-      {/* Main Content Area */}
-      <div className="max-w-6xl mx-auto px-6 pb-12">
+        {/* Quick Actions */}
         <motion.div
-          key={location.pathname}
-          initial={{ opacity: 0, x: isMatchActive ? 20 : -20 }}
-          animate={{ opacity: 1, x: 0 }}
-          exit={{ opacity: 0, x: isMatchActive ? -20 : 20 }}
-          transition={{ duration: 0.4 }}
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.6 }}
+          className="bg-gray-800/30 backdrop-blur-sm border border-gray-700 rounded-xl p-6"
         >
-          <Outlet />
-        </motion.div>
-      </div>
-
-      {/* Help Modal */}
-      {showHelp && (
-        <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          className="fixed inset-0 bg-rich-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4"
-          onClick={() => setShowHelp(false)}
-        >
-          <motion.div
-            initial={{ scale: 0.9, opacity: 0 }}
-            animate={{ scale: 1, opacity: 1 }}
-            className="glass-card rounded-xl p-6 max-w-md w-full"
-            onClick={(e) => e.stopPropagation()}
-          >
-            <h3 className="text-xl font-bold mb-4 gradient-text">
-              Magic Studio Help
-            </h3>
-            <div className="space-y-4 text-sm text-gray-300">
-              <div>
-                <strong className="text-white">Magic Match:</strong> Point your
-                device at the crowd, let AI analyze the energy, and get instant
-                playlist recommendations.
-              </div>
-              <div>
-                <strong className="text-white">Magic Set:</strong> Create custom
-                playlists with AI assistance, manual curation, and fine-tuning
-                controls.
-              </div>
-            </div>
-            <button
-              onClick={() => setShowHelp(false)}
-              className="club-button w-full mt-6"
-            >
-              Got it!
+          <h3 className="text-lg font-semibold mb-4 flex items-center space-x-2">
+            <Zap className="w-5 h-5 text-electric-blue" />
+            <span>Quick Actions</span>
+          </h3>
+          <div className="grid sm:grid-cols-3 gap-4">
+            <button className="flex items-center justify-center space-x-2 py-3 px-4 bg-gradient-to-r from-green-500 to-emerald-600 rounded-lg hover:from-green-600 hover:to-emerald-700 transition-all">
+              <Brain className="w-4 h-4" />
+              <span>AI Quick Mix</span>
             </button>
-          </motion.div>
+            <button className="flex items-center justify-center space-x-2 py-3 px-4 bg-gradient-to-r from-purple-500 to-pink-600 rounded-lg hover:from-purple-600 hover:to-pink-700 transition-all">
+              <TrendingUp className="w-4 h-4" />
+              <span>Trending Now</span>
+            </button>
+            <button className="flex items-center justify-center space-x-2 py-3 px-4 bg-gradient-to-r from-orange-500 to-red-600 rounded-lg hover:from-orange-600 hover:to-red-700 transition-all">
+              <Music className="w-4 h-4" />
+              <span>My Library</span>
+            </button>
+          </div>
         </motion.div>
-      )}
+
+        {/* Help Section */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.8 }}
+          className="mt-8 text-center"
+        >
+          <p className="text-gray-400 text-sm">
+            Need help choosing? 
+            <button className="text-electric-blue hover:text-bright-turquoise ml-1 underline">
+              Watch our tutorial
+            </button>
+          </p>
+        </motion.div>
+      </div>
     </div>
   );
 };
