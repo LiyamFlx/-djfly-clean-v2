@@ -4,7 +4,7 @@
   "installCommand": "npm install --legacy-peer-deps",
   "rewrites": [
     {
-      "source": "/((?!assets/).*)",
+      "source": "/((?!api/|_next/|static/|assets/|favicon.ico|sw.js|manifest.json|.*\\..*).*)",
       "destination": "/index.html"
     }
   ],
