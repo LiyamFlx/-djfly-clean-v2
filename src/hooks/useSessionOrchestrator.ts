@@ -5,7 +5,6 @@ import {
   SessionStatus, 
   SessionTransition, 
   SessionContext, 
-  SessionEvent,
   SessionUpdate,
   EnergyPoint 
 } from '../types/session';
@@ -321,7 +320,7 @@ export function useSessionOrchestrator(): UseSessionOrchestratorReturn {
     transitionSession,
     
     // Session status
-    isSessionActive,
+    isSessionActive: isSessionActive(),
     canTransition,
     getCurrentStatus,
     

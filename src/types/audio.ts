@@ -128,6 +128,22 @@ export interface AdvancedTrackAnalysis {
   transitionQuality: { [trackId: string]: number };
 }
 
+// Legacy AudioFeatures interface for compatibility
+export interface AudioFeatures {
+  bpm: number;
+  key: string;
+  energy: number;
+  valence: number;
+  danceability: number;
+  loudness: number;
+  acousticness: number;
+  instrumentalness: number;
+  liveness: number;
+  speechiness: number;
+  tempo: number;
+  timeSignature: number;
+}
+
 // Enhanced Track interface with advanced analysis
 export interface Track {
   id: string;

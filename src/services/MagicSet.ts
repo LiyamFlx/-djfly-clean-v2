@@ -76,7 +76,7 @@ export class MagicSet {
   }
 
   private async generateInitialSet(context: SessionContext): Promise<{ tracks_order: string[], energy_curve: EnergyPoint[] }> {
-    const { bpmTarget, genres, crowdSize } = context;
+    const { bpmTarget, genres } = context;
     
     // Filter tracks by criteria
     let filteredTracks = this.tracks.filter(track => {
@@ -107,7 +107,7 @@ export class MagicSet {
     
     const tracks_order = filteredTracks.slice(0, 20).map(track => {
       // Calculate energy progression
-      const energyStep = this.calculateEnergyStep(track, currentEnergy, context);
+      const energyStep = this.calculateEnergyStep(track, currentEnergy);
       currentEnergy = Math.max(0, Math.min(1, currentEnergy + energyStep));
       
       energyCurve.push({
@@ -118,7 +118,7 @@ export class MagicSet {
       return track.id;
     });
 
-    return { tracks_order, energy_curve };
+    return { tracks_order, energy_curve: energyCurve };
   }
 
   private async optimizeSet(): Promise<{ order: string[], energyCurve: EnergyPoint[], confidence: number, rationale: string }> {
@@ -203,7 +203,7 @@ export class MagicSet {
         energyFlow,
         crowdAppeal,
         transitionQuality,
-        explanation: this.generateMatchExplanation(baseTrack, candidateTrack, {
+        explanation: this.generateMatchExplanation({
           harmonicCompatibility,
           energyFlow,
           crowdAppeal,
@@ -314,7 +314,7 @@ export class MagicSet {
       .sort(([,a], [,b]) => b - a)[0]?.[0] || 'C';
   }
 
-  private calculateEnergyStep(track: Track, currentEnergy: number, context: SessionContext): number {
+  private calculateEnergyStep(track: Track, currentEnergy: number): number {
     const trackEnergy = track.energy || 0.5;
     const energyDiff = trackEnergy - currentEnergy;
     
@@ -336,10 +336,12 @@ export class MagicSet {
     score += (uniqueArtists / order.length) * 0.5;
     
     // BPM consistency score
-    const bpms = order.map(id => this.tracks.find(t => t.id === id)?.bpm).filter(Boolean);
-    const avgBpm = bpms.reduce((sum, bpm) => sum + bpm!, 0) / bpms.length;
-    const bpmVariance = bpms.reduce((sum, bpm) => sum + Math.pow(bpm! - avgBpm, 2), 0) / bpms.length;
-    score += Math.max(0, 1 - (bpmVariance / 100));
+    const bpms = order.map(id => this.tracks.find(t => t.id === id)?.bpm).filter((bpm): bpm is number => bpm !== undefined);
+    if (bpms.length > 0) {
+      const avgBpm = bpms.reduce((sum, bpm) => sum + bpm, 0) / bpms.length;
+      const bpmVariance = bpms.reduce((sum, bpm) => sum + Math.pow(bpm - avgBpm, 2), 0) / bpms.length;
+      score += Math.max(0, 1 - (bpmVariance / 100));
+    }
     
     return score;
   }
@@ -370,7 +372,7 @@ export class MagicSet {
     order.forEach((trackId, index) => {
       const track = this.tracks.find(t => t.id === trackId);
       if (track) {
-        const energyStep = this.calculateEnergyStep(track, currentEnergy, {});
+        const energyStep = this.calculateEnergyStep(track, currentEnergy);
         currentEnergy = Math.max(0, Math.min(1, currentEnergy + energyStep));
         
         energyCurve.push({
@@ -447,7 +449,7 @@ export class MagicSet {
     return keyMap[key] || [key];
   }
 
-  private generateMatchExplanation(track1: Track, track2: Track, scores: any): string {
+  private generateMatchExplanation(scores: any): string {
     const explanations: string[] = [];
     
     if (scores.harmonicCompatibility > 0.8) {
