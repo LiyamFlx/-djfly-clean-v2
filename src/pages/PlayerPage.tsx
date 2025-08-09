@@ -54,11 +54,11 @@ const PlayerPage: React.FC = () => {
   const sessionDurationMinutes = 0; // Simplified for now
 
   return (
-    <div className="min-h-screen bg-club-gradient">
+    <div className="min-h-screen bg-void-gradient">
       {/* End Set Button */}
       <button
         onClick={() => setFinishModalOpen(true)}
-        className="absolute top-6 right-6 glass-card p-3 rounded-full text-gray-300 hover:text-white hover:shadow-lg transition-all z-10"
+        className="absolute top-6 right-6 glass-card p-3 rounded-full text-silver hover:text-snow hover:shadow-sonic transition-all z-10"
         aria-label="End Set"
       >
         <LogOut className="w-5 h-5" />
@@ -69,7 +69,7 @@ const PlayerPage: React.FC = () => {
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
           <div className="glass-card p-6 max-w-md w-full mx-4">
             <h3 className="text-xl font-semibold mb-4">End Set?</h3>
-            <p className="text-gray-300 mb-6">Are you sure you want to end this set?</p>
+            <p className="text-silver mb-6">Are you sure you want to end this set?</p>
             <div className="flex gap-3">
               <button 
                 onClick={handleConfirmFinish}
@@ -103,7 +103,7 @@ const PlayerPage: React.FC = () => {
               animate={{ rotate: isPlaying ? 360 : 0 }}
               transition={{ duration: 20, repeat: Infinity, ease: 'linear' }}
             >
-              <div className="w-64 h-64 md:w-80 md:h-80 mx-auto rounded-full shadow-2xl shadow-electric-blue/20 bg-gradient-to-br from-electric-blue/20 to-bright-turquoise/20 flex items-center justify-center">
+              <div className="w-64 h-64 md:w-80 md:h-80 mx-auto rounded-full shadow-2xl shadow-sonic-blue/20 bg-gradient-to-br from-sonic-blue/15 to-wave-teal/15 flex items-center justify-center">
                 <div className="text-6xl">🎵</div>
               </div>
             </motion.div>
@@ -115,22 +115,22 @@ const PlayerPage: React.FC = () => {
               transition={{ delay: 0.2 }}
               className="mb-8"
             >
-              <h1 className="text-3xl md:text-4xl font-bold mb-2 text-white">
+              <h1 className="text-3xl md:text-4xl font-bold mb-2 text-snow">
                 {displayTrack.title}
               </h1>
-              <p className="text-xl text-gray-300 mb-4">
+              <p className="text-xl text-pearl mb-4">
                 {displayTrack.artist}
               </p>
 
               {/* Track Features */}
               <div className="flex justify-center gap-4 text-sm">
                 {displayTrack.bpm > 0 && (
-                  <span className="px-3 py-1 bg-electric-blue/20 rounded-full">
+                  <span className="px-3 py-1 bg-sonic-blue/20 rounded-full">
                     {displayTrack.bpm} BPM
                   </span>
                 )}
                 {displayTrack.genre && (
-                  <span className="px-3 py-1 bg-laser-pink/20 rounded-full">
+                  <span className="px-3 py-1 bg-rhythm-purple/20 rounded-full">
                     {displayTrack.genre}
                   </span>
                 )}
@@ -149,9 +149,9 @@ const PlayerPage: React.FC = () => {
                 <span>{formatTime(180)}</span>
               </div>
 
-              <div className="w-full bg-rich-black/50 rounded-full h-2 cursor-pointer">
+              <div className="w-full bg-charcoal/50 rounded-full h-2 cursor-pointer">
                 <motion.div
-                  className="bg-gradient-to-r from-electric-blue to-bright-turquoise h-2 rounded-full"
+                  className="bg-sonic-gradient h-2 rounded-full"
                   style={{ width: `${progress}%` }}
                   initial={{ width: 0 }}
                   animate={{ width: `${progress}%` }}
@@ -166,17 +166,17 @@ const PlayerPage: React.FC = () => {
               transition={{ delay: 0.4 }}
               className="flex items-center justify-center gap-6 mb-8"
             >
-              <button className="p-3 text-gray-400 hover:text-white transition-colors">
+              <button className="p-3 text-ash hover:text-snow transition-colors">
                 <Shuffle className="w-6 h-6" />
               </button>
 
-              <button className="p-3 text-gray-400 hover:text-white transition-colors">
+              <button className="p-3 text-ash hover:text-snow transition-colors">
                 <SkipBack className="w-6 h-6" />
               </button>
 
               <button
                 onClick={() => setIsPlaying(!isPlaying)}
-                className="p-6 bg-gradient-to-r from-electric-blue to-bright-turquoise rounded-full text-rich-black hover:scale-105 transition-transform"
+                className="p-6 bg-sonic-gradient rounded-full text-deep-void hover:scale-105 transition-transform"
               >
                 {isPlaying ? (
                   <Pause className="w-8 h-8" />
@@ -185,11 +185,11 @@ const PlayerPage: React.FC = () => {
                 )}
               </button>
 
-              <button className="p-3 text-gray-400 hover:text-white transition-colors">
+              <button className="p-3 text-ash hover:text-snow transition-colors">
                 <SkipForward className="w-6 h-6" />
               </button>
 
-              <button className="p-3 text-gray-400 hover:text-white transition-colors">
+              <button className="p-3 text-ash hover:text-snow transition-colors">
                 <Repeat className="w-6 h-6" />
               </button>
             </motion.div>
@@ -201,7 +201,7 @@ const PlayerPage: React.FC = () => {
               transition={{ delay: 0.5 }}
               className="flex items-center justify-center gap-4 max-w-xs mx-auto"
             >
-              <Volume2 className="w-5 h-5 text-gray-400" />
+              <Volume2 className="w-5 h-5 text-ash" />
               <input
                 type="range"
                 min="0"
@@ -209,9 +209,9 @@ const PlayerPage: React.FC = () => {
                 step="1"
                 value={volume}
                 onChange={(e) => setVolume(parseInt(e.target.value))}
-                className="flex-1 h-2 bg-rich-black/50 rounded-lg appearance-none cursor-pointer slider"
+                className="flex-1 h-2 bg-charcoal/50 rounded-lg appearance-none cursor-pointer slider"
               />
-              <span className="text-sm text-gray-400 w-10">
+              <span className="text-sm text-ash w-10">
                 {volume}%
               </span>
             </motion.div>
@@ -231,7 +231,7 @@ const PlayerPage: React.FC = () => {
           width: 16px;
           height: 16px;
           border-radius: 50%;
-          background: linear-gradient(45deg, #00D4FF, #00FFCC);
+          background: linear-gradient(135deg, #3B82F6, #0891B2);
           cursor: pointer;
         }
         
@@ -239,7 +239,7 @@ const PlayerPage: React.FC = () => {
           width: 16px;
           height: 16px;
           border-radius: 50%;
-          background: linear-gradient(45deg, #00D4FF, #00FFCC);
+          background: linear-gradient(135deg, #3B82F6, #0891B2);
           cursor: pointer;
           border: none;
         }

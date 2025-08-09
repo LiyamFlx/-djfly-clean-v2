@@ -39,12 +39,12 @@ const HomePage: React.FC = () => {
     <div className="min-h-screen overflow-x-hidden">
       {/* Hero Section - Redesigned for immediate engagement */}
       <section className="relative min-h-screen flex items-center justify-center px-4 sm:px-6 lg:px-8">
-        {/* Enhanced Background Effects */}
+        {/* Subtle Background Effects */}
         <div className="absolute inset-0 overflow-hidden">
-          <div className="absolute -top-1/4 -left-1/4 w-96 h-96 bg-electric-blue/15 rounded-full blur-3xl animate-pulse-slow" />
-          <div className="absolute -bottom-1/4 -right-1/4 w-96 h-96 bg-bright-turquoise/15 rounded-full blur-3xl animate-pulse-slow" />
-          <div className="absolute top-1/3 left-1/3 w-64 h-64 bg-laser-pink/10 rounded-full blur-2xl animate-pulse-slow" />
-          <div className="absolute bottom-1/3 right-1/3 w-48 h-48 bg-electric-blue/5 rounded-full blur-xl animate-pulse-slow" />
+          <div className="absolute -top-1/4 -left-1/4 w-96 h-96 bg-sonic-blue/8 rounded-full blur-3xl animate-pulse-slow" />
+          <div className="absolute -bottom-1/4 -right-1/4 w-96 h-96 bg-wave-teal/6 rounded-full blur-3xl animate-pulse-slow" />
+          <div className="absolute top-1/3 left-1/3 w-64 h-64 bg-rhythm-purple/5 rounded-full blur-2xl animate-pulse-slow" />
+          <div className="absolute bottom-1/3 right-1/3 w-48 h-48 bg-sonic-blue/3 rounded-full blur-xl animate-pulse-slow" />
         </div>
 
         <div className="relative max-w-6xl mx-auto text-center">
@@ -58,7 +58,7 @@ const HomePage: React.FC = () => {
             <div className="relative">
               <div className="text-8xl mb-4 relative z-10">🎧</div>
               <motion.div 
-                className="absolute inset-0 bg-electric-blue/20 rounded-full blur-xl"
+                className="absolute inset-0 bg-sonic-blue/15 rounded-full blur-xl"
                 animate={{ scale: [1, 1.2, 1] }}
                 transition={{ duration: 2, repeat: Infinity }}
               />
@@ -72,7 +72,7 @@ const HomePage: React.FC = () => {
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 1, delay: 0.3 }}
           >
-            <span className="block text-white mb-4">Your Perfect DJ</span>
+            <span className="block text-snow mb-4">Your Perfect DJ</span>
             <span className="block gradient-text animate-gradient">
               In 5 Seconds
             </span>
@@ -85,7 +85,7 @@ const HomePage: React.FC = () => {
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 1, delay: 0.5 }}
           >
-            <span className="text-bright-turquoise font-semibold">No setup. No learning curve.</span><br />
+            <span className="text-wave-teal font-semibold">No setup. No learning curve.</span><br />
             Just point, click, and watch AI create the perfect playlist for any crowd.
           </motion.p>
 
@@ -98,12 +98,12 @@ const HomePage: React.FC = () => {
           >
             <motion.button
               onClick={handleTryNow}
-              className="relative group bg-gradient-to-r from-electric-blue via-bright-turquoise to-laser-pink text-white text-xl font-bold px-12 py-6 rounded-2xl shadow-2xl overflow-hidden"
+              className="relative group bg-sonic-gradient text-snow text-xl font-bold px-12 py-6 rounded-2xl shadow-sonic-lg overflow-hidden"
               whileHover={{ scale: 1.05, y: -2 }}
               whileTap={{ scale: 0.98 }}
             >
               <motion.div
-                className="absolute inset-0 bg-gradient-to-r from-laser-pink via-electric-blue to-bright-turquoise opacity-0 group-hover:opacity-100 transition-opacity duration-300"
+                className="absolute inset-0 bg-rhythm-gradient opacity-0 group-hover:opacity-100 transition-opacity duration-300"
               />
               <span className="relative z-10 flex items-center justify-center gap-3">
                 <Zap className="w-6 h-6" />
@@ -169,8 +169,8 @@ const HomePage: React.FC = () => {
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
           >
-            <h2 className="text-4xl md:text-5xl font-bold text-white mb-6">
-              How It <span className="text-bright-turquoise">Works</span>
+            <h2 className="text-4xl md:text-5xl font-bold text-snow mb-6">
+              How It <span className="text-wave-teal">Works</span>
             </h2>
             <p className="text-xl text-gray-300 max-w-2xl mx-auto">
               Three simple steps to perfect music, every time
@@ -184,21 +184,21 @@ const HomePage: React.FC = () => {
                 icon: <Volume2 className="w-12 h-12" />,
                 title: 'Capture',
                 description: 'Record 5 seconds of crowd noise or describe your vibe',
-                color: 'electric-blue'
+                color: 'sonic-blue'
               },
               {
                 step: '02', 
                 icon: <Zap className="w-12 h-12" />,
                 title: 'AI Magic',
                 description: 'Our AI analyzes energy, mood, and musical preferences instantly',
-                color: 'bright-turquoise'
+                color: 'wave-teal'
               },
               {
                 step: '03',
                 icon: <Music className="w-12 h-12" />,
                 title: 'Perfect Mix',
                 description: 'Get a curated playlist with smooth transitions and pro tips',
-                color: 'laser-pink'
+                color: 'rhythm-purple'
               }
             ].map((item, index) => (
               <motion.div
@@ -218,7 +218,7 @@ const HomePage: React.FC = () => {
                     {item.step}
                   </div>
                 </div>
-                <h3 className="text-2xl font-bold text-white mb-4">{item.title}</h3>
+                <h3 className="text-2xl font-bold text-snow mb-4">{item.title}</h3>
                 <p className="text-gray-300 leading-relaxed">{item.description}</p>
               </motion.div>
             ))}
@@ -235,8 +235,8 @@ const HomePage: React.FC = () => {
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
           >
-            <h2 className="text-4xl md:text-5xl font-bold text-white mb-6">
-              Choose Your <span className="text-laser-pink">Style</span>
+            <h2 className="text-4xl md:text-5xl font-bold text-snow mb-6">
+              Choose Your <span className="text-rhythm-purple">Style</span>
             </h2>
             <p className="text-xl text-gray-300 max-w-2xl mx-auto">
               Two powerful ways to create the perfect soundtrack
@@ -254,18 +254,18 @@ const HomePage: React.FC = () => {
               onHoverStart={() => setActiveDemo('match')}
               onHoverEnd={() => setActiveDemo(null)}
             >
-              <div className="glass-card p-8 border-2 border-electric-blue/30 group-hover:border-electric-blue/60 transition-all duration-300">
+              <div className="glass-card p-8 border-2 border-sonic-blue/30 group-hover:border-sonic-blue/60 transition-all duration-300">
                 <div className="flex items-center justify-between mb-6">
                   <div className="flex items-center gap-4">
-                    <div className="w-16 h-16 bg-electric-blue/20 rounded-full flex items-center justify-center">
-                      <Mic className="w-8 h-8 text-electric-blue" />
+                    <div className="w-16 h-16 bg-sonic-blue/20 rounded-full flex items-center justify-center">
+                      <Mic className="w-8 h-8 text-sonic-blue" />
                     </div>
                     <div>
-                      <h3 className="text-2xl font-bold text-white">Magic Match</h3>
-                      <p className="text-gray-400">AI Crowd Reading</p>
+                      <h3 className="text-2xl font-bold text-snow">Magic Match</h3>
+                      <p className="text-silver">AI Crowd Reading</p>
                     </div>
                   </div>
-                  <ArrowRight className="w-6 h-6 text-electric-blue group-hover:translate-x-2 transition-transform" />
+                  <ArrowRight className="w-6 h-6 text-sonic-blue group-hover:translate-x-2 transition-transform" />
                 </div>
                 
                 <p className="text-gray-300 mb-6 leading-relaxed">

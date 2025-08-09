@@ -4,7 +4,7 @@
 
 @layer base {
   body {
-    @apply bg-rich-black text-white;
+    @apply bg-deep-void text-snow;
     font-family:
       system-ui,
       -apple-system,
@@ -15,49 +15,41 @@
     transition: background-color 0.3s ease, color 0.3s ease;
   }
 
-  /* Light theme styles */
+  /* Light theme styles - for future implementation */
   .light body {
-    @apply bg-white text-neutral-900;
+    @apply bg-snow text-charcoal;
   }
 
-  .light .bg-rich-black {
-    @apply bg-white;
+  .light .bg-deep-void {
+    @apply bg-snow;
   }
 
-  .light .bg-neutral-900 {
+  .light .bg-charcoal {
     @apply bg-gray-50;
   }
 
-  .light .bg-neutral-800 {
+  .light .bg-slate-dark {
     @apply bg-gray-100;
   }
 
-  .light .text-white {
-    @apply text-neutral-900;
+  .light .text-snow {
+    @apply text-charcoal;
   }
 
-  .light .text-neutral-300 {
-    @apply text-neutral-600;
+  .light .text-pearl {
+    @apply text-ash;
   }
 
-  .light .text-neutral-400 {
-    @apply text-neutral-500;
+  .light .text-silver {
+    @apply text-slate-dark;
   }
 
-  .light .border-neutral-800 {
+  .light .border-slate-dark {
     @apply border-gray-200;
   }
 
-  .light .border-neutral-700 {
+  .light .border-graphite {
     @apply border-gray-300;
-  }
-
-  .light .bg-hero-gradient {
-    background: radial-gradient(ellipse at center, rgba(0, 212, 255, 0.05) 0%, rgba(249, 250, 251, 0.9) 50%, #f9fafb 100%);
-  }
-
-  .light .bg-club-gradient {
-    background: linear-gradient(135deg, #f9fafb 0%, rgba(0, 212, 255, 0.02) 50%, #f9fafb 100%);
   }
 
   .light .glass-card {
@@ -70,55 +62,71 @@
 }
 
 @layer components {
-  /* Button Components */
+  /* Button Components - Refined for music UI */
   .btn-primary {
-    @apply bg-button-gradient text-white font-semibold px-6 py-3 rounded-xl;
+    @apply bg-sonic-gradient text-snow font-semibold px-6 py-3 rounded-xl;
     @apply transform transition-all duration-300;
-    @apply hover:scale-105 hover:shadow-glow;
+    @apply hover:scale-105 hover:shadow-sonic;
     @apply active:scale-95;
-    @apply focus:outline-none focus:ring-2 focus:ring-blue-400 focus:ring-opacity-20;
+    @apply focus:outline-none focus:shadow-focus;
   }
 
   .btn-secondary {
-    @apply bg-transparent border-2 border-blue-400 text-blue-400;
+    @apply bg-transparent border-2 border-sonic-blue text-sonic-blue;
     @apply font-semibold px-6 py-3 rounded-xl;
     @apply transition-all duration-300;
-    @apply hover:bg-blue-400 hover:text-white hover:shadow-glow;
-    @apply focus:outline-none focus:ring-2 focus:ring-blue-400 focus:ring-opacity-20;
+    @apply hover:bg-sonic-blue hover:text-snow hover:shadow-sonic;
+    @apply focus:outline-none focus:shadow-focus;
   }
 
   .control-button {
-    @apply bg-neutral-800 bg-opacity-50 text-neutral-300 border border-neutral-700;
+    @apply bg-slate-dark/50 text-silver border border-graphite;
     @apply rounded-xl transition-all duration-300;
-    @apply hover:bg-neutral-700 hover:bg-opacity-50 hover:text-white hover:border-neutral-600;
-    @apply focus:outline-none focus:ring-2 focus:ring-blue-400 focus:ring-opacity-20;
+    @apply hover:bg-graphite/50 hover:text-pearl hover:border-silver;
+    @apply focus:outline-none focus:shadow-focus;
   }
 
-  /* Card Components */
+  /* Card Components - Sophisticated and minimal */
   .card {
-    @apply bg-neutral-900 bg-opacity-50 backdrop-blur-sm border border-neutral-800 rounded-2xl;
-    @apply shadow-xl;
+    @apply bg-charcoal/80 backdrop-blur-sm border border-slate-dark rounded-2xl;
+    @apply shadow-glass;
   }
 
   .card-hover {
     @apply card transition-all duration-300;
-    @apply hover:bg-neutral-900 hover:bg-opacity-70 hover:shadow-glow-sm hover:-translate-y-1;
-    @apply hover:border-neutral-700;
+    @apply hover:bg-charcoal hover:shadow-glass-lg hover:-translate-y-1;
+    @apply hover:border-graphite;
   }
 
   .glass-card {
-    @apply bg-white bg-opacity-5 backdrop-blur-md border border-white border-opacity-10 rounded-xl;
-    @apply shadow-2xl;
+    @apply bg-charcoal/20 backdrop-blur-md border border-graphite/30 rounded-xl;
+    @apply shadow-glass-lg;
   }
 
   /* Text Components */
   .text-gradient {
-    @apply bg-button-gradient bg-clip-text text-transparent;
+    @apply bg-sonic-gradient bg-clip-text text-transparent;
     background-size: 200% 200%;
   }
 
   .gradient-text {
     @apply text-gradient;
+  }
+
+  .text-primary {
+    @apply text-snow;
+  }
+
+  .text-secondary {
+    @apply text-pearl;
+  }
+
+  .text-muted {
+    @apply text-silver;
+  }
+
+  .text-subtle {
+    @apply text-ash;
   }
 
   /* Layout Components */
@@ -129,13 +137,13 @@
   /* Responsive Navigation */
   .nav-link {
     @apply flex items-center space-x-3 px-4 py-3 rounded-xl;
-    @apply text-neutral-300 font-medium transition-all duration-300;
-    @apply hover:bg-white hover:bg-opacity-10 hover:text-white;
-    @apply focus:outline-none focus:ring-2 focus:ring-blue-400 focus:ring-opacity-20;
+    @apply text-silver font-medium transition-all duration-300;
+    @apply hover:bg-charcoal/30 hover:text-pearl;
+    @apply focus:outline-none focus:shadow-focus;
   }
 
   .nav-link.active {
-    @apply bg-blue-500 bg-opacity-20 text-blue-400 shadow-glow-sm;
+    @apply bg-sonic-blue/20 text-sonic-blue shadow-sonic;
   }
 
   /* Responsive Button Sizes */
@@ -178,26 +186,13 @@
     @apply transition-all duration-300 ease-in-out;
   }
 
-  /* Shadow Utilities */
-  .shadow-glow {
-    box-shadow: 0 0 20px rgba(0, 212, 255, 0.3), 0 0 40px rgba(0, 255, 204, 0.2);
-  }
-
-  .shadow-glow-sm {
-    box-shadow: 0 0 10px rgba(0, 212, 255, 0.2), 0 0 20px rgba(0, 255, 204, 0.1);
-  }
-
-  /* Background Gradients */
+  /* Background Gradients - Refined for minimalist aesthetic */
   .bg-hero-gradient {
-    background: radial-gradient(ellipse at center, rgba(0, 212, 255, 0.1) 0%, rgba(13, 13, 13, 0.9) 50%, #0d0d0d 100%);
+    background: radial-gradient(ellipse at center, rgba(59, 130, 246, 0.05) 0%, rgba(10, 10, 10, 0.9) 50%, #0A0A0A 100%);
   }
 
   .bg-club-gradient {
-    background: linear-gradient(135deg, #0d0d0d 0%, rgba(0, 212, 255, 0.05) 50%, #0d0d0d 100%);
-  }
-
-  .bg-button-gradient {
-    background: linear-gradient(135deg, #00d4ff 0%, #00ffcc 100%);
+    background: linear-gradient(135deg, #0A0A0A 0%, rgba(59, 130, 246, 0.03) 50%, #0A0A0A 100%);
   }
 
   /* Mobile Menu Animations */

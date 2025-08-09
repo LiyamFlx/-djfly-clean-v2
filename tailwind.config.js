@@ -4,31 +4,53 @@ export default {
   theme: {
     extend: {
       colors: {
-        // DJfly brand colors - Enhanced palette
-        'electric-blue': '#00D4FF',
-        'bright-turquoise': '#00FFCC',
-        'laser-pink': '#FF0080',
-        'rich-black': '#0D0D0D',
-
-        // Extended color palette for better hierarchy
-        'neon-purple': '#8B5CF6',
-        'cyber-green': '#10B981',
-        'sunset-orange': '#F59E0B',
-        'deep-indigo': '#6366F1',
-
-        // Semantic colors
-        success: '#10B981',
-        warning: '#F59E0B',
-        error: '#EF4444',
-        info: '#3B82F6',
-
-        // Gradient combinations
-        'gradient-primary':
-          'linear-gradient(135deg, #00D4FF 0%, #00FFCC 50%, #8B5CF6 100%)',
-        'gradient-secondary':
-          'linear-gradient(135deg, #FF0080 0%, #8B5CF6 100%)',
-        'gradient-success': 'linear-gradient(135deg, #10B981 0%, #059669 100%)',
-        'gradient-warning': 'linear-gradient(135deg, #F59E0B 0%, #D97706 100%)',
+        // Minimalist Music-Focused Palette
+        // Deep, rich blacks and grays for premium feel
+        'deep-void': '#0A0A0A',        // Almost pure black for deep backgrounds
+        'charcoal': '#1A1A1A',         // Primary dark surfaces
+        'slate-dark': '#2A2A2A',       // Secondary surfaces
+        'graphite': '#3A3A3A',         // Elevated elements
+        
+        // Sophisticated grays for text hierarchy
+        'ash': '#6B7280',              // Secondary text
+        'silver': '#9CA3AF',           // Tertiary text  
+        'pearl': '#D1D5DB',            // Primary light text
+        'snow': '#F9FAFB',             // Pure white accents
+        
+        // Music-inspired accent colors - calm and focused
+        'sonic-blue': '#3B82F6',       // Primary brand - trustworthy blue
+        'wave-teal': '#0891B2',        // Secondary - ocean depth
+        'rhythm-purple': '#7C3AED',    // Accent - creative energy
+        'beat-green': '#059669',       // Success - natural harmony
+        
+        // Warm accents for energy and emotion
+        'melody-orange': '#EA580C',    // Warning/energy
+        'tempo-red': '#DC2626',        // Error/stop
+        'harmony-yellow': '#D97706',   // Highlight/attention
+        
+        // Subtle tints for backgrounds and states
+        'sonic-blue-50': '#EFF6FF',
+        'sonic-blue-100': '#DBEAFE', 
+        'sonic-blue-900': '#1E3A8A',
+        'sonic-blue-950': '#1E2A5E',
+        
+        'wave-teal-50': '#ECFDF5',
+        'wave-teal-900': '#064E3B',
+        
+        'rhythm-purple-50': '#F5F3FF',
+        'rhythm-purple-900': '#581C87',
+        
+        // Semantic colors for clear communication
+        success: '#059669',
+        warning: '#D97706', 
+        error: '#DC2626',
+        info: '#0891B2',
+        
+        // Special music UI elements
+        'waveform': '#3B82F6',         // Audio visualization
+        'progress': '#0891B2',         // Playback progress
+        'accent': '#7C3AED',           // Interactive elements
+        'glow': '#3B82F6',             // Hover/focus states
       },
       fontFamily: {
         display: ['Inter', 'system-ui', 'sans-serif'],
@@ -97,14 +119,21 @@ export default {
         },
       },
       backgroundImage: {
-        'club-gradient':
-          'linear-gradient(135deg, #0D0D0D 0%, #1A1A2E 25%, #16213E 50%, #0F3460 75%, #533A7B 100%)',
-        'neon-gradient':
-          'linear-gradient(45deg, #00D4FF, #00FFCC, #8B5CF6, #FF0080)',
+        // Subtle, sophisticated gradients for music applications
+        'void-gradient': 
+          'linear-gradient(135deg, #0A0A0A 0%, #1A1A1A 50%, #2A2A2A 100%)',
+        'charcoal-gradient':
+          'linear-gradient(135deg, #1A1A1A 0%, #2A2A2A 50%, #3A3A3A 100%)',
+        'sonic-gradient':
+          'linear-gradient(135deg, #3B82F6 0%, #0891B2 100%)',
+        'rhythm-gradient':
+          'linear-gradient(135deg, #7C3AED 0%, #3B82F6 100%)',
+        'wave-gradient':
+          'linear-gradient(135deg, #0891B2 0%, #059669 100%)',
         'glass-gradient':
-          'linear-gradient(135deg, rgba(255,255,255,0.1) 0%, rgba(255,255,255,0.05) 100%)',
-        'energy-gradient':
-          'linear-gradient(90deg, #FF0080 0%, #8B5CF6 50%, #00D4FF 100%)',
+          'linear-gradient(135deg, rgba(255,255,255,0.05) 0%, rgba(255,255,255,0.02) 100%)',
+        'glow-gradient':
+          'radial-gradient(circle, rgba(59,130,246,0.1) 0%, transparent 70%)',
       },
       backdropBlur: {
         xs: '2px',
@@ -119,11 +148,15 @@ export default {
         '5xl': '2.5rem',
       },
       boxShadow: {
-        neon: '0 0 20px rgba(0, 212, 255, 0.5)',
-        'neon-pink': '0 0 20px rgba(255, 0, 128, 0.5)',
-        'neon-purple': '0 0 20px rgba(139, 92, 246, 0.5)',
-        glass: '0 8px 32px rgba(0, 0, 0, 0.3)',
-        glow: '0 0 40px rgba(0, 212, 255, 0.3)',
+        // Refined shadows for depth and focus
+        'sonic': '0 0 20px rgba(59, 130, 246, 0.3)',
+        'sonic-lg': '0 0 40px rgba(59, 130, 246, 0.4)',
+        'wave': '0 0 20px rgba(8, 145, 178, 0.3)',
+        'rhythm': '0 0 20px rgba(124, 58, 237, 0.3)',
+        'glass': '0 8px 32px rgba(0, 0, 0, 0.5)',
+        'glass-lg': '0 16px 48px rgba(0, 0, 0, 0.7)',
+        'subtle': '0 2px 8px rgba(0, 0, 0, 0.3)',
+        'focus': '0 0 0 2px rgba(59, 130, 246, 0.5)',
       },
       zIndex: {
         60: '60',
