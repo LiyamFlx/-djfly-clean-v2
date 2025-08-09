@@ -229,32 +229,42 @@ const MagicSetPage: React.FC = () => {
         )}
 
         {/* Manual Track Addition */}
-        <div className="glass-card p-6 rounded-xl">
-          <h3 className="text-xl font-semibold mb-4">Manual Curation</h3>
-          <p className="text-gray-400 text-sm mb-4">
+        <motion.div 
+          className="card p-8 rounded-2xl"
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.4 }}
+        >
+          <h3 className="text-2xl font-bold text-gradient mb-4">Manual Curation</h3>
+          <p className="text-neutral-300 text-lg mb-6 leading-relaxed">
             Search and add tracks manually, or upload your own music files
           </p>
 
-          <div className="flex gap-2">
-            <input
+          <div className="flex gap-4">
+            <motion.input
               type="text"
               placeholder="Search tracks by title, artist, or genre..."
-              className="flex-1 px-4 py-2 bg-rich-black/50 border border-white/20 rounded-lg text-white placeholder-gray-400 focus:border-electric-blue focus:ring-1 focus:ring-electric-blue focus:outline-none"
+              className="flex-1 px-6 py-4 bg-neutral-800/50 border border-white/20 rounded-xl text-white placeholder-neutral-400 focus:border-primary-400 focus:ring-2 focus:ring-primary-400/20 focus:outline-none text-lg transition-all duration-300"
+              whileFocus={{ scale: 1.02 }}
             />
-            <button className="px-4 py-2 bg-white/10 hover:bg-white/20 rounded-lg transition-colors">
-              <Plus className="w-4 h-4" />
-            </button>
+            <motion.button 
+              className="control-button px-6 py-4"
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+            >
+              <Plus className="w-5 h-5" />
+            </motion.button>
           </div>
-        </div>
+        </motion.div>
 
         {/* Error Display */}
         {aiState.error && (
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            className="glass-card p-4 rounded-xl border-red-500/50"
+            className="card p-6 rounded-xl border border-red-500/50 bg-red-500/5"
           >
-            <p className="text-red-400">Error: {aiState.error}</p>
+            <p className="text-red-400 text-lg font-medium">Error: {aiState.error}</p>
           </motion.div>
         )}
       </motion.div>

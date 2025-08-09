@@ -9,7 +9,7 @@ import AppLayout from './Layout/AppLayout';
 import HomePage from '@/pages/HomePage';
 import StudioPage from '@/pages/StudioPage';
 import MagicSetPage from '@/pages/MagicSetPage';
-// import MagicMatchPage from '@/pages/MagicMatchPage'; // Removed - using inline component in App.tsx
+import MagicMatchPage from '@/pages/MagicMatchPage';
 import PlayerPage from '@/pages/PlayerPage';
 import ProducerPage from '@/pages/ProducerPage';
 import ProfilePage from '@/pages/ProfilePage';
@@ -42,7 +42,7 @@ const AppRouter: React.FC = () => {
           {/* Studio routes */}
           <Route path={ROUTES.STUDIO} element={<StudioPage />}>
             <Route path="set" element={<MagicSetPage />} />
-            {/* <Route path="match" element={<MagicMatchPage />} /> */}
+            <Route path="match" element={<MagicMatchPage />} />
           </Route>
 
           {/* Main app pages */}

@@ -65,12 +65,14 @@ const StudioPage: React.FC = () => {
           animate={{ opacity: 1, y: 0 }}
           className="text-center mb-12"
         >
-          <h1 className="text-4xl font-bold mb-4">
-            <span className="bg-gradient-to-r from-electric-blue to-bright-turquoise bg-clip-text text-transparent">
-              Magic Studio
-            </span>
-          </h1>
-          <p className="text-xl text-gray-300 max-w-2xl mx-auto">
+          <motion.h1 
+            className="text-5xl lg:text-6xl font-bold mb-6 text-gradient leading-tight"
+            animate={{ backgroundPosition: ['0% 50%', '100% 50%', '0% 50%'] }}
+            transition={{ duration: 6, repeat: Infinity }}
+          >
+            Magic Studio
+          </motion.h1>
+          <p className="text-xl md:text-2xl text-neutral-300 max-w-3xl mx-auto leading-relaxed">
             Choose your AI-powered music creation method. Both tools use
             advanced machine learning to deliver perfect mixes for any
             situation.
@@ -90,7 +92,7 @@ const StudioPage: React.FC = () => {
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: index * 0.2 }}
                 className={`relative group cursor-pointer ${
-                  isSelected ? 'ring-2 ring-electric-blue' : ''
+                  isSelected ? 'ring-2 ring-primary-400' : ''
                 }`}
                 onClick={() => setSelectedFeature(feature.id)}
               >
@@ -131,7 +133,7 @@ const StudioPage: React.FC = () => {
                         transition={{ delay: index * 0.2 + i * 0.1 }}
                         className="flex items-center space-x-3"
                       >
-                        <div className="w-2 h-2 bg-electric-blue rounded-full"></div>
+                        <div className="w-2 h-2 bg-primary-400 rounded-full"></div>
                         <span className="text-sm text-gray-300">{benefit}</span>
                       </motion.div>
                     ))}
@@ -156,8 +158,8 @@ const StudioPage: React.FC = () => {
                     to={feature.route}
                     className={`block w-full py-4 px-6 rounded-xl text-center font-semibold transition-all duration-300 ${
                       isSelected
-                        ? 'bg-gradient-to-r from-electric-blue to-bright-turquoise text-rich-black'
-                        : 'bg-gray-700 hover:bg-gray-600 text-white'
+                        ? 'btn-primary'
+                        : 'bg-neutral-700 hover:bg-neutral-600 text-white'
                     }`}
                   >
                     {isSelected
@@ -171,7 +173,7 @@ const StudioPage: React.FC = () => {
                   <motion.div
                     initial={{ scale: 0 }}
                     animate={{ scale: 1 }}
-                    className="absolute -top-2 -right-2 w-8 h-8 bg-electric-blue rounded-full flex items-center justify-center"
+                    className="absolute -top-2 -right-2 w-8 h-8 bg-primary-500 rounded-full flex items-center justify-center"
                   >
                     <Sparkles className="w-4 h-4 text-rich-black" />
                   </motion.div>
@@ -189,7 +191,7 @@ const StudioPage: React.FC = () => {
           className="bg-gray-800/30 backdrop-blur-sm border border-gray-700 rounded-xl p-6"
         >
           <h3 className="text-lg font-semibold mb-4 flex items-center space-x-2">
-            <Zap className="w-5 h-5 text-electric-blue" />
+            <Zap className="w-5 h-5 text-primary-400" />
             <span>Quick Actions</span>
           </h3>
           <div className="grid sm:grid-cols-3 gap-4">
@@ -217,7 +219,7 @@ const StudioPage: React.FC = () => {
         >
           <p className="text-gray-400 text-sm">
             Need help choosing?
-            <button className="text-electric-blue hover:text-bright-turquoise ml-1 underline">
+            <button className="text-primary-400 hover:text-secondary-400 ml-1 underline">
               Watch our tutorial
             </button>
           </p>

@@ -1,257 +1,161 @@
-<<<<<<< HEAD
-// Unified types used everywhere
-=======
 // Shared types across the application
->>>>>>> 86165b8 (🎯 Major Architecture Overhaul: AI-Powered DJ Engine)
 export interface Track {
   id: string;
   title: string;
   artist: string;
-<<<<<<< HEAD
   duration: number; // seconds
   bpm?: number | null;
   key?: string | null;
   preview_url?: string | null;
-  album?: string; // needed by api.Track users
-  uri?: string; // needed by api.Track users
-  genre?: string | null; // some components expect this
-  image?: string; // album artwork
+  album?: string;
+  uri?: string;
+  genre?: string | null;
+  image?: string;
   energy?: number; // energy level 0-1
   source?: 'spotify' | 'youtube' | 'demo' | 'local' | 'lastfm';
-  spotify_url?: string;
-  popularity?: number;
-  valence?: number;
-  danceability?: number;
-  acousticness?: number;
-  instrumentalness?: number;
-  liveness?: number;
-  speechiness?: number;
-  loudness?: number;
-  tempo?: number;
-  artwork?: string;
-  waveform?: Float32Array;
-=======
-  duration: number;         // seconds
-  bpm?: number | null;
-  key?: string | null;
-  preview_url?: string | null;
-  album?: string;           
-  uri?: string;             
-  genre?: string | null;    
-  image?: string;
-  source?: 'spotify' | 'lastfm' | 'demo';
-  popularity?: number;      // 0-100
-  energy?: number;          // 0-1
-  danceability?: number;    // 0-1
-  valence?: number;         // 0-1
-  acousticness?: number;    // 0-1
-  instrumentalness?: number; // 0-1
-  liveness?: number;        // 0-1
-  speechiness?: number;     // 0-1
-  analysis?: AudioAnalysis;
 }
 
-export interface AudioAnalysis {
-  segments?: AudioSegment[];
-  sections?: AudioSection[];
-  bars?: AudioBar[];
-  beats?: AudioBeat[];
-  tatums?: AudioTatum[];
-}
-
-export interface AudioSegment {
-  start: number;
-  duration: number;
-  confidence: number;
-  loudness_start: number;
-  loudness_max_time: number;
-  loudness_max: number;
-  loudness_end: number;
-  pitches: number[];
-  timbre: number[];
-}
-
-export interface AudioSection {
-  start: number;
-  duration: number;
-  confidence: number;
-  loudness: number;
-  tempo: number;
-  tempo_confidence: number;
-  key: number;
-  key_confidence: number;
-  mode: number;
-  mode_confidence: number;
-  time_signature: number;
-  time_signature_confidence: number;
-}
-
-export interface AudioBar {
-  start: number;
-  duration: number;
-  confidence: number;
-}
-
-export interface AudioBeat {
-  start: number;
-  duration: number;
-  confidence: number;
-}
-
-export interface AudioTatum {
-  start: number;
-  duration: number;
-  confidence: number;
->>>>>>> 86165b8 (🎯 Major Architecture Overhaul: AI-Powered DJ Engine)
-}
-
-export interface AIRecommendation {
+export interface Playlist {
+  id: string;
+  name: string;
+  description?: string;
   tracks: Track[];
-<<<<<<< HEAD
-  energy: number; // 0..100
-  mood: string; // "morning" | "afternoon" | "evening" | "late-night" | custom
-=======
-  energy: number;                 // 0..100
-  mood: string;                   
->>>>>>> 86165b8 (🎯 Major Architecture Overhaul: AI-Powered DJ Engine)
-  reasoning?: string;
-  mixingTips?: string[];
-  nextTrackSuggestions?: Track[];
-  energyCurve?: number[];
+  created_at?: string;
+  user_id?: string;
+  isPublic?: boolean;
+  duration?: number; // total duration in seconds
+  averageBPM?: number;
+  averageEnergy?: number;
 }
 
-<<<<<<< HEAD
-// Minimal AI recommendation for backward compatibility
-export interface MinimalAIRecommendation {
-  tracks: Track[];
-  energy: number;
-  mood: string;
+export interface PlaylistGenerateOptions {
+  genre?: string;
+  energy?: 'low' | 'medium' | 'high';
+  mood?: 'chill' | 'energetic' | 'mixed';
+  bpmRange?: [number, number];
+  duration?: number; // in minutes
+  includePopular?: boolean;
 }
 
-export type DayPart = 'morning' | 'afternoon' | 'evening' | 'late-night';
-=======
-export type DayPart = "morning" | "afternoon" | "evening" | "late-night";
->>>>>>> 86165b8 (🎯 Major Architecture Overhaul: AI-Powered DJ Engine)
-
-export interface AIInsights {
-  recommendations?: AIRecommendation[];
-  motionDetection?: Record<string, unknown>;
-  densityMapping?: Record<string, unknown>;
-  demographics?: { label: string; percentage: number }[];
+export interface User {
+  id: string;
+  email: string;
+  username?: string;
+  display_name?: string;
+  avatar_url?: string;
+  created_at?: string;
+  preferences?: UserPreferences;
 }
 
-export type Analytics = Record<string, unknown>;
+export interface UserPreferences {
+  defaultVolume?: number;
+  preferredGenres?: string[];
+  crossfadeTime?: number;
+  autoPlay?: boolean;
+  highQualityAudio?: boolean;
+  darkMode?: boolean;
+}
 
-<<<<<<< HEAD
-// State types for the store
 export interface AudioState {
   isPlaying: boolean;
-=======
-// Audio Player States
-export interface AudioState {
-  isPlaying: boolean;
-  isPaused: boolean;
->>>>>>> 86165b8 (🎯 Major Architecture Overhaul: AI-Powered DJ Engine)
   currentTrack: Track | null;
   queue: Track[];
   currentTime: number;
   duration: number;
   volume: number;
-<<<<<<< HEAD
+  isLoading: boolean;
+  error: string | null;
+  repeat: 'none' | 'one' | 'all';
+  shuffle: boolean;
   crossfadeTime: number;
+  isListening: boolean;
 }
 
 export interface CrowdState {
-  isListening: boolean;
   currentEnergy: number;
-  mood: 'excited' | 'chill' | 'energetic' | 'mellow' | 'unknown';
+  mood: 'low' | 'medium' | 'high' | 'mixed';
   engagementLevel: 'low' | 'medium' | 'high';
-  crowdSize: number;
-  averageAge: number;
-  energyTrend: 'rising' | 'falling' | 'stable';
+  dominantGenres: string[];
+  bpmPreference: number;
   lastUpdated: Date | null;
 }
 
-export interface AIState {
-  isGenerating: boolean;
-  prompt: string;
-  generatedTracks: Track[];
-  error: string | null;
-  progress: number;
-}
-
 export interface SessionState {
-  sessionId: string;
+  id: string | null;
   startTime: Date | null;
   totalTracks: number;
-  averageTrackRating: number;
-  setFlow: 'buildup' | 'maintain' | 'cooldown';
-  crowdSatisfaction: number;
+  mixedMinutes: number;
+  crowdFeedback: CrowdState | null;
+  averageEnergy: number;
+  isActive: boolean;
 }
 
-export interface UIState {
-  currentPage: string;
-  showOnboarding: boolean;
-  theme: 'dark' | 'light';
-  isMobileView: boolean;
-}
-=======
-  isLoading: boolean;
-  error: string | null;
+// UI Component types
+export type ButtonVariant = 'primary' | 'secondary' | 'ghost' | 'outline';
+export type ButtonSize = 'sm' | 'md' | 'lg' | 'xl';
+
+export interface ComponentProps {
+  className?: string;
+  children?: React.ReactNode;
 }
 
-// Crowd response and detection
-export interface CrowdState {
-  energy: number;           // 0-1
-  engagement: number;       // 0-1
-  mood: string;
-  danceFloorDensity: number;
-  avgAge: number;
-  feedback: string[];
-  peakMoments: Array<{
-    timestamp: number;
-    energy: number;
-    track: Track;
-  }>;
+// API Response types
+export interface ApiResponse<T = any> {
+  success: boolean;
+  data?: T;
+  error?: string;
+  message?: string;
 }
 
-// AI-powered insights and recommendations
-export interface AIState {
-  insights: AIInsights;
-  isAnalyzing: boolean;
-  lastUpdate: number;
-  recommendations: AIRecommendation[];
-  crowdPredictions: {
-    nextEnergyLevel: number;
-    suggestedGenre: string;
-    peakTime: number;
+export interface PaginatedResponse<T> extends ApiResponse<T[]> {
+  pagination: {
+    page: number;
+    limit: number;
+    total: number;
+    hasNext: boolean;
+    hasPrev: boolean;
   };
 }
 
-// Session management
-export interface SessionState {
-  id: string;
-  startTime: number;
-  endTime: number | null;
-  venue: string;
-  totalTracks: number;
-  averageEnergy: number;
-  peakEnergy: number;
-  crowdSize: number;
-  isRecording: boolean;
+// Search and filtering
+export interface SearchFilters {
+  query?: string;
+  genre?: string;
+  bpmRange?: [number, number];
+  energyRange?: [number, number];
+  durationRange?: [number, number];
+  source?: Track['source'][];
 }
 
-// UI state management
-export interface UIState {
-  sidebarOpen: boolean;
-  currentView: 'player' | 'library' | 'analytics' | 'settings';
-  notifications: Array<{
-    id: string;
-    type: 'info' | 'warning' | 'error' | 'success';
-    message: string;
-    timestamp: number;
-  }>;
-  isFullscreen: boolean;
-  theme: 'dark' | 'light';
+export interface SearchResult {
+  tracks: Track[];
+  total: number;
+  query: string;
+  filters: SearchFilters;
+  took: number; // search time in ms
 }
->>>>>>> 86165b8 (🎯 Major Architecture Overhaul: AI-Powered DJ Engine)
+
+// Error types
+export interface AppError {
+  code: string;
+  message: string;
+  details?: any;
+  timestamp: Date;
+}
+
+// Service status
+export interface ServiceStatus {
+  spotify: boolean;
+  lastfm: boolean;
+  supabase: boolean;
+  openai: boolean;
+}
+
+export type Theme = 'light' | 'dark';
+
+// Export utility types
+export type DeepPartial<T> = {
+  [P in keyof T]?: T[P] extends object ? DeepPartial<T[P]> : T[P];
+};
+
+export type RequiredBy<T, K extends keyof T> = T & Required<Pick<T, K>>;

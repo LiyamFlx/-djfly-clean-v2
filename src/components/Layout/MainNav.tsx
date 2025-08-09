@@ -12,6 +12,7 @@ import {
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { ROUTES } from '@/constants/routes';
+import ThemeToggle from '@/components/ui/ThemeToggle';
 
 interface NavItemProps {
   path: string;
@@ -108,10 +109,12 @@ const MainNav: React.FC = () => {
             {navItems.map((item) => (
               <NavItem key={item.path} {...item} />
             ))}
+            <ThemeToggle className="ml-2" />
           </div>
 
           {/* Mobile menu button */}
-          <div className="md:hidden flex items-center">
+          <div className="md:hidden flex items-center space-x-2">
+            <ThemeToggle size="sm" />
             <button
               onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
               className="inline-flex items-center justify-center p-2 rounded-md text-gray-400 hover:text-white hover:bg-white/10 focus:outline-none"

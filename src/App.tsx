@@ -11,6 +11,7 @@ import { musicLibrary } from '@/services/musicLibrary';
 import type { Track } from '@/types/shared';
 import ApiStatusIndicator from '@/components/ApiStatusIndicator';
 import SpotifyCallbackPage from '@/pages/auth/SpotifyCallbackPage';
+import { ThemeProvider } from '@/contexts/ThemeContext';
 
 // Lazy load heavy components for better performance
 const LoginPage = lazy(() => import('@/pages/auth/LoginPage'));
@@ -987,10 +988,11 @@ const ProfilePage = () => {
 
 function App() {
   return (
-    <BrowserRouter>
-      <div className="pb-16">
-        <ApiStatusIndicator />
-        <Routes>
+    <ThemeProvider>
+      <BrowserRouter>
+        <div className="pb-16">
+          <ApiStatusIndicator />
+          <Routes>
           <Route path="/" element={<HomePage />} />
           <Route path="/studio" element={<StudioPage />} />
           <Route path="/studio/match" element={<MagicMatchPage />} />
@@ -1055,9 +1057,10 @@ function App() {
           {/* 404 Page */}
           <Route path="*" element={<NotFoundPage />} />
         </Routes>
-      </div>
-      <Navigation />
-    </BrowserRouter>
+        </div>
+        <Navigation />
+      </BrowserRouter>
+    </ThemeProvider>
   );
 }
 

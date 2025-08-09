@@ -1,8 +1,7 @@
-<<<<<<< HEAD
+// Re-export all types from their respective files
 export * from './shared';
-=======
-export * from "./shared";
-export * from "./api";
-export * from "./session";
-export * from "./supabase";
->>>>>>> 86165b8 (🎯 Major Architecture Overhaul: AI-Powered DJ Engine)
+export * from './api';
+export * from './session';
+
+// Legacy exports for backward compatibility
+export type { Track, Playlist, User, AudioState } from './shared';

@@ -12,24 +12,202 @@
     font-feature-settings:
       'rlig' 1,
       'calt' 1;
+    transition: background-color 0.3s ease, color 0.3s ease;
+  }
+
+  /* Light theme styles */
+  .light body {
+    @apply bg-white text-neutral-900;
+  }
+
+  .light .bg-rich-black {
+    @apply bg-white;
+  }
+
+  .light .bg-neutral-900 {
+    @apply bg-gray-50;
+  }
+
+  .light .bg-neutral-800 {
+    @apply bg-gray-100;
+  }
+
+  .light .text-white {
+    @apply text-neutral-900;
+  }
+
+  .light .text-neutral-300 {
+    @apply text-neutral-600;
+  }
+
+  .light .text-neutral-400 {
+    @apply text-neutral-500;
+  }
+
+  .light .border-neutral-800 {
+    @apply border-gray-200;
+  }
+
+  .light .border-neutral-700 {
+    @apply border-gray-300;
+  }
+
+  .light .bg-hero-gradient {
+    background: radial-gradient(ellipse at center, rgba(0, 212, 255, 0.05) 0%, rgba(249, 250, 251, 0.9) 50%, #f9fafb 100%);
+  }
+
+  .light .bg-club-gradient {
+    background: linear-gradient(135deg, #f9fafb 0%, rgba(0, 212, 255, 0.02) 50%, #f9fafb 100%);
+  }
+
+  .light .glass-card {
+    @apply bg-white/80 backdrop-blur-md border border-gray-200 shadow-lg;
+  }
+
+  .light .card {
+    @apply bg-white/90 border border-gray-200 shadow-lg;
   }
 }
 
 @layer components {
-  .club-button {
-    @apply bg-gradient-to-r from-electric-blue to-bright-turquoise;
-    @apply text-rich-black font-bold px-6 py-3 rounded-lg;
-    @apply transform transition-all duration-200;
-    @apply hover:scale-105 hover:shadow-lg hover:shadow-electric-blue/25;
+  /* Button Components */
+  .btn-primary {
+    @apply bg-button-gradient text-white font-semibold px-6 py-3 rounded-xl;
+    @apply transform transition-all duration-300;
+    @apply hover:scale-105 hover:shadow-glow;
     @apply active:scale-95;
+    @apply focus:outline-none focus:ring-2 focus:ring-primary-400/20;
+  }
+
+  .btn-secondary {
+    @apply bg-transparent border-2 border-primary-400 text-primary-400;
+    @apply font-semibold px-6 py-3 rounded-xl;
+    @apply transition-all duration-300;
+    @apply hover:bg-primary-400 hover:text-white hover:shadow-glow;
+    @apply focus:outline-none focus:ring-2 focus:ring-primary-400/20;
+  }
+
+  .control-button {
+    @apply bg-neutral-800/50 text-neutral-300 border border-neutral-700;
+    @apply rounded-xl transition-all duration-300;
+    @apply hover:bg-neutral-700/50 hover:text-white hover:border-neutral-600;
+    @apply focus:outline-none focus:ring-2 focus:ring-primary-400/20;
+  }
+
+  /* Card Components */
+  .card {
+    @apply bg-neutral-900/50 backdrop-blur-sm border border-neutral-800 rounded-2xl;
+    @apply shadow-xl;
+  }
+
+  .card-hover {
+    @apply card transition-all duration-300;
+    @apply hover:bg-neutral-900/70 hover:shadow-glow-sm hover:-translate-y-1;
+    @apply hover:border-neutral-700;
   }
 
   .glass-card {
-    @apply bg-white/10 backdrop-blur-sm border border-white/20 rounded-xl;
+    @apply bg-white/5 backdrop-blur-md border border-white/10 rounded-xl;
+    @apply shadow-2xl;
+  }
+
+  /* Text Components */
+  .text-gradient {
+    @apply bg-button-gradient bg-clip-text text-transparent;
+    background-size: 200% 200%;
   }
 
   .gradient-text {
-    @apply bg-gradient-to-r from-electric-blue via-bright-turquoise to-laser-pink;
-    @apply bg-clip-text text-transparent;
+    @apply text-gradient;
+  }
+
+  /* Layout Components */
+  .container-custom {
+    @apply max-w-7xl mx-auto px-4 sm:px-6 lg:px-8;
+  }
+
+  /* Responsive Navigation */
+  .nav-link {
+    @apply flex items-center space-x-3 px-4 py-3 rounded-xl;
+    @apply text-neutral-300 font-medium transition-all duration-300;
+    @apply hover:bg-white/10 hover:text-white;
+    @apply focus:outline-none focus:ring-2 focus:ring-primary-400/20;
+  }
+
+  .nav-link.active {
+    @apply bg-primary-500/20 text-primary-400 shadow-glow-sm;
+  }
+
+  /* Responsive Button Sizes */
+  .btn-sm {
+    @apply px-4 py-2 text-sm;
+  }
+
+  .btn-lg {
+    @apply px-8 py-4 text-lg;
+  }
+
+  .btn-xl {
+    @apply px-10 py-5 text-xl;
+  }
+
+  /* Mobile-First Responsive Text */
+  .text-responsive-sm {
+    @apply text-sm sm:text-base;
+  }
+
+  .text-responsive-md {
+    @apply text-base sm:text-lg md:text-xl;
+  }
+
+  .text-responsive-lg {
+    @apply text-lg sm:text-xl md:text-2xl lg:text-3xl;
+  }
+
+  .text-responsive-xl {
+    @apply text-xl sm:text-2xl md:text-3xl lg:text-4xl xl:text-5xl;
+  }
+
+  /* Touch-Friendly Interactive Elements */
+  .touch-button {
+    @apply min-h-[44px] min-w-[44px] flex items-center justify-center;
+  }
+
+  /* Audio Components */
+  .audio-bar {
+    @apply transition-all duration-300 ease-in-out;
+  }
+
+  /* Shadow Utilities */
+  .shadow-glow {
+    box-shadow: 0 0 20px rgba(0, 212, 255, 0.3), 0 0 40px rgba(0, 255, 204, 0.2);
+  }
+
+  .shadow-glow-sm {
+    box-shadow: 0 0 10px rgba(0, 212, 255, 0.2), 0 0 20px rgba(0, 255, 204, 0.1);
+  }
+
+  /* Background Gradients */
+  .bg-hero-gradient {
+    background: radial-gradient(ellipse at center, rgba(0, 212, 255, 0.1) 0%, rgba(13, 13, 13, 0.9) 50%, #0d0d0d 100%);
+  }
+
+  .bg-club-gradient {
+    background: linear-gradient(135deg, #0d0d0d 0%, rgba(0, 212, 255, 0.05) 50%, #0d0d0d 100%);
+  }
+
+  .bg-button-gradient {
+    background: linear-gradient(135deg, #00d4ff 0%, #00ffcc 100%);
+  }
+
+  /* Mobile Menu Animations */
+  @media (max-width: 768px) {
+    .nav-link {
+      @apply w-full justify-start;
+    }
+    
+    .btn-primary, .btn-secondary {
+      @apply w-full justify-center;
+    }
   }
 }
