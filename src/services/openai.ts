@@ -51,7 +51,7 @@ export class OpenAIService {
    * Analyze crowd audio and generate music recommendations
    */
   async analyzeCrowdAudio(
-    audioData: ArrayBuffer
+    _audioData: ArrayBuffer
   ): Promise<AudioAnalysisResult> {
     try {
       await this.rateLimit();

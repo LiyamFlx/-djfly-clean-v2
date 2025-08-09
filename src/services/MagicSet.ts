@@ -1,4 +1,4 @@
-import { Track, AdvancedTrackAnalysis } from '../types/audio';
+import { Track } from '../types/audio';
 import { SessionContext, EnergyPoint } from '../types/session';
 
 export interface MagicSetResult {

@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { spotifyService } from '@/services/spotify';
-import { authService } from '@/services/auth';
 
 const SpotifyCallbackPage: React.FC = () => {
   const [searchParams] = useSearchParams();
@@ -16,7 +15,6 @@ const SpotifyCallbackPage: React.FC = () => {
       try {
         const code = searchParams.get('code');
         const error = searchParams.get('error');
-        const state = searchParams.get('state');
 
         if (error) {
           setStatus('error');

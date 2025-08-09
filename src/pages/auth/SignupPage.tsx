@@ -49,7 +49,7 @@ const SignupPage: React.FC = () => {
       } else {
         setError(result.error || 'Signup failed');
       }
-    } catch (_err) {
+    } catch {
       setError('An unexpected error occurred');
     } finally {
       setIsLoading(false);

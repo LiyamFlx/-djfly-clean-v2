@@ -1,4 +1,4 @@
-import { Session, SessionEvent, SessionAnalytics } from '../types/session';
+import { Session, SessionEvent } from '../types/session';
 import { Track } from '../types/audio';
 
 export interface ProducerReport {
@@ -215,8 +215,6 @@ export class MagicProducer {
 
     // Analyze session patterns
     const energyPattern = this.analyzeEnergyPattern();
-    const crowdPreferences = this.analyzeCrowdPreferences();
-    const transitionQuality = this.analyzeTransitionQuality();
 
     // Generate recommendations based on analysis
     const highEnergyTracks = this.tracks.filter((t) => (t.energy || 0) > 0.8);
@@ -549,7 +547,7 @@ export class MagicProducer {
   private analyzeMoodProgression(): CrowdInsights['moodProgression'] {
     const crowdEvents = this.events.filter((e) => e.type === 'CROWD_REACT');
 
-    return crowdEvents.map((event, index) => ({
+    return crowdEvents.map((event) => ({
       timestamp: event.payload.timestamp,
       mood: event.payload.crowd_response?.mood || 'neutral',
       energy: event.payload.crowd_response?.energy || 0,
@@ -587,7 +585,8 @@ export class MagicProducer {
 
   private calculateTechnicalMetrics(): PerformanceMetrics['technical'] {
     const transitionEvents = this.events.filter((e) => e.type === 'TRANSITION');
-    const errorEvents = this.events.filter((e) => e.type === 'ERROR');
+    // Collect error events (reserved for future diagnostics)
+    this.events.filter((e) => e.type === 'ERROR');
 
     const transitionQuality =
       transitionEvents.length > 0
@@ -608,7 +607,8 @@ export class MagicProducer {
   private calculateArtisticMetrics(): PerformanceMetrics['artistic'] {
     const crowdSatisfaction = this.calculateCrowdSatisfaction();
     const energyFlow = this.assessEnergyFlow();
-    const trackVariety = this.calculateTrackVariety();
+    // Track variety (reserved for future analytics)
+    this.calculateTrackVariety();
 
     return {
       trackSelection: 0.85, // Simulated
@@ -760,14 +760,14 @@ export class MagicProducer {
 
   // Public Methods
   async exportReport(
-    reportId: string,
+    _reportId: string,
     format: 'csv' | 'pdf' | 'json'
   ): Promise<string> {
     // In real implementation, generate and return export
-    return `export_${reportId}.${format}`;
+    return `export_${Date.now()}.${format}`;
   }
 
-  getReport(reportId: string): ProducerReport | null {
+  getReport(_reportId: string): ProducerReport | null {
     // In real implementation, load from database
     return null;
   }

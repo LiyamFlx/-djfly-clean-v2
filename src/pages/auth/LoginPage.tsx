@@ -22,7 +22,7 @@ const LoginPage: React.FC = () => {
       } else {
         setError(result.error || 'Login failed');
       }
-    } catch (_err) {
+    } catch {
       setError('An unexpected error occurred');
     } finally {
       setIsLoading(false);

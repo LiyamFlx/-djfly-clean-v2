@@ -121,7 +121,7 @@ export function useAudioPlayer(
         currentTrackRef.current = track;
 
         // Load track into deck A
-        magicPlayerRef.current.loadTrack('A', track).catch((_err) => {
+        magicPlayerRef.current.loadTrack('A', track).catch(() => {
           setError('Failed to load track');
           setIsLoading(false);
         });
@@ -156,7 +156,7 @@ export function useAudioPlayer(
       if (magicPlayerRef.current) {
         magicPlayerRef.current.play('A');
       }
-    } catch (_err) {
+    } catch {
       setError('Failed to start playback');
       setIsLoading(false);
     }
@@ -196,7 +196,6 @@ export function useAudioPlayer(
   // Get frequency data for visualization
   const getFrequencyData = useCallback(() => {
     if (magicPlayerRef.current) {
-      const analysis = magicPlayerRef.current.getCurrentAnalysis();
       return new Uint8Array(128); // Placeholder - implement actual frequency data
     }
     return new Uint8Array(128);
@@ -205,7 +204,6 @@ export function useAudioPlayer(
   // Get time domain data for visualization
   const getTimeDomainData = useCallback(() => {
     if (magicPlayerRef.current) {
-      const analysis = magicPlayerRef.current.getCurrentAnalysis();
       return new Uint8Array(128); // Placeholder - implement actual time domain data
     }
     return new Uint8Array(128);
