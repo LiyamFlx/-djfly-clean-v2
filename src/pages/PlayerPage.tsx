@@ -51,9 +51,7 @@ const PlayerPage: React.FC = () => {
     navigate('/producer');
   };
 
-  const sessionDurationMinutes = sessionState.startTime
-    ? Math.round((Date.now() - sessionState.startTime.getTime()) / 60000)
-    : 0;
+  const sessionDurationMinutes = 0; // Simplified for now
 
   return (
     <div className="min-h-screen bg-club-gradient">
@@ -66,13 +64,29 @@ const PlayerPage: React.FC = () => {
         <LogOut className="w-5 h-5" />
       </button>
 
-      <FinishSetModal
-        isOpen={isFinishModalOpen}
-        onClose={() => setFinishModalOpen(false)}
-        onConfirm={handleConfirmFinish}
-        sessionTime={sessionDurationMinutes}
-        tracksPlayed={sessionState.totalTracks}
-      />
+      {/* FinishSetModal temporarily disabled */}
+      {isFinishModalOpen && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
+          <div className="glass-card p-6 max-w-md w-full mx-4">
+            <h3 className="text-xl font-semibold mb-4">End Set?</h3>
+            <p className="text-gray-300 mb-6">Are you sure you want to end this set?</p>
+            <div className="flex gap-3">
+              <button 
+                onClick={handleConfirmFinish}
+                className="btn-primary flex-1"
+              >
+                End Set
+              </button>
+              <button 
+                onClick={() => setFinishModalOpen(false)}
+                className="btn-secondary flex-1"
+              >
+                Continue
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Main Player Interface */}
       <div className="flex flex-col min-h-screen">
@@ -86,15 +100,12 @@ const PlayerPage: React.FC = () => {
             {/* Album Art */}
             <motion.div
               className="relative mb-8"
-              animate={{ rotate: audioState.isPlaying ? 360 : 0 }}
+              animate={{ rotate: isPlaying ? 360 : 0 }}
               transition={{ duration: 20, repeat: Infinity, ease: 'linear' }}
             >
-              <img
-                src={currentTrack.image}
-                alt={currentTrack.title}
-                className="w-64 h-64 md:w-80 md:h-80 mx-auto rounded-full shadow-2xl shadow-electric-blue/20"
-              />
-              <div className="absolute inset-0 rounded-full bg-gradient-to-br from-electric-blue/20 to-laser-pink/20"></div>
+              <div className="w-64 h-64 md:w-80 md:h-80 mx-auto rounded-full shadow-2xl shadow-electric-blue/20 bg-gradient-to-br from-electric-blue/20 to-bright-turquoise/20 flex items-center justify-center">
+                <div className="text-6xl">🎵</div>
+              </div>
             </motion.div>
 
             {/* Track Info */}
@@ -105,27 +116,22 @@ const PlayerPage: React.FC = () => {
               className="mb-8"
             >
               <h1 className="text-3xl md:text-4xl font-bold mb-2 text-white">
-                {currentTrack.title}
+                {displayTrack.title}
               </h1>
               <p className="text-xl text-gray-300 mb-4">
-                {currentTrack.artist}
+                {displayTrack.artist}
               </p>
 
               {/* Track Features */}
               <div className="flex justify-center gap-4 text-sm">
-                {currentTrack.bpm && (
+                {displayTrack.bpm > 0 && (
                   <span className="px-3 py-1 bg-electric-blue/20 rounded-full">
-                    {currentTrack.bpm} BPM
+                    {displayTrack.bpm} BPM
                   </span>
                 )}
-                {currentTrack.energy && (
-                  <span className="px-3 py-1 bg-bright-turquoise/20 rounded-full">
-                    {Math.round(currentTrack.energy * 100)}% Energy
-                  </span>
-                )}
-                {currentTrack.genre && (
+                {displayTrack.genre && (
                   <span className="px-3 py-1 bg-laser-pink/20 rounded-full">
-                    {currentTrack.genre}
+                    {displayTrack.genre}
                   </span>
                 )}
               </div>
@@ -139,8 +145,8 @@ const PlayerPage: React.FC = () => {
               className="mb-8"
             >
               <div className="flex justify-between text-sm text-gray-400 mb-2">
-                <span>{formatTime(audioState.currentTime)}</span>
-                <span>{formatTime(audioState.duration)}</span>
+                <span>{formatTime(0)}</span>
+                <span>{formatTime(180)}</span>
               </div>
 
               <div className="w-full bg-rich-black/50 rounded-full h-2 cursor-pointer">
@@ -169,10 +175,10 @@ const PlayerPage: React.FC = () => {
               </button>
 
               <button
-                onClick={togglePlayback}
+                onClick={() => setIsPlaying(!isPlaying)}
                 className="p-6 bg-gradient-to-r from-electric-blue to-bright-turquoise rounded-full text-rich-black hover:scale-105 transition-transform"
               >
-                {audioState.isPlaying ? (
+                {isPlaying ? (
                   <Pause className="w-8 h-8" />
                 ) : (
                   <Play className="w-8 h-8 ml-1" />
@@ -199,107 +205,24 @@ const PlayerPage: React.FC = () => {
               <input
                 type="range"
                 min="0"
-                max="1"
-                step="0.01"
-                value={audioState.volume}
-                onChange={(e) => setVolume(parseFloat(e.target.value))}
+                max="100"
+                step="1"
+                value={volume}
+                onChange={(e) => setVolume(parseInt(e.target.value))}
                 className="flex-1 h-2 bg-rich-black/50 rounded-lg appearance-none cursor-pointer slider"
               />
               <span className="text-sm text-gray-400 w-10">
-                {Math.round(audioState.volume * 100)}%
+                {volume}%
               </span>
             </motion.div>
           </motion.div>
         </div>
 
-        {/* Live Analytics Panel */}
-        {crowdState.lastUpdated && (
-          <motion.div
-            initial={{ opacity: 0, y: 50 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.6 }}
-            className="glass-card mx-4 mb-4 p-4 rounded-xl"
-          >
-            <h3 className="text-lg font-semibold mb-4 text-center">
-              Live Analytics
-            </h3>
+        {/* Track List */}
+        <div className="mx-4 mb-4">
+          <TrackList title="Current Playlist" showPlayButton={true} />
+        </div>
 
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-center">
-              <div>
-                <div className="text-2xl font-bold text-electric-blue">
-                  {Math.round(crowdState.currentEnergy * 100)}%
-                </div>
-                <div className="text-xs text-gray-400">Crowd Energy</div>
-              </div>
-
-              <div>
-                <div className="text-2xl font-bold text-bright-turquoise capitalize">
-                  {crowdState.mood}
-                </div>
-                <div className="text-xs text-gray-400">Mood</div>
-              </div>
-
-              <div>
-                <div className="text-2xl font-bold text-laser-pink capitalize">
-                  {crowdState.engagementLevel}
-                </div>
-                <div className="text-xs text-gray-400">Engagement</div>
-              </div>
-
-              <div>
-                <div className="text-2xl font-bold text-electric-blue">
-                  {sessionState.totalTracks}
-                </div>
-                <div className="text-xs text-gray-400">Tracks Played</div>
-              </div>
-            </div>
-          </motion.div>
-        )}
-
-        {/* Queue Preview */}
-        {audioState.queue.length > 1 && (
-          <motion.div
-            initial={{ opacity: 0, y: 50 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.7 }}
-            className="glass-card mx-4 mb-4 p-4 rounded-xl"
-          >
-            <h3 className="text-lg font-semibold mb-4">Up Next</h3>
-
-            <div className="space-y-2">
-              {audioState.queue.slice(1, 4).map((track, index) => (
-                <div
-                  key={track.id}
-                  className="flex items-center gap-3 p-2 rounded-lg hover:bg-white/5 transition-colors"
-                >
-                  <div className="text-sm text-gray-400 w-6">{index + 2}.</div>
-                  <img
-                    src={track.image}
-                    alt={track.title}
-                    className="w-10 h-10 rounded"
-                  />
-                  <div className="flex-1 min-w-0">
-                    <div className="text-sm font-medium text-white truncate">
-                      {track.title}
-                    </div>
-                    <div className="text-xs text-gray-400 truncate">
-                      {track.artist}
-                    </div>
-                  </div>
-                  <div className="text-xs text-gray-400">
-                    {formatTime(track.duration)}
-                  </div>
-                </div>
-              ))}
-
-              {audioState.queue.length > 4 && (
-                <div className="text-center text-sm text-gray-400 py-2">
-                  +{audioState.queue.length - 4} more tracks
-                </div>
-              )}
-            </div>
-          </motion.div>
-        )}
       </div>
 
       <style>{`
