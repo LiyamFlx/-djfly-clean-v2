@@ -51,15 +51,18 @@ VITE_PLAYER_MAX_VOLUME=90
 ## 🚀 Setup Instructions
 
 ### 1. Create .env file
+
 ```bash
 # In your project root directory
 touch .env
 ```
 
 ### 2. Add your real credentials
+
 Replace the placeholder values with your actual API credentials.
 
 ### 3. Restart the development server
+
 ```bash
 # Stop the current server (Ctrl+C)
 # Then restart
@@ -86,12 +89,14 @@ After adding real credentials:
 ## 📊 Expected Changes
 
 **Before (with demo credentials):**
+
 - ❌ Supabase 404 errors
-- ❌ Spotify 400 errors  
+- ❌ Spotify 400 errors
 - ❌ OpenAI 401 errors
 - ❌ Limited functionality
 
 **After (with real credentials):**
+
 - ✅ Successful API connections
 - ✅ Full functionality
 - ✅ Real data from services
@@ -100,6 +105,7 @@ After adding real credentials:
 ## 🛡️ Security Improvements Active
 
 With real credentials, you'll also benefit from:
+
 - ✅ Secure token storage
 - ✅ Input validation
 - ✅ Rate limiting

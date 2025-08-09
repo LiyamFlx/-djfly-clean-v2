@@ -33,7 +33,10 @@ export class MusicLibrary {
             return lastfmTracks;
           }
         } catch (error) {
-          console.warn('⚠️ Last.fm search failed, falling back to demo tracks:', error);
+          console.warn(
+            '⚠️ Last.fm search failed, falling back to demo tracks:',
+            error
+          );
         }
       }
 
@@ -49,13 +52,21 @@ export class MusicLibrary {
   /**
    * Get track recommendations using AI
    */
-  async getRecommendations(seedTracks: Track[], targetEnergy?: number, targetMood?: string): Promise<Track[]> {
+  async getRecommendations(
+    seedTracks: Track[],
+    targetEnergy?: number,
+    targetMood?: string
+  ): Promise<Track[]> {
     try {
       if (!openaiService.isConfigured()) {
         throw new Error('AI service not configured');
       }
 
-      return await openaiService.getTrackRecommendations(seedTracks, targetEnergy, targetMood);
+      return await openaiService.getTrackRecommendations(
+        seedTracks,
+        targetEnergy,
+        targetMood
+      );
     } catch (error) {
       console.error('❌ AI recommendations failed:', error);
       throw error;
@@ -71,7 +82,10 @@ export class MusicLibrary {
         throw new Error('AI service not configured');
       }
 
-      const aiRecommendation = await openaiService.generatePlaylist(prompt, context);
+      const aiRecommendation = await openaiService.generatePlaylist(
+        prompt,
+        context
+      );
       return aiRecommendation.tracks;
     } catch (error) {
       console.error('❌ Playlist generation failed:', error);
@@ -115,7 +129,7 @@ export class MusicLibrary {
    * Add track to library
    */
   addTrack(track: Track): void {
-    const existingIndex = this.tracks.findIndex(t => t.id === track.id);
+    const existingIndex = this.tracks.findIndex((t) => t.id === track.id);
     if (existingIndex === -1) {
       this.tracks.push(track);
     }
@@ -125,7 +139,7 @@ export class MusicLibrary {
    * Remove track from library
    */
   removeTrack(trackId: string): void {
-    this.tracks = this.tracks.filter(track => track.id !== trackId);
+    this.tracks = this.tracks.filter((track) => track.id !== trackId);
   }
 
   /**
@@ -208,11 +222,12 @@ export class MusicLibrary {
     ];
 
     // Filter by query if provided
-    const filtered = query 
-      ? demoTracks.filter(track => 
-          track.title.toLowerCase().includes(query.toLowerCase()) ||
-          track.artist.toLowerCase().includes(query.toLowerCase()) ||
-          track.genre.toLowerCase().includes(query.toLowerCase())
+    const filtered = query
+      ? demoTracks.filter(
+          (track) =>
+            track.title.toLowerCase().includes(query.toLowerCase()) ||
+            track.artist.toLowerCase().includes(query.toLowerCase()) ||
+            track.genre.toLowerCase().includes(query.toLowerCase())
         )
       : demoTracks;
 
@@ -251,7 +266,7 @@ export class MusicLibrary {
   removeTrackFromPlaylist(playlistId: string, trackId: string): void {
     const playlist = this.playlists.get(playlistId);
     if (playlist) {
-      const updatedPlaylist = playlist.filter(track => track.id !== trackId);
+      const updatedPlaylist = playlist.filter((track) => track.id !== trackId);
       this.playlists.set(playlistId, updatedPlaylist);
     }
   }
@@ -280,11 +295,17 @@ export class MusicLibrary {
   /**
    * Search tracks by BPM range
    */
-  async searchByBPM(minBPM: number, maxBPM: number, limit: number = 20): Promise<Track[]> {
+  async searchByBPM(
+    minBPM: number,
+    maxBPM: number,
+    limit: number = 20
+  ): Promise<Track[]> {
     const allTracks = await this.searchTracks('', 100);
-    return allTracks.filter(track => 
-      track.bpm && track.bpm >= minBPM && track.bpm <= maxBPM
-    ).slice(0, limit);
+    return allTracks
+      .filter(
+        (track) => track.bpm && track.bpm >= minBPM && track.bpm <= maxBPM
+      )
+      .slice(0, limit);
   }
 
   /**
@@ -300,7 +321,9 @@ export class MusicLibrary {
    */
   getFavorites(): Track[] {
     // In a real implementation, this would come from user preferences
-    return this.tracks.filter(track => track.popularity && track.popularity > 80);
+    return this.tracks.filter(
+      (track) => track.popularity && track.popularity > 80
+    );
   }
 
   /**
@@ -317,7 +340,7 @@ export class MusicLibrary {
   exportLibrary(): string {
     return JSON.stringify({
       tracks: this.tracks,
-      playlists: Object.fromEntries(this.playlists)
+      playlists: Object.fromEntries(this.playlists),
     });
   }
 

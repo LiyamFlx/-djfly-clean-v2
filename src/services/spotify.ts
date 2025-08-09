@@ -45,7 +45,7 @@ export class SpotifyService {
     this.clientId = API_CONFIG.spotify.clientId || '';
     this.clientSecret = API_CONFIG.spotify.clientSecret || '';
     this.redirectUri = API_CONFIG.spotify.redirectUri || '';
-    
+
     if (!this.clientId || !this.clientSecret) {
       console.error('❌ Spotify credentials not configured');
     } else {
@@ -79,7 +79,7 @@ export class SpotifyService {
         method: 'POST',
         headers: {
           'Content-Type': 'application/x-www-form-urlencoded',
-          'Authorization': `Basic ${btoa(`${this.clientId}:${this.clientSecret}`)}`,
+          Authorization: `Basic ${btoa(`${this.clientId}:${this.clientSecret}`)}`,
         },
         body: new URLSearchParams({
           grant_type: 'authorization_code',
@@ -94,7 +94,7 @@ export class SpotifyService {
 
       const data: SpotifyTokenResponse = await response.json();
       this.accessToken = data.access_token;
-      this.tokenExpiry = Date.now() + (data.expires_in * 1000);
+      this.tokenExpiry = Date.now() + data.expires_in * 1000;
       this.refreshToken = data.refresh_token || null;
 
       // Store token securely
@@ -119,7 +119,7 @@ export class SpotifyService {
         method: 'POST',
         headers: {
           'Content-Type': 'application/x-www-form-urlencoded',
-          'Authorization': `Basic ${btoa(`${this.clientId}:${this.clientSecret}`)}`,
+          Authorization: `Basic ${btoa(`${this.clientId}:${this.clientSecret}`)}`,
         },
         body: new URLSearchParams({
           grant_type: 'refresh_token',
@@ -133,8 +133,8 @@ export class SpotifyService {
 
       const data: SpotifyTokenResponse = await response.json();
       this.accessToken = data.access_token;
-      this.tokenExpiry = Date.now() + (data.expires_in * 1000);
-      
+      this.tokenExpiry = Date.now() + data.expires_in * 1000;
+
       if (data.refresh_token) {
         this.refreshToken = data.refresh_token;
       }
@@ -170,14 +170,16 @@ export class SpotifyService {
     try {
       const token = await this.getValidToken();
       if (!token) {
-        throw new Error('Spotify not authenticated. Please authenticate first.');
+        throw new Error(
+          'Spotify not authenticated. Please authenticate first.'
+        );
       }
 
       const response = await fetch(
         `${API_CONFIG.spotify.baseUrl}/search?q=${encodeURIComponent(query)}&type=track&limit=${limit}`,
         {
           headers: {
-            'Authorization': `Bearer ${token}`,
+            Authorization: `Bearer ${token}`,
           },
         }
       );
@@ -187,11 +189,11 @@ export class SpotifyService {
       }
 
       const data: SpotifySearchResponse = await response.json();
-      
-      return data.tracks.items.map(track => ({
+
+      return data.tracks.items.map((track) => ({
         id: track.id,
         title: track.name,
-        artist: track.artists.map(a => a.name).join(', '),
+        artist: track.artists.map((a) => a.name).join(', '),
         album: track.album.name,
         duration: Math.floor(track.duration_ms / 1000),
         spotify_url: track.external_urls.spotify,
@@ -221,7 +223,7 @@ export class SpotifyService {
         `${API_CONFIG.spotify.baseUrl}/me/playlists?limit=50`,
         {
           headers: {
-            'Authorization': `Bearer ${token}`,
+            Authorization: `Bearer ${token}`,
           },
         }
       );
@@ -252,7 +254,7 @@ export class SpotifyService {
         `${API_CONFIG.spotify.baseUrl}/audio-features/${trackId}`,
         {
           headers: {
-            'Authorization': `Bearer ${token}`,
+            Authorization: `Bearer ${token}`,
           },
         }
       );
@@ -279,7 +281,7 @@ export class SpotifyService {
         expires_in: data.expires_in,
         timestamp: Date.now(),
       };
-      
+
       localStorage.setItem('spotify_token', JSON.stringify(tokenData));
     } catch (error) {
       console.error('❌ Failed to store Spotify token:', error);
@@ -296,7 +298,7 @@ export class SpotifyService {
 
       const tokenData = JSON.parse(stored);
       const now = Date.now();
-      const expiry = tokenData.timestamp + (tokenData.expires_in * 1000);
+      const expiry = tokenData.timestamp + tokenData.expires_in * 1000;
 
       if (now >= expiry) {
         this.clearTokens();

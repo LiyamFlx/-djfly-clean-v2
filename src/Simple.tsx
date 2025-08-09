@@ -190,7 +190,7 @@ const MagicSetPage = () => {
           <textarea
             value={prompt}
             onChange={(e) => setPrompt(e.target.value)}
-                            placeholder="Describe your perfect playlist - mood, energy, genre, venue..."
+            placeholder="Describe your perfect playlist - mood, energy, genre, venue..."
             className="w-full bg-gray-700 p-4 rounded text-white h-24 resize-none border border-gray-600 focus:border-purple-500 focus:outline-none"
           />
           <button

@@ -32,7 +32,7 @@ export class AudioEngine {
   private nextSource: AudioBufferSourceNode | null = null;
   private crossfadeGain: GainNode | null = null;
   private effectsChain: Map<string, AudioNode> = new Map();
-  
+
   private state: AudioState = {
     isPlaying: false,
     currentTrack: null,
@@ -48,8 +48,10 @@ export class AudioEngine {
 
   private audioBuffers: Map<string, AudioBuffer> = new Map();
   private stateChangeCallback: ((state: AudioState) => void) | null = null;
-  private progressCallback: ((currentTime: number, duration: number) => void) | null = null;
-  private progressInterval: NodeJS.Timeout | null = null;
+  private progressCallback:
+    | ((currentTime: number, duration: number) => void)
+    | null = null;
+  private progressInterval: ReturnType<typeof setInterval> | null = null;
 
   constructor() {
     this.initializeAudioContext();
@@ -60,21 +62,23 @@ export class AudioEngine {
    */
   private async initializeAudioContext(): Promise<void> {
     try {
-      this.audioContext = new (window.AudioContext || (window as any).webkitAudioContext)();
-      
+      this.audioContext = new (window.AudioContext ||
+        (window as unknown as { webkitAudioContext?: typeof AudioContext })
+          .webkitAudioContext)();
+
       // Create master gain node
       this.masterGain = this.audioContext.createGain();
       this.masterGain.connect(this.audioContext.destination);
-      
+
       // Create analyser for visualization
-    this.analyser = this.audioContext.createAnalyser();
-    this.analyser.fftSize = 2048;
+      this.analyser = this.audioContext.createAnalyser();
+      this.analyser.fftSize = 2048;
       this.analyser.connect(this.masterGain);
-      
+
       // Create crossfade gain
       this.crossfadeGain = this.audioContext.createGain();
       this.crossfadeGain.connect(this.analyser);
-      
+
       console.log('🎵 Audio engine initialized');
     } catch (error) {
       console.error('❌ Audio context initialization failed:', error);
@@ -91,7 +95,7 @@ export class AudioEngine {
 
     try {
       let audioUrl = track.preview_url || track.spotify_url || '';
-      
+
       // If no preview URL, throw error
       if (!audioUrl) {
         throw new Error('No audio URL available for this track');
@@ -104,7 +108,7 @@ export class AudioEngine {
 
       const arrayBuffer = await response.arrayBuffer();
       const audioBuffer = await this.audioContext!.decodeAudioData(arrayBuffer);
-      
+
       this.audioBuffers.set(track.id, audioBuffer);
       return audioBuffer;
     } catch (error) {
@@ -124,37 +128,37 @@ export class AudioEngine {
     try {
       // Stop current playback
       this.stop();
-      
+
       // Load audio buffer
       const audioBuffer = await this.loadAudio(track);
-      
+
       // Create source node
       this.currentSource = this.audioContext.createBufferSource();
       this.currentSource.buffer = audioBuffer;
-      
+
       // Connect through effects chain
       this.connectThroughEffects(this.currentSource);
-      
+
       // Set playback rate based on BPM
       if (track.bpm && this.state.bpm) {
         const rateRatio = track.bpm / this.state.bpm;
         this.currentSource.playbackRate.value = rateRatio;
       }
-      
+
       // Start playback
       this.currentSource.start(0, startTime);
-      
+
       // Update state
       this.state.isPlaying = true;
       this.state.currentTrack = track;
       this.state.currentTime = startTime;
       this.state.duration = audioBuffer.duration;
-      
+
       // Start progress tracking
       this.startProgressTracking();
-      
+
       this.notifyStateChange();
-      
+
       console.log('🎵 Playing track:', track.title);
     } catch (error) {
       console.error('❌ Playback error:', error);
@@ -165,7 +169,10 @@ export class AudioEngine {
   /**
    * Crossfade to next track
    */
-  async crossfadeToNext(nextTrack: Track, crossfadeDuration: number = 3): Promise<void> {
+  async crossfadeToNext(
+    nextTrack: Track,
+    crossfadeDuration: number = 3
+  ): Promise<void> {
     if (!this.audioContext || !this.currentSource) {
       await this.playTrack(nextTrack);
       return;
@@ -174,40 +181,41 @@ export class AudioEngine {
     try {
       // Load next track
       const nextBuffer = await this.loadAudio(nextTrack);
-      
+
       // Create next source
       this.nextSource = this.audioContext.createBufferSource();
       this.nextSource.buffer = nextBuffer;
-      
+
       // Connect next source
       this.connectThroughEffects(this.nextSource);
-      
+
       // Calculate crossfade timing
       const currentTime = this.audioContext.currentTime;
-      const currentEndTime = currentTime + (this.state.duration - this.state.currentTime);
+      const currentEndTime =
+        currentTime + (this.state.duration - this.state.currentTime);
       const nextStartTime = currentEndTime - crossfadeDuration;
-      
+
       // Start next track
       this.nextSource.start(nextStartTime);
-      
+
       // Fade out current track
       this.currentSource!.stop(currentEndTime);
-      
+
       // Fade in next track
       const nextGain = this.audioContext.createGain();
       nextGain.connect(this.crossfadeGain!);
       nextGain.gain.setValueAtTime(0, nextStartTime);
       nextGain.gain.linearRampToValueAtTime(this.state.volume, currentEndTime);
-      
+
       // Update state
       this.state.currentTrack = nextTrack;
       this.state.currentTime = 0;
       this.state.duration = nextBuffer.duration;
-      
+
       // Clean up old source
       this.currentSource = this.nextSource;
       this.nextSource = null;
-      
+
       console.log('🎵 Crossfading to:', nextTrack.title);
     } catch (error) {
       console.error('❌ Crossfade error:', error);
@@ -223,15 +231,15 @@ export class AudioEngine {
       this.currentSource.stop();
       this.currentSource = null;
     }
-    
+
     if (this.nextSource) {
       this.nextSource.stop();
       this.nextSource = null;
     }
-    
+
     this.state.isPlaying = false;
     this.state.currentTime = 0;
-    
+
     this.stopProgressTracking();
     this.notifyStateChange();
   }
@@ -244,7 +252,7 @@ export class AudioEngine {
       this.currentSource.stop();
       this.currentSource = null;
     }
-    
+
     this.state.isPlaying = false;
     this.stopProgressTracking();
     this.notifyStateChange();
@@ -255,7 +263,7 @@ export class AudioEngine {
    */
   async resume(): Promise<void> {
     if (!this.state.currentTrack) return;
-    
+
     await this.playTrack(this.state.currentTrack, this.state.currentTime);
   }
 
@@ -264,9 +272,9 @@ export class AudioEngine {
    */
   async seek(time: number): Promise<void> {
     if (!this.state.currentTrack) return;
-    
+
     this.state.currentTime = Math.max(0, Math.min(time, this.state.duration));
-    
+
     if (this.state.isPlaying) {
       await this.playTrack(this.state.currentTrack, this.state.currentTime);
     } else {
@@ -279,11 +287,11 @@ export class AudioEngine {
    */
   setVolume(volume: number): void {
     this.state.volume = Math.max(0, Math.min(1, volume));
-    
+
     if (this.masterGain) {
       this.masterGain.gain.value = this.state.volume;
     }
-    
+
     this.notifyStateChange();
   }
 
@@ -307,7 +315,7 @@ export class AudioEngine {
    * Remove track from queue
    */
   removeFromQueue(trackId: string): void {
-    this.state.queue = this.state.queue.filter(track => track.id !== trackId);
+    this.state.queue = this.state.queue.filter((track) => track.id !== trackId);
     this.notifyStateChange();
   }
 
@@ -333,7 +341,7 @@ export class AudioEngine {
     if (!this.analyser) {
       return new Uint8Array(1024);
     }
-    
+
     const dataArray = new Uint8Array(this.analyser.frequencyBinCount);
     this.analyser.getByteFrequencyData(dataArray);
     return dataArray;
@@ -346,7 +354,7 @@ export class AudioEngine {
     if (!this.analyser) {
       return new Uint8Array(1024);
     }
-    
+
     const dataArray = new Uint8Array(this.analyser.frequencyBinCount);
     this.analyser.getByteTimeDomainData(dataArray);
     return dataArray;
@@ -357,7 +365,7 @@ export class AudioEngine {
    */
   addEffect(effect: AudioEffect): void {
     if (!this.audioContext) return;
-    
+
     const effectNode = this.createEffectNode(effect);
     if (effectNode) {
       this.effectsChain.set(effect.type, effectNode);
@@ -378,7 +386,7 @@ export class AudioEngine {
    */
   private createEffectNode(effect: AudioEffect): AudioNode | null {
     if (!this.audioContext) return null;
-    
+
     switch (effect.type) {
       case 'reverb':
         return this.createReverbNode(effect.parameters);
@@ -404,14 +412,16 @@ export class AudioEngine {
     const sampleRate = this.audioContext!.sampleRate;
     const length = sampleRate * (parameters.decay || 2);
     const impulse = this.audioContext!.createBuffer(2, length, sampleRate);
-    
+
     for (let channel = 0; channel < 2; channel++) {
       const channelData = impulse.getChannelData(channel);
       for (let i = 0; i < length; i++) {
-        channelData[i] = (Math.random() * 2 - 1) * Math.pow(1 - i / length, parameters.decay || 2);
+        channelData[i] =
+          (Math.random() * 2 - 1) *
+          Math.pow(1 - i / length, parameters.decay || 2);
       }
     }
-    
+
     convolver.buffer = impulse;
     return convolver;
   }
@@ -428,7 +438,9 @@ export class AudioEngine {
   /**
    * Create filter effect
    */
-  private createFilterNode(parameters: Record<string, number>): BiquadFilterNode {
+  private createFilterNode(
+    parameters: Record<string, number>
+  ): BiquadFilterNode {
     const filter = this.audioContext!.createBiquadFilter();
     filter.type = 'lowpass';
     filter.frequency.value = parameters.frequency || 1000;
@@ -439,7 +451,9 @@ export class AudioEngine {
   /**
    * Create compressor effect
    */
-  private createCompressorNode(parameters: Record<string, number>): DynamicsCompressorNode {
+  private createCompressorNode(
+    parameters: Record<string, number>
+  ): DynamicsCompressorNode {
     const compressor = this.audioContext!.createDynamicsCompressor();
     compressor.threshold.value = parameters.threshold || -24;
     compressor.knee.value = parameters.knee || 30;
@@ -452,18 +466,21 @@ export class AudioEngine {
   /**
    * Create distortion effect
    */
-  private createDistortionNode(parameters: Record<string, number>): WaveShaperNode {
+  private createDistortionNode(
+    parameters: Record<string, number>
+  ): WaveShaperNode {
     const distortion = this.audioContext!.createWaveShaper();
     const amount = parameters.amount || 50;
     const samples = 44100;
     const curve = new Float32Array(samples);
     const deg = Math.PI / 180;
-    
+
     for (let i = 0; i < samples; i++) {
       const x = (i * 2) / samples - 1;
-      curve[i] = ((3 + amount) * x * 20 * deg) / (Math.PI + amount * Math.abs(x));
+      curve[i] =
+        ((3 + amount) * x * 20 * deg) / (Math.PI + amount * Math.abs(x));
     }
-    
+
     distortion.curve = curve;
     distortion.oversample = '4x';
     return distortion;
@@ -474,13 +491,13 @@ export class AudioEngine {
    */
   private connectThroughEffects(source: AudioNode): void {
     let currentNode: AudioNode = source;
-    
+
     // Connect through all effects
     for (const effect of this.effectsChain.values()) {
       currentNode.connect(effect);
       currentNode = effect;
     }
-    
+
     // Connect to crossfade gain
     currentNode.connect(this.crossfadeGain!);
   }
@@ -499,11 +516,11 @@ export class AudioEngine {
    */
   private startProgressTracking(): void {
     this.stopProgressTracking();
-    
+
     this.progressInterval = setInterval(() => {
       if (this.state.isPlaying && this.state.currentTrack) {
         this.state.currentTime += 0.1;
-        
+
         if (this.state.currentTime >= this.state.duration) {
           this.handleTrackEnd();
         } else {
@@ -573,11 +590,11 @@ export class AudioEngine {
   destroy(): void {
     this.stop();
     this.stopProgressTracking();
-    
+
     if (this.audioContext) {
       this.audioContext.close();
     }
-    
+
     this.audioBuffers.clear();
     this.effectsChain.clear();
   }

@@ -42,6 +42,7 @@ supabase db push
 ## 🎯 **After Schema Deployment:**
 
 The following errors should be resolved:
+
 - ❌ `404 (Bad Request)` from Supabase
 - ❌ `invalid input syntax for type bigint`
 - ❌ Database connection issues

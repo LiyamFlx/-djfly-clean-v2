@@ -116,14 +116,17 @@ const CrowdResponseSimulator: React.FC<CrowdResponseSimulatorProps> = ({
 
   const [showAdvancedAnalytics, setShowAdvancedAnalytics] = useState(false);
   const [isSimulating, setIsSimulating] = useState(false);
-  const simulationInterval = useRef<ReturnType<typeof setInterval> | null>(null);
+  const simulationInterval = useRef<ReturnType<typeof setInterval> | null>(
+    null
+  );
 
   const updateCrowdEnergy = useCallback(() => {
     const analytics = advancedAudioService.getAnalytics() as any;
 
     // Calculate new energy based on audio and crowd factors
     const audioEnergy =
-      ((analytics as any).deckA?.energy || 0) + ((analytics as any).deckB?.energy || 0);
+      ((analytics as any).deckA?.energy || 0) +
+      ((analytics as any).deckB?.energy || 0);
     const crowdDensity = Math.random() * 0.3 + 0.7; // Simulated crowd density
     const motionActivity = Math.random() * 0.4 + 0.5; // Simulated motion
     const vocalResponse = Math.random() * 0.5 + 0.3; // Simulated vocal response
@@ -323,7 +326,9 @@ const CrowdResponseSimulator: React.FC<CrowdResponseSimulatorProps> = ({
           </div>
 
           <div className="text-center mb-4">
-            <div className={`text-4xl font-bold ${getEnergyColor(crowdEnergy.level)}`}>
+            <div
+              className={`text-4xl font-bold ${getEnergyColor(crowdEnergy.level)}`}
+            >
               {Math.round(crowdEnergy.level)}%
             </div>
             <div className="text-sm text-gray-400 capitalize">
@@ -342,11 +347,15 @@ const CrowdResponseSimulator: React.FC<CrowdResponseSimulatorProps> = ({
             </div>
             <div className="flex justify-between text-sm">
               <span>Motion Activity:</span>
-              <span>{Math.round(crowdEnergy.factors.motionActivity * 100)}%</span>
+              <span>
+                {Math.round(crowdEnergy.factors.motionActivity * 100)}%
+              </span>
             </div>
             <div className="flex justify-between text-sm">
               <span>Vocal Response:</span>
-              <span>{Math.round(crowdEnergy.factors.vocalResponse * 100)}%</span>
+              <span>
+                {Math.round(crowdEnergy.factors.vocalResponse * 100)}%
+              </span>
             </div>
           </div>
         </div>
@@ -356,10 +365,7 @@ const CrowdResponseSimulator: React.FC<CrowdResponseSimulatorProps> = ({
           <h3 className="text-lg font-semibold mb-4">Crowd Segments</h3>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             {crowdSegments.map((segment) => (
-              <div
-                key={segment.id}
-                className="bg-gray-700 p-3 rounded-lg"
-              >
+              <div key={segment.id} className="bg-gray-700 p-3 rounded-lg">
                 <div className="flex items-center justify-between mb-2">
                   <span className="text-sm font-medium capitalize">
                     {segment.id.replace('-', ' ')}
@@ -367,7 +373,9 @@ const CrowdResponseSimulator: React.FC<CrowdResponseSimulatorProps> = ({
                   {getMoodIcon(segment.mood)}
                 </div>
 
-                <div className={`text-2xl font-bold ${getEnergyColor(segment.energy)}`}>
+                <div
+                  className={`text-2xl font-bold ${getEnergyColor(segment.energy)}`}
+                >
                   {Math.round(segment.energy)}%
                 </div>
 
@@ -386,12 +394,15 @@ const CrowdResponseSimulator: React.FC<CrowdResponseSimulatorProps> = ({
                   </div>
                   <div className="flex justify-between text-xs">
                     <span>Recording:</span>
-                    <span>{Math.round(segment.behavior.phoneRecording * 100)}%</span>
+                    <span>
+                      {Math.round(segment.behavior.phoneRecording * 100)}%
+                    </span>
                   </div>
                 </div>
 
                 <div className="mt-2 text-xs text-gray-400">
-                  {segment.demographics.age} • {segment.demographics.groupSize} people
+                  {segment.demographics.age} • {segment.demographics.groupSize}{' '}
+                  people
                 </div>
               </div>
             ))}
@@ -405,19 +416,25 @@ const CrowdResponseSimulator: React.FC<CrowdResponseSimulatorProps> = ({
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           <div className="text-center">
             <div className="text-sm text-gray-400 mb-1">Next Minute</div>
-            <div className={`text-2xl font-bold ${getEnergyColor(crowdEnergy.predictions.nextMinute)}`}>
+            <div
+              className={`text-2xl font-bold ${getEnergyColor(crowdEnergy.predictions.nextMinute)}`}
+            >
               {Math.round(crowdEnergy.predictions.nextMinute)}%
             </div>
           </div>
           <div className="text-center">
             <div className="text-sm text-gray-400 mb-1">Peak Time</div>
-            <div className={`text-2xl font-bold ${getEnergyColor(crowdEnergy.predictions.peakTime)}`}>
+            <div
+              className={`text-2xl font-bold ${getEnergyColor(crowdEnergy.predictions.peakTime)}`}
+            >
               {Math.round(crowdEnergy.predictions.peakTime)}%
             </div>
           </div>
           <div className="text-center">
             <div className="text-sm text-gray-400 mb-1">Drop Time</div>
-            <div className={`text-2xl font-bold ${getEnergyColor(crowdEnergy.predictions.dropTime)}`}>
+            <div
+              className={`text-2xl font-bold ${getEnergyColor(crowdEnergy.predictions.dropTime)}`}
+            >
               {Math.round(crowdEnergy.predictions.dropTime)}%
             </div>
           </div>

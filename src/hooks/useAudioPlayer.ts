@@ -20,7 +20,7 @@ export function useAudioPlayer(
   const [currentTime, setCurrentTime] = useState(0);
   const [volume, setVolumeState] = useState(options.volume || 1);
   const [error, setError] = useState<string | null>(null);
-  const [bufferProgress, setBufferProgress] = useState(0);
+  const [bufferProgress] = useState(0);
 
   const currentTrackRef = useRef<Track | null>(null);
   const progressIntervalRef = useRef<number | null>(null);
@@ -121,8 +121,8 @@ export function useAudioPlayer(
         currentTrackRef.current = track;
 
         // Load track into deck A
-        magicPlayerRef.current.loadTrack('A', track).catch((err) => {
-          setError(err.message || 'Failed to load track');
+        magicPlayerRef.current.loadTrack('A', track).catch((_err) => {
+          setError('Failed to load track');
           setIsLoading(false);
         });
       }
@@ -156,7 +156,7 @@ export function useAudioPlayer(
       if (magicPlayerRef.current) {
         magicPlayerRef.current.play('A');
       }
-    } catch (err) {
+    } catch (_err) {
       setError('Failed to start playback');
       setIsLoading(false);
     }

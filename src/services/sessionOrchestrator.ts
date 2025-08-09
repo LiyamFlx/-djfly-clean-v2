@@ -1,15 +1,13 @@
 import { createClient } from '@supabase/supabase-js';
-import { 
-  Session, 
-  SessionStatus, 
-  SessionTransition, 
-  SessionContext, 
-  SessionEvent, 
+import {
+  Session,
+  SessionStatus,
+  SessionTransition,
+  SessionContext,
   SessionUpdate,
   SessionRecovery,
-  EnergyPoint 
+  EnergyPoint,
 } from '../types/session';
-import { Track } from '../types/audio';
 
 // Session State Machine Configuration
 const STATE_TRANSITIONS: Record<SessionStatus, SessionTransition[]> = {
@@ -22,22 +20,29 @@ const STATE_TRANSITIONS: Record<SessionStatus, SessionTransition[]> = {
   LIVE_PAUSED: ['RESUME_LIVE', 'END_SESSION'],
   LIVE_RECOVERING: ['RECOVER_LIVE', 'END_SESSION'],
   ANALYTICS_READY: ['GENERATE_ANALYTICS', 'ARCHIVE'],
-  ARCHIVED: []
+  ARCHIVED: [],
 };
 
 export class SessionOrchestrator {
   private supabase = createClient(
-    process.env.VITE_SUPABASE_URL!,
-    process.env.VITE_SUPABASE_ANON_KEY!
+    import.meta.env.VITE_SUPABASE_URL as string,
+    import.meta.env.VITE_SUPABASE_ANON_KEY as string
   );
-  
+
   private currentSession: Session | null = null;
-  private autoSaveInterval: NodeJS.Timeout | null = null;
-  private realtimeChannel: any = null;
-  private eventListeners: Map<string, Function[]> = new Map();
+  private autoSaveInterval: ReturnType<typeof setInterval> | null = null;
+  private realtimeChannel: {
+    send: (payload: unknown) => void;
+    unsubscribe: () => void;
+  } | null = null;
+  private eventListeners: Map<string, Array<(payload: unknown) => void>> =
+    new Map();
 
   // Session Lifecycle Management
-  async createSession(userId: string, context: SessionContext): Promise<Session> {
+  async createSession(
+    userId: string,
+    context: SessionContext
+  ): Promise<Session> {
     const session: Session = {
       id: this.generateSessionId(),
       user_id: userId,
@@ -46,7 +51,7 @@ export class SessionOrchestrator {
       energy_curve: [],
       created_at: new Date().toISOString(),
       updated_at: new Date().toISOString(),
-      realtime_channel: `session:${this.generateSessionId()}`
+      realtime_channel: `session:${this.generateSessionId()}`,
     };
 
     // Save to database
@@ -92,14 +97,16 @@ export class SessionOrchestrator {
     const allowedTransitions = STATE_TRANSITIONS[currentStatus];
 
     if (!allowedTransitions.includes(transition)) {
-      throw new Error(`Invalid transition ${transition} for status ${currentStatus}`);
+      throw new Error(
+        `Invalid transition ${transition} for status ${currentStatus}`
+      );
     }
 
     const newStatus = this.getNewStatus(currentStatus, transition);
     const updatedSession = {
       ...this.currentSession,
       status: newStatus,
-      updated_at: new Date().toISOString()
+      updated_at: new Date().toISOString(),
     };
 
     // Handle status-specific logic
@@ -124,7 +131,11 @@ export class SessionOrchestrator {
 
     this.currentSession = data;
     this.broadcastSessionUpdate(data);
-    this.emitEvent('session_transitioned', { from: currentStatus, to: newStatus, session: data });
+    this.emitEvent('session_transitioned', {
+      from: currentStatus,
+      to: newStatus,
+      session: data,
+    });
 
     return data;
   }
@@ -135,15 +146,19 @@ export class SessionOrchestrator {
 
     this.realtimeChannel = this.supabase
       .channel(this.currentSession.realtime_channel)
-      .on('postgres_changes', {
-        event: 'UPDATE',
-        schema: 'public',
-        table: 'sessions',
-        filter: `id=eq.${this.currentSession.id}`
-      }, (payload) => {
-        this.currentSession = payload.new as Session;
-        this.emitEvent('session_updated', payload.new);
-      })
+      .on(
+        'postgres_changes',
+        {
+          event: 'UPDATE',
+          schema: 'public',
+          table: 'sessions',
+          filter: `id=eq.${this.currentSession.id}`,
+        },
+        (payload) => {
+          this.currentSession = payload.new as Session;
+          this.emitEvent('session_updated', payload.new);
+        }
+      )
       .subscribe();
   }
 
@@ -155,13 +170,13 @@ export class SessionOrchestrator {
       status: session.status,
       active_track_id: session.active_track_id,
       energy_level: this.calculateCurrentEnergy(),
-      timestamp: new Date().toISOString()
+      timestamp: new Date().toISOString(),
     };
 
     this.realtimeChannel.send({
       type: 'broadcast',
       event: 'session_update',
-      payload: update
+      payload: update,
     });
   }
 
@@ -171,7 +186,7 @@ export class SessionOrchestrator {
 
     const energyPoint: EnergyPoint = {
       t: Date.now(),
-      value
+      value,
     };
 
     this.currentSession.energy_curve.push(energyPoint);
@@ -180,12 +195,14 @@ export class SessionOrchestrator {
 
   private calculateCurrentEnergy(): number {
     if (!this.currentSession?.energy_curve.length) return 0;
-    
+
     const recentPoints = this.currentSession.energy_curve
       .slice(-10) // Last 10 points
-      .map(p => p.value);
-    
-    return recentPoints.reduce((sum, val) => sum + val, 0) / recentPoints.length;
+      .map((p) => p.value);
+
+    return (
+      recentPoints.reduce((sum, val) => sum + val, 0) / recentPoints.length
+    );
   }
 
   // Session Recovery
@@ -198,13 +215,11 @@ export class SessionOrchestrator {
       last_track_id: this.currentSession.active_track_id,
       energy_curve: this.currentSession.energy_curve,
       context: this.currentSession.context,
-      recovery_timestamp: new Date().toISOString()
+      recovery_timestamp: new Date().toISOString(),
     };
 
     // Save to recovery table
-    await this.supabase
-      .from('session_recoveries')
-      .upsert(recovery);
+    await this.supabase.from('session_recoveries').upsert(recovery);
   }
 
   async recoverSession(sessionId: string): Promise<Session> {
@@ -227,13 +242,14 @@ export class SessionOrchestrator {
         status: recovery.last_status,
         active_track_id: recovery.last_track_id,
         energy_curve: recovery.energy_curve,
-        updated_at: new Date().toISOString()
+        updated_at: new Date().toISOString(),
       })
       .eq('id', sessionId)
       .select()
       .single();
 
-    if (sessionError) throw new Error(`Failed to recover session: ${sessionError.message}`);
+    if (sessionError)
+      throw new Error(`Failed to recover session: ${sessionError.message}`);
 
     this.currentSession = session;
     this.emitEvent('session_recovered', session);
@@ -242,14 +258,17 @@ export class SessionOrchestrator {
   }
 
   // Event Management
-  addEventListener(event: string, listener: Function): void {
+  addEventListener(event: string, listener: (payload: unknown) => void): void {
     if (!this.eventListeners.has(event)) {
       this.eventListeners.set(event, []);
     }
     this.eventListeners.get(event)!.push(listener);
   }
 
-  removeEventListener(event: string, listener: Function): void {
+  removeEventListener(
+    event: string,
+    listener: (payload: unknown) => void
+  ): void {
     const listeners = this.eventListeners.get(event);
     if (listeners) {
       const index = listeners.indexOf(listener);
@@ -259,10 +278,10 @@ export class SessionOrchestrator {
     }
   }
 
-  private emitEvent(event: string, data: any): void {
+  private emitEvent(event: string, data: unknown): void {
     const listeners = this.eventListeners.get(event);
     if (listeners) {
-      listeners.forEach(listener => listener(data));
+      listeners.forEach((listener) => listener(data));
     }
   }
 
@@ -289,7 +308,7 @@ export class SessionOrchestrator {
         .from('sessions')
         .update({
           ...this.currentSession,
-          updated_at: new Date().toISOString()
+          updated_at: new Date().toISOString(),
         })
         .eq('id', this.currentSession.id);
     } catch (error) {
@@ -302,7 +321,10 @@ export class SessionOrchestrator {
     return `session_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
   }
 
-  private getNewStatus(currentStatus: SessionStatus, transition: SessionTransition): SessionStatus {
+  private getNewStatus(
+    currentStatus: SessionStatus,
+    transition: SessionTransition
+  ): SessionStatus {
     const transitionMap: Record<SessionTransition, SessionStatus> = {
       CREATE: 'SETUP',
       START_SETUP: 'SETUP',
@@ -319,7 +341,7 @@ export class SessionOrchestrator {
       RECOVER_LIVE: 'LIVE',
       END_SESSION: 'ANALYTICS_READY',
       GENERATE_ANALYTICS: 'ANALYTICS_READY',
-      ARCHIVE: 'ARCHIVED'
+      ARCHIVE: 'ARCHIVED',
     };
 
     return transitionMap[transition] || currentStatus;

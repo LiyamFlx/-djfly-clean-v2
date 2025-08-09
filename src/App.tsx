@@ -8,7 +8,7 @@ import {
 } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { musicLibrary } from '@/services/musicLibrary';
-import type { Track, AIRecommendation } from '@/types/shared';
+import type { Track } from '@/types/shared';
 import ApiStatusIndicator from '@/components/ApiStatusIndicator';
 import SpotifyCallbackPage from '@/pages/auth/SpotifyCallbackPage';
 
@@ -316,9 +316,7 @@ const HomePage = () => (
 
       {/* Get Started */}
       <div className="bg-gradient-to-r from-blue-900/30 to-purple-900/30 border border-blue-600/30 rounded-xl p-6 mb-8">
-        <h2 className="text-2xl font-bold mb-3">
-          🎵 Get Started with DJfly
-        </h2>
+        <h2 className="text-2xl font-bold mb-3">🎵 Get Started with DJfly</h2>
         <p className="text-gray-300 mb-4">
           Experience AI-powered music discovery instantly
         </p>
@@ -455,7 +453,11 @@ const MagicMatchPage = () => {
                     ? 'progressive'
                     : 'mixed',
               crowdEnergy,
-              timeOfDay: timeOfDay as 'morning' | 'afternoon' | 'evening' | 'late-night',
+              timeOfDay: timeOfDay as
+                | 'morning'
+                | 'afternoon'
+                | 'evening'
+                | 'late-night',
               venue: 'club',
               duration: 45,
             });
@@ -470,7 +472,10 @@ const MagicMatchPage = () => {
         } catch (error) {
           console.warn('AI analysis failed, using fallback:', error);
           // Fallback to existing generator
-          const playlist = await musicLibrary.searchTracks('electronic house techno', 8);
+          const playlist = await musicLibrary.searchTracks(
+            'electronic house techno',
+            8
+          );
           appState.queue = playlist;
         }
       }, 5000); // Record for 5 seconds
@@ -913,9 +918,7 @@ const ProfilePage = () => {
           <div className="flex items-center justify-between">
             <div>
               <p className="text-gray-300">Supabase Connection</p>
-              <p className="text-sm text-gray-400">
-                Connected
-              </p>
+              <p className="text-sm text-gray-400">Connected</p>
             </div>
             <div className="flex items-center gap-2">
               <div className="w-3 h-3 bg-green-500 rounded-full"></div>
@@ -1003,7 +1006,7 @@ function App() {
             }
           />
           <Route path="/profile" element={<ProfilePage />} />
-          
+
           {/* Authentication Routes */}
           <Route
             path="/auth/login"
@@ -1025,9 +1028,15 @@ function App() {
               </Suspense>
             }
           />
-          <Route path="/auth/forgot-password" element={<ForgotPasswordPage />} />
+          <Route
+            path="/auth/forgot-password"
+            element={<ForgotPasswordPage />}
+          />
           <Route path="/auth/reset-password" element={<ResetPasswordPage />} />
-          <Route path="/auth/spotify/callback" element={<SpotifyCallbackPage />} />
+          <Route
+            path="/auth/spotify/callback"
+            element={<SpotifyCallbackPage />}
+          />
 
           {/* Producer Analytics */}
           <Route path="/producer" element={<ProducerAnalyticsPage />} />

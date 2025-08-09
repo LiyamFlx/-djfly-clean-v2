@@ -6,7 +6,9 @@ import { authService } from '@/services/auth';
 const SpotifyCallbackPage: React.FC = () => {
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
-  const [status, setStatus] = useState<'loading' | 'success' | 'error'>('loading');
+  const [status, setStatus] = useState<'loading' | 'success' | 'error'>(
+    'loading'
+  );
   const [message, setMessage] = useState('Connecting to Spotify...');
 
   useEffect(() => {
@@ -29,14 +31,14 @@ const SpotifyCallbackPage: React.FC = () => {
         }
 
         setMessage('Exchanging code for access token...');
-        
+
         // Exchange code for token
         const success = await spotifyService.exchangeCodeForToken(code);
-        
+
         if (success) {
           setStatus('success');
           setMessage('Successfully connected to Spotify!');
-          
+
           // Redirect to player after short delay
           setTimeout(() => {
             navigate('/player');
@@ -65,25 +67,45 @@ const SpotifyCallbackPage: React.FC = () => {
                 <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-white"></div>
               )}
               {status === 'success' && (
-                <svg className="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                <svg
+                  className="w-8 h-8 text-white"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M5 13l4 4L19 7"
+                  />
                 </svg>
               )}
               {status === 'error' && (
-                <svg className="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                <svg
+                  className="w-8 h-8 text-white"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M6 18L18 6M6 6l12 12"
+                  />
                 </svg>
               )}
             </div>
-            
+
             <h1 className="text-2xl font-bold mb-4">
               {status === 'loading' && 'Connecting to Spotify'}
               {status === 'success' && 'Successfully Connected!'}
               {status === 'error' && 'Connection Failed'}
             </h1>
-            
+
             <p className="text-gray-300 mb-6">{message}</p>
-            
+
             {status === 'error' && (
               <button
                 onClick={() => navigate('/player')}

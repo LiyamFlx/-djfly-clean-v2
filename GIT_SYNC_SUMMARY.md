@@ -23,6 +23,7 @@
 ### **Files Added/Modified:**
 
 **New Files:**
+
 - `DATABASE_SETUP.md` - Database deployment guide
 - `ENVIRONMENT_SETUP.md` - Environment configuration guide
 - `ENV_SETUP_COMPLETE.md` - Complete setup with placeholders
@@ -30,6 +31,7 @@
 - `src/services/lastfm.ts` - Complete Last.fm API service
 
 **Modified Files:**
+
 - `src/config/apiConfig.ts` - Enhanced API configuration
 - `src/hooks/__tests__/useAudioPlayer.test.ts` - Updated tests
 - `src/hooks/useAuth.ts` - Improved authentication

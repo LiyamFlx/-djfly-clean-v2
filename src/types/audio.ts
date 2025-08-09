@@ -75,9 +75,9 @@ export interface HarmonicAnalysis {
 
 export interface SpectralFeatures {
   brightness: number; // High frequency content
-  warmth: number;     // Low frequency content
-  presence: number;   // Mid frequency content
-  clarity: number;    // Overall spectral clarity
+  warmth: number; // Low frequency content
+  presence: number; // Mid frequency content
+  clarity: number; // Overall spectral clarity
 }
 
 export interface BeatStructure {
@@ -90,10 +90,10 @@ export interface BeatStructure {
 }
 
 export interface StemAnalysis {
-  vocals: number;     // Vocal presence (0-1)
-  drums: number;      // Drum presence (0-1)
-  bass: number;       // Bass presence (0-1)
-  other: number;      // Other instruments (0-1)
+  vocals: number; // Vocal presence (0-1)
+  drums: number; // Drum presence (0-1)
+  bass: number; // Bass presence (0-1)
+  other: number; // Other instruments (0-1)
   separationQuality: number; // Quality of stem separation (0-1)
 }
 
@@ -104,24 +104,24 @@ export interface AdvancedTrackAnalysis {
   energy: number;
   valence: number;
   danceability: number;
-  
+
   // Enhanced analysis
   harmonicAnalysis: HarmonicAnalysis;
   spectralFeatures: SpectralFeatures;
   beatStructure: BeatStructure;
   stemAnalysis?: StemAnalysis;
-  
+
   // Energy analysis
   energyCurve: Array<{ time: number; value: number }>;
   peakEnergy: number;
   averageEnergy: number;
-  
+
   // Transition analysis
   introLength: number;
   outroLength: number;
   buildUpPoints: number[];
   dropPoints: number[];
-  
+
   // Compatibility scores
   harmonicCompatibility: { [key: string]: number };
   energyCompatibility: { [bpm: number]: number };
@@ -163,10 +163,10 @@ export interface Track {
   danceability?: number;
   popularity?: number;
   genre?: string;
-  
+
   // Advanced analysis
   analysis?: AdvancedTrackAnalysis;
-  
+
   // DJ-specific features
   hotCues?: Array<{
     id: string;
@@ -174,14 +174,14 @@ export interface Track {
     label: string;
     color: string;
   }>;
-  
+
   loops?: Array<{
     id: string;
     start: number;
     end: number;
     active: boolean;
   }>;
-  
+
   // Metadata
   tags?: string[];
   notes?: string;
@@ -199,18 +199,18 @@ export interface AudioEngineState {
   duration: number;
   volume: number;
   crossfadeTime: number;
-  
+
   // Enhanced features
   pitch: number; // Pitch shift (-12 to +12 semitones)
   tempo: number; // Tempo multiplier (0.5 to 2.0)
-  
+
   // Effects
   effects: {
     filter: { frequency: number; resonance: number; enabled: boolean };
     echo: { delay: number; feedback: number; enabled: boolean };
     reverb: { roomSize: number; dampening: number; enabled: boolean };
   };
-  
+
   // Performance metrics
   latency: number;
   bufferHealth: number;
@@ -225,16 +225,16 @@ export interface RealTimeAnalysis {
   zeroCrossingRate: number;
   rms: number;
   peak: number;
-  
+
   // Beat detection
   beatConfidence: number;
   nextBeatTime: number;
   phaseAlignment: number;
-  
+
   // Harmonic analysis
   currentKey: string;
   harmonicStability: number;
-  
+
   // Performance metrics
   analysisLatency: number;
   processingTime: number;
@@ -250,7 +250,7 @@ export interface AudioPipeline {
     reverb: ConvolverNode;
   };
   output: AudioNode;
-  
+
   // Analysis nodes
   fft: AnalyserNode;
   beatDetector: AudioWorkletNode;

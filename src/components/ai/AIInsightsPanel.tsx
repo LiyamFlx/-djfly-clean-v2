@@ -59,8 +59,10 @@ const AIInsightsPanel: React.FC<AIInsightsPanelProps> = ({
   className = '',
 }) => {
   const [insights, setInsights] = useState<InsightCard[]>([]);
-  const [personalizedInsights, setPersonalizedInsights] = useState<PersonalizedInsights | null>(null);
-  const [crowdVisionData, setCrowdVisionData] = useState<CrowdVisionData | null>(null);
+  const [personalizedInsights, setPersonalizedInsights] =
+    useState<PersonalizedInsights | null>(null);
+  const [crowdVisionData, setCrowdVisionData] =
+    useState<CrowdVisionData | null>(null);
   const [computerVisionFeatures, setComputerVisionFeatures] =
     useState<ComputerVisionFeatures | null>(null);
   const [isAnalyzing, setIsAnalyzing] = useState(false);
@@ -467,7 +469,9 @@ const AIInsightsPanel: React.FC<AIInsightsPanelProps> = ({
                             className="flex justify-between text-xs"
                           >
                             <span>{age}</span>
-                            <span>{Math.round((percentage as number) * 100)}%</span>
+                            <span>
+                              {Math.round((percentage as number) * 100)}%
+                            </span>
                           </div>
                         ))}
                       </div>
@@ -486,7 +490,9 @@ const AIInsightsPanel: React.FC<AIInsightsPanelProps> = ({
                             className="flex justify-between text-xs"
                           >
                             <span className="capitalize">{gender}</span>
-                            <span>{Math.round((percentage as number) * 100)}%</span>
+                            <span>
+                              {Math.round((percentage as number) * 100)}%
+                            </span>
                           </div>
                         ))}
                       </div>

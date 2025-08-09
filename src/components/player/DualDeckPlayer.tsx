@@ -26,7 +26,12 @@ interface MixingState {
 
 interface TransitionQuality {
   score: number;
-  factors: { bpmMatch: number; keyCompatibility: number; energyFlow: number; timing: number };
+  factors: {
+    bpmMatch: number;
+    keyCompatibility: number;
+    energyFlow: number;
+    timing: number;
+  };
   suggestions: string[];
 }
 
@@ -65,11 +70,13 @@ const DualDeckPlayer: React.FC<DualDeckPlayerProps> = ({ className = '' }) => {
     effects: { reverb: 0, delay: 0, filter: 0 },
   });
 
-  const [transitionQuality, setTransitionQuality] = useState<TransitionQuality>({
-    score: 0,
-    factors: { bpmMatch: 0, keyCompatibility: 0, energyFlow: 0, timing: 0 },
-    suggestions: [],
-  });
+  const [transitionQuality, setTransitionQuality] = useState<TransitionQuality>(
+    {
+      score: 0,
+      factors: { bpmMatch: 0, keyCompatibility: 0, energyFlow: 0, timing: 0 },
+      suggestions: [],
+    }
+  );
 
   const [showAnalytics, setShowAnalytics] = useState(false);
   const analyticsInterval = useRef<ReturnType<typeof setInterval> | null>(null);
@@ -143,9 +150,9 @@ const DualDeckPlayer: React.FC<DualDeckPlayerProps> = ({ className = '' }) => {
     try {
       advancedAudioService.setDeckVolume(deck, volume);
       if (deck === 'A') {
-        setDeckA(prev => ({ ...prev, volume }));
+        setDeckA((prev) => ({ ...prev, volume }));
       } else {
-        setDeckB(prev => ({ ...prev, volume }));
+        setDeckB((prev) => ({ ...prev, volume }));
       }
     } catch (error) {
       console.error(`Failed to set volume for deck ${deck}:`, error);
@@ -156,9 +163,9 @@ const DualDeckPlayer: React.FC<DualDeckPlayerProps> = ({ className = '' }) => {
     try {
       advancedAudioService.setPitch(deck, pitch);
       if (deck === 'A') {
-        setDeckA(prev => ({ ...prev, pitch }));
+        setDeckA((prev) => ({ ...prev, pitch }));
       } else {
-        setDeckB(prev => ({ ...prev, pitch }));
+        setDeckB((prev) => ({ ...prev, pitch }));
       }
     } catch (error) {
       console.error(`Failed to set pitch for deck ${deck}:`, error);
@@ -168,7 +175,7 @@ const DualDeckPlayer: React.FC<DualDeckPlayerProps> = ({ className = '' }) => {
   const setCrossfader = (position: number) => {
     try {
       advancedAudioService.setCrossfader(position);
-      setMixingState(prev => ({ ...prev, crossfader: position }));
+      setMixingState((prev) => ({ ...prev, crossfader: position }));
     } catch (error) {
       console.error('Failed to set crossfader:', error);
     }
@@ -177,9 +184,9 @@ const DualDeckPlayer: React.FC<DualDeckPlayerProps> = ({ className = '' }) => {
   const setEQ = (band: 'low' | 'mid' | 'high', value: number) => {
     try {
       advancedAudioService.setEQ(band, value);
-      setMixingState(prev => ({
+      setMixingState((prev) => ({
         ...prev,
-        eq: { ...prev.eq, [band]: value }
+        eq: { ...prev.eq, [band]: value },
       }));
     } catch (error) {
       console.error(`Failed to set EQ ${band}:`, error);
@@ -189,9 +196,9 @@ const DualDeckPlayer: React.FC<DualDeckPlayerProps> = ({ className = '' }) => {
   const setEffect = (effect: 'reverb' | 'delay' | 'filter', value: number) => {
     try {
       advancedAudioService.setEffect(effect, value);
-      setMixingState(prev => ({
+      setMixingState((prev) => ({
         ...prev,
-        effects: { ...prev.effects, [effect]: value }
+        effects: { ...prev.effects, [effect]: value },
       }));
     } catch (error) {
       console.error(`Failed to set effect ${effect}:`, error);
@@ -201,7 +208,7 @@ const DualDeckPlayer: React.FC<DualDeckPlayerProps> = ({ className = '' }) => {
   const setMasterVolume = (volume: number) => {
     try {
       // advancedAudioService.setMasterVolume?.(volume);
-      setMixingState(prev => ({ ...prev, masterVolume: volume }));
+      setMixingState((prev) => ({ ...prev, masterVolume: volume }));
     } catch (error) {
       console.error('Failed to set master volume:', error);
     }
@@ -225,10 +232,10 @@ const DualDeckPlayer: React.FC<DualDeckPlayerProps> = ({ className = '' }) => {
     return 'text-red-400';
   };
 
-  const WaveformDisplay: React.FC<{ waveform: Float32Array; color: string }> = ({ 
-    waveform, 
-    color 
-  }) => (
+  const WaveformDisplay: React.FC<{
+    waveform: Float32Array;
+    color: string;
+  }> = ({ waveform, color }) => (
     <div className="h-24 bg-gray-700 rounded-lg mb-4 relative overflow-hidden">
       <div className="absolute inset-0 flex items-center justify-center">
         {Array.from(waveform).map((value, index) => (
@@ -273,7 +280,9 @@ const DualDeckPlayer: React.FC<DualDeckPlayerProps> = ({ className = '' }) => {
         <div className="bg-gray-800 p-4 rounded-lg">
           <div className="flex items-center justify-between mb-4">
             <h3 className="text-lg font-semibold text-blue-400">Deck A</h3>
-            <div className={`flex items-center gap-1 ${getEnergyColor(deckA.energy)}`}>
+            <div
+              className={`flex items-center gap-1 ${getEnergyColor(deckA.energy)}`}
+            >
               <Zap className="w-4 h-4" />
               <span className="text-sm">{Math.round(deckA.energy * 100)}%</span>
             </div>
@@ -342,7 +351,9 @@ const DualDeckPlayer: React.FC<DualDeckPlayerProps> = ({ className = '' }) => {
         <div className="bg-gray-800 p-4 rounded-lg">
           <div className="flex items-center justify-between mb-4">
             <h3 className="text-lg font-semibold text-green-400">Deck B</h3>
-            <div className={`flex items-center gap-1 ${getEnergyColor(deckB.energy)}`}>
+            <div
+              className={`flex items-center gap-1 ${getEnergyColor(deckB.energy)}`}
+            >
               <Zap className="w-4 h-4" />
               <span className="text-sm">{Math.round(deckB.energy * 100)}%</span>
             </div>
@@ -530,7 +541,9 @@ const DualDeckPlayer: React.FC<DualDeckPlayerProps> = ({ className = '' }) => {
                 max="1"
                 step="0.01"
                 value={mixingState.effects.reverb}
-                onChange={(e) => setEffect('reverb', parseFloat(e.target.value))}
+                onChange={(e) =>
+                  setEffect('reverb', parseFloat(e.target.value))
+                }
                 className="flex-1 accent-blue-500"
               />
               <span className="text-xs w-12">
@@ -566,7 +579,9 @@ const DualDeckPlayer: React.FC<DualDeckPlayerProps> = ({ className = '' }) => {
                 max="1"
                 step="0.01"
                 value={mixingState.effects.filter}
-                onChange={(e) => setEffect('filter', parseFloat(e.target.value))}
+                onChange={(e) =>
+                  setEffect('filter', parseFloat(e.target.value))
+                }
                 className="flex-1 accent-green-500"
               />
               <span className="text-xs w-12">

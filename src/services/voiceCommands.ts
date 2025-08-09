@@ -25,7 +25,7 @@ class VoiceCommandService {
   private isInitialized = false;
 
   constructor() {
-    if (typeof window !== "undefined") {
+    if (typeof window !== 'undefined') {
       this.initializeVoiceRecognition();
       this.setupCommands();
     }
@@ -39,7 +39,8 @@ class VoiceCommandService {
         'SpeechRecognition' in window
       ) {
         const SpeechRecognition =
-          (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
+          (window as any).SpeechRecognition ||
+          (window as any).webkitSpeechRecognition;
         this.recognition = new SpeechRecognition();
 
         this.recognition.continuous = true;
@@ -258,7 +259,10 @@ class VoiceCommandService {
     let highestConfidence = 0;
 
     for (const command of this.commands) {
-      const confidence = this.calculateMatchConfidence(transcript, command.phrase);
+      const confidence = this.calculateMatchConfidence(
+        transcript,
+        command.phrase
+      );
       if (confidence > 0.7) {
         matchedCommands.push({
           ...command,
@@ -279,7 +283,7 @@ class VoiceCommandService {
     if (matchedCommands.length > 0) {
       const bestCommand = matchedCommands[0];
       console.log(`🎤 Voice command executed: ${bestCommand.phrase}`);
-      
+
       if (this.onCommandCallback) {
         this.onCommandCallback(bestCommand);
       }
@@ -291,14 +295,14 @@ class VoiceCommandService {
   private calculateMatchConfidence(transcript: string, phrase: string): number {
     const transcriptWords = transcript.toLowerCase().split(' ');
     const phraseWords = phrase.toLowerCase().split(' ');
-    
+
     let matches = 0;
     for (const word of phraseWords) {
       if (transcriptWords.includes(word)) {
         matches++;
       }
     }
-    
+
     return matches / phraseWords.length;
   }
 
@@ -331,7 +335,7 @@ class VoiceCommandService {
   }
 
   getCommandsByCategory(category: string): VoiceCommand[] {
-    return this.commands.filter(cmd => cmd.category === category);
+    return this.commands.filter((cmd) => cmd.category === category);
   }
 
   addCommand(command: VoiceCommand): void {
@@ -339,7 +343,7 @@ class VoiceCommandService {
   }
 
   removeCommand(commandId: string): void {
-    this.commands = this.commands.filter(cmd => cmd.id !== commandId);
+    this.commands = this.commands.filter((cmd) => cmd.id !== commandId);
   }
 
   isListeningForCommands(): boolean {
@@ -360,7 +364,9 @@ class VoiceCommandService {
       isInitialized: this.isInitialized,
       isListening: this.isListening,
       commandsCount: this.commands.length,
-      supported: typeof window !== "undefined" && ('webkitSpeechRecognition' in window || 'SpeechRecognition' in window),
+      supported:
+        typeof window !== 'undefined' &&
+        ('webkitSpeechRecognition' in window || 'SpeechRecognition' in window),
     };
   }
 

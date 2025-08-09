@@ -12,7 +12,9 @@ export const useFocusTrap = (isActive: boolean) => {
       'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])'
     );
     const firstElement = focusableElements[0] as HTMLElement;
-    const lastElement = focusableElements[focusableElements.length - 1] as HTMLElement;
+    const lastElement = focusableElements[
+      focusableElements.length - 1
+    ] as HTMLElement;
 
     const handleKeyDown = (e: KeyboardEvent) => {
       if (e.key === 'Tab') {
@@ -38,15 +40,18 @@ export const useFocusTrap = (isActive: boolean) => {
 };
 
 // Screen reader announcements
-export const announceToScreenReader = (message: string, priority: 'polite' | 'assertive' = 'polite') => {
+export const announceToScreenReader = (
+  message: string,
+  priority: 'polite' | 'assertive' = 'polite'
+) => {
   const announcement = document.createElement('div');
   announcement.setAttribute('aria-live', priority);
   announcement.setAttribute('aria-atomic', 'true');
   announcement.className = 'sr-only';
   announcement.textContent = message;
-  
+
   document.body.appendChild(announcement);
-  
+
   setTimeout(() => {
     document.body.removeChild(announcement);
   }, 1000);
@@ -137,7 +142,7 @@ export const getContrastRatio = (color1: string, color2: string): number => {
     const g = parseInt(hex.substr(2, 2), 16) / 255;
     const b = parseInt(hex.substr(4, 2), 16) / 255;
 
-    const [rs, gs, bs] = [r, g, b].map(c => {
+    const [rs, gs, bs] = [r, g, b].map((c) => {
       if (c <= 0.03928) {
         return c / 12.92;
       }
@@ -156,7 +161,10 @@ export const getContrastRatio = (color1: string, color2: string): number => {
   return (brightest + 0.05) / (darkest + 0.05);
 };
 
-export const isAccessibleContrast = (color1: string, color2: string): boolean => {
+export const isAccessibleContrast = (
+  color1: string,
+  color2: string
+): boolean => {
   const ratio = getContrastRatio(color1, color2);
   return ratio >= 4.5; // WCAG AA standard for normal text
 };
@@ -165,8 +173,9 @@ export const isAccessibleContrast = (color1: string, color2: string): boolean =>
 export const createSkipLink = (targetId: string, text: string) => {
   return {
     href: `#${targetId}`,
-    className: "sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4 focus:z-50 focus:px-4 focus:py-2 focus:bg-electric-blue focus:text-rich-black focus:rounded-lg focus:font-semibold",
-    text
+    className:
+      'sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4 focus:z-50 focus:px-4 focus:py-2 focus:bg-electric-blue focus:text-rich-black focus:rounded-lg focus:font-semibold',
+    text,
   };
 };
 
@@ -179,11 +188,13 @@ export const getAriaLabel = (action: string, context?: string): string => {
 };
 
 // Live region announcements for dynamic content - JSX version available in separate component file
-export const createLiveRegion = (priority: 'polite' | 'assertive' = 'polite') => {
+export const createLiveRegion = (
+  priority: 'polite' | 'assertive' = 'polite'
+) => {
   return {
     'aria-live': priority,
     'aria-atomic': 'true',
-    className: 'sr-only'
+    className: 'sr-only',
   };
 };
 
@@ -214,7 +225,7 @@ export const describeAudioVisualization = (
   const energyLevel = energy > 80 ? 'high' : energy > 60 ? 'medium' : 'low';
   const tempo = bpm > 140 ? 'fast' : bpm > 120 ? 'moderate' : 'slow';
   const status = isPlaying ? 'playing' : 'paused';
-  
+
   return `Track is ${status} with ${energyLevel} energy, ${tempo} tempo at ${bpm} BPM in ${key} key`;
 };
 
@@ -244,15 +255,17 @@ export const useVoiceControl = () => {
 
   const startListening = () => {
     if ('webkitSpeechRecognition' in window || 'SpeechRecognition' in window) {
-      const SpeechRecognition = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
+      const SpeechRecognition =
+        (window as any).SpeechRecognition ||
+        (window as any).webkitSpeechRecognition;
       const recognition = new SpeechRecognition();
-      
+
       recognition.continuous = true;
       recognition.interimResults = true;
-      
+
       recognition.onstart = () => setIsListening(true);
       recognition.onend = () => setIsListening(false);
-      
+
       recognition.start();
       return recognition;
     }

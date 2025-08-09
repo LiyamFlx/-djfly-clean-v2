@@ -109,11 +109,11 @@ export function useAuth(): UseAuthReturn {
 
       try {
         const result = await authService.updatePreferences(updates);
-      if (result.success) {
+        if (result.success) {
           setUser(authService.getCurrentUser());
-      } else {
+        } else {
           throw new Error(result.error || 'Profile update failed');
-      }
+        }
       } catch (err) {
         const errorMessage =
           err instanceof Error ? err.message : 'Profile update failed';
@@ -152,9 +152,9 @@ export function useAuth(): UseAuthReturn {
 
       try {
         const result = await authService.updatePassword(newPassword);
-      if (!result.success) {
-        throw new Error(result.error || 'Password reset failed');
-      }
+        if (!result.success) {
+          throw new Error(result.error || 'Password reset failed');
+        }
       } catch (err) {
         const errorMessage =
           err instanceof Error ? err.message : 'Password reset failed';

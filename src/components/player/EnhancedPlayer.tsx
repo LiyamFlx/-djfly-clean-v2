@@ -46,7 +46,7 @@ const EnhancedPlayer: React.FC<EnhancedPlayerProps> = ({ className = '' }) => {
   });
 
   const [showAnalytics, setShowAnalytics] = useState(false);
-  const [volume, setVolume] = useState(0.8);
+  const [volume] = useState(0.8);
   const [isMuted, setIsMuted] = useState(false);
   const progressRef = useRef<HTMLDivElement>(null);
 
@@ -54,7 +54,7 @@ const EnhancedPlayer: React.FC<EnhancedPlayerProps> = ({ className = '' }) => {
   useEffect(() => {
     if (trackInfo.isPlaying) {
       const interval = setInterval(() => {
-        setTrackInfo(prev => ({
+        setTrackInfo((prev) => ({
           ...prev,
           currentTime: Math.min(prev.currentTime + 1, prev.duration),
         }));
@@ -65,7 +65,7 @@ const EnhancedPlayer: React.FC<EnhancedPlayerProps> = ({ className = '' }) => {
   }, [trackInfo.isPlaying]);
 
   const togglePlay = () => {
-    setTrackInfo(prev => ({ ...prev, isPlaying: !prev.isPlaying }));
+    setTrackInfo((prev) => ({ ...prev, isPlaying: !prev.isPlaying }));
   };
 
   const formatTime = (seconds: number) => {
@@ -91,7 +91,9 @@ const EnhancedPlayer: React.FC<EnhancedPlayerProps> = ({ className = '' }) => {
   const progress = (trackInfo.currentTime / trackInfo.duration) * 100;
 
   return (
-    <div className={`bg-gray-900/50 backdrop-blur-sm border border-gray-700 rounded-2xl p-6 ${className}`}>
+    <div
+      className={`bg-gray-900/50 backdrop-blur-sm border border-gray-700 rounded-2xl p-6 ${className}`}
+    >
       {/* Track Info Header */}
       <div className="flex items-center justify-between mb-6">
         <div className="flex items-center space-x-4">
@@ -103,11 +105,13 @@ const EnhancedPlayer: React.FC<EnhancedPlayerProps> = ({ className = '' }) => {
             <Music className="w-8 h-8 text-rich-black" />
           </motion.div>
           <div>
-            <h3 className="text-lg font-semibold text-white">{trackInfo.title}</h3>
+            <h3 className="text-lg font-semibold text-white">
+              {trackInfo.title}
+            </h3>
             <p className="text-gray-400">{trackInfo.artist}</p>
           </div>
         </div>
-        
+
         <button
           onClick={() => setShowAnalytics(!showAnalytics)}
           className="p-2 text-gray-400 hover:text-white hover:bg-white/10 rounded-lg transition-all"
@@ -131,7 +135,9 @@ const EnhancedPlayer: React.FC<EnhancedPlayerProps> = ({ className = '' }) => {
                   <Target className="w-4 h-4 text-electric-blue" />
                   <span className="text-sm text-gray-400">BPM</span>
                 </div>
-                <p className={`text-xl font-bold ${getBPMColor(trackInfo.bpm)}`}>
+                <p
+                  className={`text-xl font-bold ${getBPMColor(trackInfo.bpm)}`}
+                >
                   {trackInfo.bpm}
                 </p>
               </div>
@@ -140,7 +146,9 @@ const EnhancedPlayer: React.FC<EnhancedPlayerProps> = ({ className = '' }) => {
                   <Zap className="w-4 h-4 text-laser-pink" />
                   <span className="text-sm text-gray-400">Energy</span>
                 </div>
-                <p className={`text-xl font-bold ${getEnergyColor(trackInfo.energy)}`}>
+                <p
+                  className={`text-xl font-bold ${getEnergyColor(trackInfo.energy)}`}
+                >
                   {trackInfo.energy}%
                 </p>
               </div>
@@ -149,9 +157,7 @@ const EnhancedPlayer: React.FC<EnhancedPlayerProps> = ({ className = '' }) => {
                   <TrendingUp className="w-4 h-4 text-cyber-green" />
                   <span className="text-sm text-gray-400">Key</span>
                 </div>
-                <p className="text-xl font-bold text-white">
-                  {trackInfo.key}
-                </p>
+                <p className="text-xl font-bold text-white">{trackInfo.key}</p>
               </div>
             </div>
           </motion.div>
@@ -164,7 +170,11 @@ const EnhancedPlayer: React.FC<EnhancedPlayerProps> = ({ className = '' }) => {
           {trackInfo.waveform.map((height, index) => (
             <motion.div
               key={index}
-              animate={trackInfo.isPlaying ? { height: [height * 60, height * 80, height * 60] } : {}}
+              animate={
+                trackInfo.isPlaying
+                  ? { height: [height * 60, height * 80, height * 60] }
+                  : {}
+              }
               transition={{
                 duration: 0.5,
                 repeat: Infinity,
@@ -186,12 +196,15 @@ const EnhancedPlayer: React.FC<EnhancedPlayerProps> = ({ className = '' }) => {
         <div
           ref={progressRef}
           className="w-full h-2 bg-gray-700 rounded-full overflow-hidden cursor-pointer"
+          role="button"
+          tabIndex={0}
+          onKeyDown={() => {}}
           onClick={(e) => {
             if (progressRef.current) {
               const rect = progressRef.current.getBoundingClientRect();
               const clickX = e.clientX - rect.left;
               const newTime = (clickX / rect.width) * trackInfo.duration;
-              setTrackInfo(prev => ({ ...prev, currentTime: newTime }));
+              setTrackInfo((prev) => ({ ...prev, currentTime: newTime }));
             }
           }}
         >
@@ -219,7 +232,11 @@ const EnhancedPlayer: React.FC<EnhancedPlayerProps> = ({ className = '' }) => {
             whileTap={{ scale: 0.9 }}
             className="w-12 h-12 bg-gradient-to-r from-electric-blue to-bright-turquoise rounded-full flex items-center justify-center text-rich-black font-bold"
           >
-            {trackInfo.isPlaying ? <Pause className="w-6 h-6" /> : <Play className="w-6 h-6" />}
+            {trackInfo.isPlaying ? (
+              <Pause className="w-6 h-6" />
+            ) : (
+              <Play className="w-6 h-6" />
+            )}
           </motion.button>
           <button className="p-2 text-gray-400 hover:text-white hover:bg-white/10 rounded-lg transition-all">
             <SkipForward className="w-5 h-5" />
@@ -235,7 +252,11 @@ const EnhancedPlayer: React.FC<EnhancedPlayerProps> = ({ className = '' }) => {
             onClick={() => setIsMuted(!isMuted)}
             className="p-2 text-gray-400 hover:text-white hover:bg-white/10 rounded-lg transition-all"
           >
-            {isMuted ? <VolumeX className="w-5 h-5" /> : <Volume2 className="w-5 h-5" />}
+            {isMuted ? (
+              <VolumeX className="w-5 h-5" />
+            ) : (
+              <Volume2 className="w-5 h-5" />
+            )}
           </button>
           <div className="w-24 h-2 bg-gray-700 rounded-full overflow-hidden">
             <motion.div

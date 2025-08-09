@@ -38,15 +38,18 @@ const SignupPage: React.FC = () => {
         password: formData.password,
         username: formData.username,
       });
-      
+
       if (result.success) {
-        navigate('/auth/login', { 
-          state: { message: 'Account created successfully! Please check your email to verify your account.' }
+        navigate('/auth/login', {
+          state: {
+            message:
+              'Account created successfully! Please check your email to verify your account.',
+          },
         });
       } else {
         setError(result.error || 'Signup failed');
       }
-    } catch (err) {
+    } catch (_err) {
       setError('An unexpected error occurred');
     } finally {
       setIsLoading(false);
@@ -55,9 +58,9 @@ const SignupPage: React.FC = () => {
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
-    setFormData(prev => ({
+    setFormData((prev) => ({
       ...prev,
-      [name]: value
+      [name]: value,
     }));
   };
 
@@ -78,7 +81,10 @@ const SignupPage: React.FC = () => {
             )}
 
             <div>
-              <label htmlFor="username" className="block text-sm font-medium mb-2">
+              <label
+                htmlFor="username"
+                className="block text-sm font-medium mb-2"
+              >
                 Username
               </label>
               <input
@@ -110,7 +116,10 @@ const SignupPage: React.FC = () => {
             </div>
 
             <div>
-              <label htmlFor="password" className="block text-sm font-medium mb-2">
+              <label
+                htmlFor="password"
+                className="block text-sm font-medium mb-2"
+              >
                 Password
               </label>
               <input
@@ -126,7 +135,10 @@ const SignupPage: React.FC = () => {
             </div>
 
             <div>
-              <label htmlFor="confirmPassword" className="block text-sm font-medium mb-2">
+              <label
+                htmlFor="confirmPassword"
+                className="block text-sm font-medium mb-2"
+              >
                 Confirm Password
               </label>
               <input
@@ -153,7 +165,10 @@ const SignupPage: React.FC = () => {
           <div className="mt-6 text-center">
             <p className="text-sm text-gray-400">
               Already have an account?{' '}
-              <Link to="/auth/login" className="text-blue-400 hover:text-blue-300">
+              <Link
+                to="/auth/login"
+                className="text-blue-400 hover:text-blue-300"
+              >
                 Sign in
               </Link>
             </p>

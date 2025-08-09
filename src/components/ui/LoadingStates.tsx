@@ -100,7 +100,10 @@ export const AIAnalysisLoading: React.FC<AIAnalysisLoadingProps> = ({
       {/* Animated Icon */}
       <motion.div
         animate={stage === 'recording' ? { scale: [1, 1.1, 1] } : {}}
-        transition={{ duration: 2, repeat: stage === 'recording' ? Infinity : 0 }}
+        transition={{
+          duration: 2,
+          repeat: stage === 'recording' ? Infinity : 0,
+        }}
         className={`${currentStage.color}`}
       >
         <Icon className="w-16 h-16" />

@@ -1,36 +1,49 @@
 import React, { useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
-import {
-  Home,
-  Sparkles,
-  Play,
-  BarChart,
-  User,
-  X,
-  Music,
-} from 'lucide-react';
+import { Home, Sparkles, Play, BarChart, User, X, Music } from 'lucide-react';
 import { ROUTES } from '@/constants/routes';
 
 interface MobileNavProps {
   className?: string;
 }
 
-const MobileNav: React.FC<MobileNavProps> = ({ className = '' }) => {
+const MobileNav: React.FC<MobileNavProps> = () => {
   const [isOpen, setIsOpen] = useState(false);
   const location = useLocation();
 
   const navItems = [
     { path: ROUTES.HOME, icon: Home, label: 'Home', color: 'text-blue-400' },
-    { path: ROUTES.STUDIO, icon: Sparkles, label: 'Studio', color: 'text-purple-400' },
-    { path: ROUTES.PLAYER, icon: Play, label: 'Player', color: 'text-green-400' },
-    { path: ROUTES.PRODUCER, icon: BarChart, label: 'Analytics', color: 'text-orange-400' },
-    { path: ROUTES.PROFILE, icon: User, label: 'Profile', color: 'text-pink-400' },
+    {
+      path: ROUTES.STUDIO,
+      icon: Sparkles,
+      label: 'Studio',
+      color: 'text-purple-400',
+    },
+    {
+      path: ROUTES.PLAYER,
+      icon: Play,
+      label: 'Player',
+      color: 'text-green-400',
+    },
+    {
+      path: ROUTES.PRODUCER,
+      icon: BarChart,
+      label: 'Analytics',
+      color: 'text-orange-400',
+    },
+    {
+      path: ROUTES.PROFILE,
+      icon: User,
+      label: 'Profile',
+      color: 'text-pink-400',
+    },
   ];
 
-  const currentItem = navItems.find(item => 
-    location.pathname === item.path || 
-    (item.path !== ROUTES.HOME && location.pathname.startsWith(item.path))
+  const currentItem = navItems.find(
+    (item) =>
+      location.pathname === item.path ||
+      (item.path !== ROUTES.HOME && location.pathname.startsWith(item.path))
   );
 
   return (
@@ -90,7 +103,9 @@ const MobileNav: React.FC<MobileNavProps> = ({ className = '' }) => {
               exit={{ y: '100%', opacity: 0 }}
               transition={{ type: 'spring', damping: 25, stiffness: 300 }}
               className="fixed bottom-0 left-0 right-0 z-50 bg-gray-900/95 backdrop-blur-xl border-t border-white/10 rounded-t-3xl p-6"
-              style={{ paddingBottom: 'calc(1.5rem + env(safe-area-inset-bottom))' }}
+              style={{
+                paddingBottom: 'calc(1.5rem + env(safe-area-inset-bottom))',
+              }}
             >
               {/* Current Page Indicator */}
               {currentItem && (
@@ -99,9 +114,13 @@ const MobileNav: React.FC<MobileNavProps> = ({ className = '' }) => {
                   animate={{ opacity: 1, y: 0 }}
                   className="text-center mb-6"
                 >
-                  <div className={`inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/10 ${currentItem.color}`}>
+                  <div
+                    className={`inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/10 ${currentItem.color}`}
+                  >
                     <currentItem.icon className="w-4 h-4" />
-                    <span className="text-sm font-medium">Currently: {currentItem.label}</span>
+                    <span className="text-sm font-medium">
+                      Currently: {currentItem.label}
+                    </span>
                   </div>
                 </motion.div>
               )}
@@ -109,8 +128,10 @@ const MobileNav: React.FC<MobileNavProps> = ({ className = '' }) => {
               {/* Navigation Items */}
               <div className="grid grid-cols-2 gap-4">
                 {navItems.map((item, index) => {
-                  const isActive = location.pathname === item.path || 
-                    (item.path !== ROUTES.HOME && location.pathname.startsWith(item.path));
+                  const isActive =
+                    location.pathname === item.path ||
+                    (item.path !== ROUTES.HOME &&
+                      location.pathname.startsWith(item.path));
 
                   return (
                     <motion.div
@@ -129,12 +150,20 @@ const MobileNav: React.FC<MobileNavProps> = ({ className = '' }) => {
                         }`}
                       >
                         <div className="text-center">
-                          <div className={`w-12 h-12 mx-auto mb-3 rounded-xl flex items-center justify-center ${
-                            isActive ? 'bg-gradient-to-r from-electric-blue to-bright-turquoise' : 'bg-white/10'
-                          }`}>
-                            <item.icon className={`w-6 h-6 ${isActive ? 'text-rich-black' : item.color}`} />
+                          <div
+                            className={`w-12 h-12 mx-auto mb-3 rounded-xl flex items-center justify-center ${
+                              isActive
+                                ? 'bg-gradient-to-r from-electric-blue to-bright-turquoise'
+                                : 'bg-white/10'
+                            }`}
+                          >
+                            <item.icon
+                              className={`w-6 h-6 ${isActive ? 'text-rich-black' : item.color}`}
+                            />
                           </div>
-                          <span className={`text-sm font-medium ${isActive ? 'text-electric-blue' : 'text-gray-300'}`}>
+                          <span
+                            className={`text-sm font-medium ${isActive ? 'text-electric-blue' : 'text-gray-300'}`}
+                          >
                             {item.label}
                           </span>
                         </div>

@@ -41,7 +41,7 @@ export class OpenAIService {
   constructor() {
     this.apiKey = API_CONFIG.openai.apiKey || '';
     this.baseUrl = API_CONFIG.openai.baseUrl || 'https://api.openai.com/v1';
-    
+
     if (!this.apiKey) {
       console.error('❌ OpenAI API key not configured');
     }
@@ -50,16 +50,18 @@ export class OpenAIService {
   /**
    * Analyze crowd audio and generate music recommendations
    */
-  async analyzeCrowdAudio(audioData: ArrayBuffer): Promise<AudioAnalysisResult> {
+  async analyzeCrowdAudio(
+    audioData: ArrayBuffer
+  ): Promise<AudioAnalysisResult> {
     try {
       await this.rateLimit();
 
       const prompt = this.buildAudioAnalysisPrompt();
-      
+
       const response = await fetch(`${this.baseUrl}/chat/completions`, {
         method: 'POST',
         headers: {
-          'Authorization': `Bearer ${this.apiKey}`,
+          Authorization: `Bearer ${this.apiKey}`,
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
@@ -67,12 +69,13 @@ export class OpenAIService {
           messages: [
             {
               role: 'system',
-              content: 'You are an expert DJ and music analyst. Analyze the provided audio data and return detailed insights about the crowd energy, mood, and music recommendations.'
+              content:
+                'You are an expert DJ and music analyst. Analyze the provided audio data and return detailed insights about the crowd energy, mood, and music recommendations.',
             },
             {
               role: 'user',
-              content: prompt
-            }
+              content: prompt,
+            },
           ],
           max_tokens: 1000,
           temperature: 0.7,
@@ -80,12 +83,14 @@ export class OpenAIService {
       });
 
       if (!response.ok) {
-        throw new Error(`OpenAI API error: ${response.status} ${response.statusText}`);
+        throw new Error(
+          `OpenAI API error: ${response.status} ${response.statusText}`
+        );
       }
 
       const data: OpenAIResponse = await response.json();
       const content = data.choices[0]?.message?.content;
-      
+
       if (!content) {
         throw new Error('No response content from OpenAI');
       }
@@ -100,7 +105,10 @@ export class OpenAIService {
   /**
    * Generate playlist based on prompt and context
    */
-  async generatePlaylist(prompt: string, context?: any): Promise<AIRecommendation> {
+  async generatePlaylist(
+    prompt: string,
+    context?: any
+  ): Promise<AIRecommendation> {
     try {
       await this.rateLimit();
 
@@ -127,7 +135,7 @@ export class OpenAIService {
       const response = await fetch(`${this.baseUrl}/chat/completions`, {
         method: 'POST',
         headers: {
-          'Authorization': `Bearer ${this.apiKey}`,
+          Authorization: `Bearer ${this.apiKey}`,
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
@@ -135,12 +143,12 @@ export class OpenAIService {
           messages: [
             {
               role: 'system',
-              content: systemPrompt
+              content: systemPrompt,
             },
             {
               role: 'user',
-              content: `Generate a playlist for: ${prompt}${context ? `\nContext: ${JSON.stringify(context)}` : ''}`
-            }
+              content: `Generate a playlist for: ${prompt}${context ? `\nContext: ${JSON.stringify(context)}` : ''}`,
+            },
           ],
           max_tokens: 2000,
           temperature: 0.8,
@@ -148,12 +156,14 @@ export class OpenAIService {
       });
 
       if (!response.ok) {
-        throw new Error(`OpenAI API error: ${response.status} ${response.statusText}`);
+        throw new Error(
+          `OpenAI API error: ${response.status} ${response.statusText}`
+        );
       }
 
       const data: OpenAIResponse = await response.json();
       const content = data.choices[0]?.message?.content;
-      
+
       if (!content) {
         throw new Error('No response content from OpenAI');
       }
@@ -168,16 +178,20 @@ export class OpenAIService {
   /**
    * Generate track recommendations based on seed tracks
    */
-  async getTrackRecommendations(seedTracks: Track[], targetEnergy?: number, targetMood?: string): Promise<Track[]> {
+  async getTrackRecommendations(
+    seedTracks: Track[],
+    targetEnergy?: number,
+    targetMood?: string
+  ): Promise<Track[]> {
     try {
       await this.rateLimit();
 
-      const seedInfo = seedTracks.map(track => ({
+      const seedInfo = seedTracks.map((track) => ({
         title: track.title,
         artist: track.artist,
         energy: track.energy || 0.5,
         bpm: track.bpm || 120,
-        genre: track.genre || 'electronic'
+        genre: track.genre || 'electronic',
       }));
 
       const prompt = `Based on these seed tracks: ${JSON.stringify(seedInfo)}, recommend similar tracks. Target energy: ${targetEnergy || 'match seed'}, mood: ${targetMood || 'match seed'}. Return only track titles and artists.`;
@@ -185,7 +199,7 @@ export class OpenAIService {
       const response = await fetch(`${this.baseUrl}/chat/completions`, {
         method: 'POST',
         headers: {
-          'Authorization': `Bearer ${this.apiKey}`,
+          Authorization: `Bearer ${this.apiKey}`,
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
@@ -193,12 +207,13 @@ export class OpenAIService {
           messages: [
             {
               role: 'system',
-              content: 'You are a music recommendation expert. Provide track recommendations in a simple format: "Title - Artist"'
+              content:
+                'You are a music recommendation expert. Provide track recommendations in a simple format: "Title - Artist"',
             },
             {
               role: 'user',
-              content: prompt
-            }
+              content: prompt,
+            },
           ],
           max_tokens: 500,
           temperature: 0.7,
@@ -206,12 +221,14 @@ export class OpenAIService {
       });
 
       if (!response.ok) {
-        throw new Error(`OpenAI API error: ${response.status} ${response.statusText}`);
+        throw new Error(
+          `OpenAI API error: ${response.status} ${response.statusText}`
+        );
       }
 
       const data: OpenAIResponse = await response.json();
       const content = data.choices[0]?.message?.content;
-      
+
       if (!content) {
         throw new Error('No response content from OpenAI');
       }
@@ -226,14 +243,16 @@ export class OpenAIService {
   /**
    * Analyze text for mood and energy
    */
-  async analyzeText(text: string): Promise<{ mood: string; energy: number; genre: string }> {
+  async analyzeText(
+    text: string
+  ): Promise<{ mood: string; energy: number; genre: string }> {
     try {
       await this.rateLimit();
 
       const response = await fetch(`${this.baseUrl}/chat/completions`, {
         method: 'POST',
         headers: {
-          'Authorization': `Bearer ${this.apiKey}`,
+          Authorization: `Bearer ${this.apiKey}`,
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
@@ -241,12 +260,13 @@ export class OpenAIService {
           messages: [
             {
               role: 'system',
-              content: 'Analyze the text and return a JSON object with mood (string), energy (0-100 number), and genre (string).'
+              content:
+                'Analyze the text and return a JSON object with mood (string), energy (0-100 number), and genre (string).',
             },
             {
               role: 'user',
-              content: text
-            }
+              content: text,
+            },
           ],
           max_tokens: 200,
           temperature: 0.3,
@@ -254,12 +274,14 @@ export class OpenAIService {
       });
 
       if (!response.ok) {
-        throw new Error(`OpenAI API error: ${response.status} ${response.statusText}`);
+        throw new Error(
+          `OpenAI API error: ${response.status} ${response.statusText}`
+        );
       }
 
       const data: OpenAIResponse = await response.json();
       const content = data.choices[0]?.message?.content;
-      
+
       if (!content) {
         throw new Error('No response content from OpenAI');
       }
@@ -277,11 +299,13 @@ export class OpenAIService {
   private async rateLimit(): Promise<void> {
     const now = Date.now();
     const timeSinceLastRequest = now - this.lastRequestTime;
-    
+
     if (timeSinceLastRequest < this.rateLimitDelay) {
-      await new Promise(resolve => setTimeout(resolve, this.rateLimitDelay - timeSinceLastRequest));
+      await new Promise((resolve) =>
+        setTimeout(resolve, this.rateLimitDelay - timeSinceLastRequest)
+      );
     }
-    
+
     this.lastRequestTime = Date.now();
   }
 
@@ -314,7 +338,7 @@ export class OpenAIService {
       if (jsonMatch) {
         return JSON.parse(jsonMatch[0]);
       }
-      
+
       // Fallback to default values
       return {
         energy: 0.7,
@@ -325,8 +349,8 @@ export class OpenAIService {
         crowdSize: 100,
         demographics: {
           ageGroups: { '18-25': 0.4, '26-35': 0.35, '36-45': 0.25 },
-          genderDistribution: { 'male': 0.6, 'female': 0.4 }
-        }
+          genderDistribution: { male: 0.6, female: 0.4 },
+        },
       };
     } catch (error) {
       console.error('❌ Failed to parse audio analysis response:', error);
@@ -349,10 +373,10 @@ export class OpenAIService {
           mood: parsed.mood || 'energetic',
           reasoning: parsed.reasoning || '',
           mixingTips: parsed.mixingTips || [],
-          energyCurve: parsed.energyCurve || [60, 70, 80, 90, 85, 75]
+          energyCurve: parsed.energyCurve || [60, 70, 80, 90, 85, 75],
         };
       }
-      
+
       throw new Error('No valid JSON found in response');
     } catch (error) {
       console.error('❌ Failed to parse playlist response:', error);
@@ -365,7 +389,7 @@ export class OpenAIService {
    */
   private parseTrackRecommendations(content: string): Track[] {
     try {
-      const lines = content.split('\n').filter(line => line.trim());
+      const lines = content.split('\n').filter((line) => line.trim());
       return lines.map((line, index) => {
         const [title, artist] = line.split(' - ');
         return {
@@ -396,7 +420,7 @@ export class OpenAIService {
     try {
       const response = await fetch(`${this.baseUrl}/usage`, {
         headers: {
-          'Authorization': `Bearer ${this.apiKey}`,
+          Authorization: `Bearer ${this.apiKey}`,
         },
       });
 
@@ -414,4 +438,3 @@ export class OpenAIService {
 
 // Export singleton instance
 export const openaiService = new OpenAIService();
-

@@ -12,7 +12,7 @@ import {
   Clock,
   Star,
 } from 'lucide-react';
-import { ROUTES } from '@/constants/routes';
+// import { ROUTES } from '@/constants/routes';
 
 const StudioPage: React.FC = () => {
   const [selectedFeature, setSelectedFeature] = useState<string | null>(null);
@@ -58,8 +58,6 @@ const StudioPage: React.FC = () => {
 
   return (
     <div className="min-h-screen bg-club-gradient text-white p-8">
-
-
       <div className="max-w-6xl mx-auto">
         {/* Header */}
         <motion.div
@@ -73,8 +71,9 @@ const StudioPage: React.FC = () => {
             </span>
           </h1>
           <p className="text-xl text-gray-300 max-w-2xl mx-auto">
-            Choose your AI-powered music creation method. Both tools use advanced 
-            machine learning to deliver perfect mixes for any situation.
+            Choose your AI-powered music creation method. Both tools use
+            advanced machine learning to deliver perfect mixes for any
+            situation.
           </p>
         </motion.div>
 
@@ -99,7 +98,9 @@ const StudioPage: React.FC = () => {
                   {/* Header */}
                   <div className="flex items-start justify-between mb-6">
                     <div className="flex items-center space-x-4">
-                      <div className={`w-16 h-16 rounded-xl bg-gradient-to-r ${feature.color} flex items-center justify-center`}>
+                      <div
+                        className={`w-16 h-16 rounded-xl bg-gradient-to-r ${feature.color} flex items-center justify-center`}
+                      >
                         <Icon className="w-8 h-8 text-white" />
                       </div>
                       <div>
@@ -109,7 +110,9 @@ const StudioPage: React.FC = () => {
                     </div>
                     <div className="flex items-center space-x-2">
                       <Clock className="w-4 h-4 text-gray-400" />
-                      <span className="text-sm text-gray-400">{feature.timeEstimate}</span>
+                      <span className="text-sm text-gray-400">
+                        {feature.timeEstimate}
+                      </span>
                     </div>
                   </div>
 
@@ -157,7 +160,9 @@ const StudioPage: React.FC = () => {
                         : 'bg-gray-700 hover:bg-gray-600 text-white'
                     }`}
                   >
-                    {isSelected ? 'Selected - Click to Continue' : `Try ${feature.title}`}
+                    {isSelected
+                      ? 'Selected - Click to Continue'
+                      : `Try ${feature.title}`}
                   </Link>
                 </div>
 
@@ -211,7 +216,7 @@ const StudioPage: React.FC = () => {
           className="mt-8 text-center"
         >
           <p className="text-gray-400 text-sm">
-            Need help choosing? 
+            Need help choosing?
             <button className="text-electric-blue hover:text-bright-turquoise ml-1 underline">
               Watch our tutorial
             </button>

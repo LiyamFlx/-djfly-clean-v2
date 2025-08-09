@@ -213,10 +213,10 @@
 
 ## 📝 Test Results
 
-**QA Conducted by:** ******\_\_\_\_******  
-**Date:** ******\_\_\_\_******  
-**Build Version:** ******\_\_\_\_******  
-**Environment:** ******\_\_\_\_******
+**QA Conducted by:** **\*\***\_\_\_\_**\*\***  
+**Date:** **\*\***\_\_\_\_**\*\***  
+**Build Version:** **\*\***\_\_\_\_**\*\***  
+**Environment:** **\*\***\_\_\_\_**\*\***
 
 **Critical Issues Found:**
 

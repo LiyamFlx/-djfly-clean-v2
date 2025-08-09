@@ -3,15 +3,15 @@ export interface Track {
   id: string;
   title: string;
   artist: string;
-  duration: number;         // seconds
+  duration: number; // seconds
   bpm?: number | null;
   key?: string | null;
   preview_url?: string | null;
-  album?: string;           // needed by api.Track users
-  uri?: string;             // needed by api.Track users
-  genre?: string | null;    // some components expect this
-  image?: string;           // album artwork
-  energy?: number;          // energy level 0-1
+  album?: string; // needed by api.Track users
+  uri?: string; // needed by api.Track users
+  genre?: string | null; // some components expect this
+  image?: string; // album artwork
+  energy?: number; // energy level 0-1
   source?: 'spotify' | 'youtube' | 'demo' | 'local' | 'lastfm';
   spotify_url?: string;
   popularity?: number;
@@ -29,8 +29,8 @@ export interface Track {
 
 export interface AIRecommendation {
   tracks: Track[];
-  energy: number;                 // 0..100
-  mood: string;                   // "morning" | "afternoon" | "evening" | "late-night" | custom
+  energy: number; // 0..100
+  mood: string; // "morning" | "afternoon" | "evening" | "late-night" | custom
   reasoning?: string;
   mixingTips?: string[];
   nextTrackSuggestions?: Track[];
@@ -44,7 +44,7 @@ export interface MinimalAIRecommendation {
   mood: string;
 }
 
-export type DayPart = "morning" | "afternoon" | "evening" | "late-night";
+export type DayPart = 'morning' | 'afternoon' | 'evening' | 'late-night';
 
 export interface AIInsights {
   recommendations?: AIRecommendation[];

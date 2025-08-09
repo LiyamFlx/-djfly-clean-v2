@@ -151,7 +151,8 @@ class AIMusicEngine {
   async analyzeMood(input: string): Promise<MoodAnalysis> {
     const cacheKey = this.generateCacheKey('mood', { input });
     const cached = this.getFromCache(cacheKey);
-    if (cached && 'energy' in cached && 'valence' in cached) return cached as MoodAnalysis;
+    if (cached && 'energy' in cached && 'valence' in cached)
+      return cached as MoodAnalysis;
 
     try {
       if (!this.apiKey) {
@@ -376,9 +377,12 @@ Create playlists that:
       energy: 75,
       mood: 'energetic',
       reasoning:
-        (aiResult as any).reasoning || 'Curated playlist based on your preferences',
-      energyCurve: (aiResult as any).energyCurve || tracks.map((_, i) => 40 + i * 8), // Default ascending curve
-      mixingTips: (aiResult as any).mixingTips || this.generateDefaultMixingTips(tracks),
+        (aiResult as any).reasoning ||
+        'Curated playlist based on your preferences',
+      energyCurve:
+        (aiResult as any).energyCurve || tracks.map((_, i) => 40 + i * 8), // Default ascending curve
+      mixingTips:
+        (aiResult as any).mixingTips || this.generateDefaultMixingTips(tracks),
       nextTrackSuggestions: trackPool.slice(0, 5),
     };
   }
@@ -401,7 +405,9 @@ Create playlists that:
         score += 30;
 
       // BPM proximity
-      const bpmDiff = Math.abs((track.bpm || 120) - ((suggestion as any).bpm || 120));
+      const bpmDiff = Math.abs(
+        (track.bpm || 120) - ((suggestion as any).bpm || 120)
+      );
       score += Math.max(0, 20 - bpmDiff);
 
       // Energy match
@@ -575,9 +581,10 @@ Create playlists that:
   private getAvailableGenres(): string[] {
     return [
       ...new Set(
-        musicLibrary.getAllTracks().map((t: Track) => t.genre).filter(
-          (genre): genre is string => genre !== undefined
-        )
+        musicLibrary
+          .getAllTracks()
+          .map((t: Track) => t.genre)
+          .filter((genre): genre is string => genre !== undefined)
       ),
     ];
   }

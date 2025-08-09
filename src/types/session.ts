@@ -1,16 +1,16 @@
 // Enhanced Session Management Types
 export type EnergyPoint = { t: number; value: number };
 
-export type SessionStatus = 
-  | 'IDLE' 
-  | 'SETUP' 
-  | 'STUDIO_SET_READY' 
-  | 'STUDIO_MATCHING' 
-  | 'STUDIO_EDITING' 
-  | 'LIVE' 
-  | 'LIVE_PAUSED' 
-  | 'LIVE_RECOVERING' 
-  | 'ANALYTICS_READY' 
+export type SessionStatus =
+  | 'IDLE'
+  | 'SETUP'
+  | 'STUDIO_SET_READY'
+  | 'STUDIO_MATCHING'
+  | 'STUDIO_EDITING'
+  | 'LIVE'
+  | 'LIVE_PAUSED'
+  | 'LIVE_RECOVERING'
+  | 'ANALYTICS_READY'
   | 'ARCHIVED';
 
 export interface CrowdDemographics {
@@ -67,7 +67,7 @@ export interface Session {
 }
 
 // Session State Machine Transitions
-export type SessionTransition = 
+export type SessionTransition =
   | 'CREATE'
   | 'START_SETUP'
   | 'SETUP_COMPLETE'
@@ -86,7 +86,7 @@ export type SessionTransition =
   | 'ARCHIVE';
 
 // Session Events for Analytics
-export type SessionEventType = 
+export type SessionEventType =
   | 'SESSION_CREATED'
   | 'SESSION_STARTED'
   | 'TRACK_PLAYED'

@@ -13,7 +13,10 @@ const mockMagicPlayer = {
   seek: vi.fn(),
   setDeckVolume: vi.fn(),
   getDeckState: vi.fn().mockReturnValue({ isPlaying: false, currentTime: 0 }),
-  getCurrentAnalysis: vi.fn().mockReturnValue({ spectrum: new Uint8Array(128), waveform: new Uint8Array(128) }),
+  getCurrentAnalysis: vi.fn().mockReturnValue({
+    spectrum: new Uint8Array(128),
+    waveform: new Uint8Array(128),
+  }),
   addEventListener: vi.fn(),
   removeEventListener: vi.fn(),
 };
@@ -57,7 +60,7 @@ describe('useAudioPlayer', () => {
     });
 
     expect(mockMagicPlayer.play).toHaveBeenCalledWith('A');
-    
+
     // Simulate the play event callback
     if (playCallback) {
       act(() => {
@@ -76,7 +79,7 @@ describe('useAudioPlayer', () => {
     });
 
     expect(mockMagicPlayer.pause).toHaveBeenCalledWith('A');
-    
+
     // Simulate the pause event callback
     if (pauseCallback) {
       act(() => {

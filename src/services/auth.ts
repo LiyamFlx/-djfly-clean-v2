@@ -4,7 +4,7 @@
  */
 
 import { supabase } from '@/lib/supabase';
-import { API_CONFIG } from '@/config/apiConfig';
+// import { API_CONFIG } from '@/config/apiConfig';
 import { spotifyService } from './spotify';
 
 export interface User {
@@ -43,7 +43,7 @@ export interface SignupData {
 
 export class AuthService {
   private currentSession: AuthSession | null = null;
-  private sessionRefreshTimer: NodeJS.Timeout | null = null;
+  private sessionRefreshTimer: ReturnType<typeof setTimeout> | null = null;
 
   constructor() {
     this.initializeAuth();
@@ -55,8 +55,10 @@ export class AuthService {
   private async initializeAuth(): Promise<void> {
     try {
       // Check for existing session
-      const { data: { session } } = await supabase.auth.getSession();
-      
+      const {
+        data: { session },
+      } = await supabase.auth.getSession();
+
       if (session) {
         await this.loadUserProfile(session.user.id);
       }
@@ -77,7 +79,9 @@ export class AuthService {
   /**
    * Sign up new user
    */
-  async signUp(data: SignupData): Promise<{ success: boolean; error?: string }> {
+  async signUp(
+    data: SignupData
+  ): Promise<{ success: boolean; error?: string }> {
     try {
       const { data: authData, error } = await supabase.auth.signUp({
         email: data.email,
@@ -129,7 +133,9 @@ export class AuthService {
   /**
    * Sign in user
    */
-  async signIn(credentials: LoginCredentials): Promise<{ success: boolean; error?: string }> {
+  async signIn(
+    credentials: LoginCredentials
+  ): Promise<{ success: boolean; error?: string }> {
     try {
       const { data, error } = await supabase.auth.signInWithPassword({
         email: credentials.email,
@@ -170,7 +176,9 @@ export class AuthService {
   /**
    * Reset password
    */
-  async resetPassword(email: string): Promise<{ success: boolean; error?: string }> {
+  async resetPassword(
+    email: string
+  ): Promise<{ success: boolean; error?: string }> {
     try {
       const { error } = await supabase.auth.resetPasswordForEmail(email, {
         redirectTo: `${window.location.origin}/auth/reset-password`,
@@ -193,7 +201,9 @@ export class AuthService {
   /**
    * Update password
    */
-  async updatePassword(newPassword: string): Promise<{ success: boolean; error?: string }> {
+  async updatePassword(
+    newPassword: string
+  ): Promise<{ success: boolean; error?: string }> {
     try {
       const { error } = await supabase.auth.updateUser({
         password: newPassword,
@@ -208,7 +218,8 @@ export class AuthService {
       console.error('❌ Password update error:', error);
       return {
         success: false,
-        error: error instanceof Error ? error.message : 'Password update failed',
+        error:
+          error instanceof Error ? error.message : 'Password update failed',
       };
     }
   }
@@ -228,7 +239,9 @@ export class AuthService {
         console.error('❌ Supabase query error:', error);
         // If it's a schema error, we'll handle it gracefully
         if (error.code === 'PGRST116') {
-          throw new Error('Database schema not found. Please deploy the database schema first.');
+          throw new Error(
+            'Database schema not found. Please deploy the database schema first.'
+          );
         }
         throw error;
       }
@@ -252,7 +265,7 @@ export class AuthService {
           },
           accessToken: '', // Will be set by Supabase
           refreshToken: '', // Will be set by Supabase
-          expiresAt: Date.now() + (60 * 60 * 1000), // 1 hour
+          expiresAt: Date.now() + 60 * 60 * 1000, // 1 hour
         };
 
         this.setupSessionRefresh();
@@ -285,8 +298,8 @@ export class AuthService {
     }
 
     // Refresh session 5 minutes before expiry
-    const refreshTime = this.currentSession?.expiresAt 
-      ? this.currentSession.expiresAt - Date.now() - (5 * 60 * 1000)
+    const refreshTime = this.currentSession?.expiresAt
+      ? this.currentSession.expiresAt - Date.now() - 5 * 60 * 1000
       : 55 * 60 * 1000; // Default 55 minutes
 
     this.sessionRefreshTimer = setTimeout(() => {
@@ -300,7 +313,7 @@ export class AuthService {
   private async refreshSession(): Promise<void> {
     try {
       const { data, error } = await supabase.auth.refreshSession();
-      
+
       if (error) {
         throw error;
       }
@@ -349,7 +362,9 @@ export class AuthService {
   /**
    * Update user preferences
    */
-  async updatePreferences(preferences: Partial<User['preferences']>): Promise<{ success: boolean; error?: string }> {
+  async updatePreferences(
+    preferences: Partial<User['preferences']>
+  ): Promise<{ success: boolean; error?: string }> {
     try {
       if (!this.currentSession) {
         throw new Error('No active session');
@@ -382,7 +397,10 @@ export class AuthService {
       console.error('❌ Update preferences error:', error);
       return {
         success: false,
-        error: error instanceof Error ? error.message : 'Failed to update preferences',
+        error:
+          error instanceof Error
+            ? error.message
+            : 'Failed to update preferences',
       };
     }
   }
@@ -415,7 +433,8 @@ export class AuthService {
       console.error('❌ Upgrade to pro error:', error);
       return {
         success: false,
-        error: error instanceof Error ? error.message : 'Failed to upgrade to pro',
+        error:
+          error instanceof Error ? error.message : 'Failed to upgrade to pro',
       };
     }
   }
@@ -430,10 +449,12 @@ export class AuthService {
   /**
    * Handle Spotify callback
    */
-  async handleSpotifyCallback(code: string): Promise<{ success: boolean; error?: string }> {
+  async handleSpotifyCallback(
+    code: string
+  ): Promise<{ success: boolean; error?: string }> {
     try {
       const success = await spotifyService.exchangeCodeForToken(code);
-      
+
       if (success) {
         return { success: true };
       } else {
@@ -443,7 +464,10 @@ export class AuthService {
       console.error('❌ Spotify callback error:', error);
       return {
         success: false,
-        error: error instanceof Error ? error.message : 'Spotify authentication failed',
+        error:
+          error instanceof Error
+            ? error.message
+            : 'Spotify authentication failed',
       };
     }
   }

@@ -320,7 +320,9 @@ export class LastfmService {
         limit: limit.toString(),
       });
 
-      const response = await this.makeRequest(`${this.baseUrl}/?${params.toString()}`);
+      const response = await this.makeRequest(
+        `${this.baseUrl}/?${params.toString()}`
+      );
       const data = response as { toptracks: { track: LastfmTrack[] } };
 
       if (!data.toptracks?.track) {
@@ -416,7 +418,7 @@ export class LastfmService {
   private mapLastfmTrackToTrack(track: LastfmTrack, source: string): Track {
     const artistName =
       typeof track.artist === 'string' ? track.artist : track.artist.name;
-    
+
     return {
       id: `lastfm_${source}_${track.name}_${artistName}`.replace(/\s+/g, '_'),
       title: track.name,
