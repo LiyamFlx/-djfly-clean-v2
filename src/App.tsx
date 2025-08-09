@@ -7,11 +7,26 @@ import {
   useNavigate,
 } from 'react-router-dom';
 import { motion } from 'framer-motion';
+import { 
+  Mic, 
+  Sparkles, 
+  BarChart, 
+  ArrowRight, 
+  CheckCircle, 
+  Zap,
+  Clock,
+  Users,
+  TrendingUp,
+  Radio,
+  Headphones
+} from 'lucide-react';
 import { musicLibrary } from '@/services/musicLibrary';
 import type { Track } from '@/types/shared';
 import ApiStatusIndicator from '@/components/ApiStatusIndicator';
 import SpotifyCallbackPage from '@/pages/auth/SpotifyCallbackPage';
 import { ThemeProvider } from '@/contexts/ThemeContext';
+import { MusicProvider, useMusicContext } from '@/contexts/MusicContext';
+import PersistentNavBar from '@/components/layout/PersistentNavBar';
 
 // Lazy load heavy components for better performance
 const LoginPage = lazy(() => import('@/pages/auth/LoginPage'));
@@ -292,115 +307,152 @@ const NotFoundPage = () => (
   </div>
 );
 
-// Simple state management with initial tracks
-const appState = {
-  currentTrack: null as Track | null,
-  queue: [] as Track[],
-  isPlaying: false,
-};
+// Music state is now managed by MusicContext
 
-// Initialize with tracks asynchronously
-musicLibrary.searchTracks('electronic house techno', 8).then((tracks) => {
-  if (tracks.length > 0) {
-    appState.queue = tracks;
-    console.log('🎵 Initial playlist loaded:', tracks.length, 'tracks');
-  }
-});
+// Import the redesigned HomePage component
+import HomePage from '@/pages/HomePage';
+import OnboardingTips from '@/components/ui/OnboardingTips';
+import TrackList from '@/components/ui/TrackList';
+import FeatureComparisonCard from '@/components/ui/FeatureComparisonCard';
+import useProgressTracking from '@/hooks/useProgressTracking';
 
-const HomePage = () => (
-  <div className="min-h-screen bg-gray-900 text-white p-8">
-    <div className="max-w-4xl mx-auto text-center">
-      <h1 className="text-4xl font-bold text-blue-400 mb-4">DJfly</h1>
-      <p className="text-xl mb-8">
-        AI-powered DJ platform that reads any room instantly
-      </p>
+const StudioPage = () => {
+  const navigate = useNavigate();
+  const { trackFeatureUsage } = useProgressTracking();
+  
+  const handleFeatureSelect = (feature: 'magic-match' | 'magic-set') => {
+    trackFeatureUsage(feature);
+    navigate(feature === 'magic-match' ? '/studio/match' : '/studio/set');
+  };
+  
+  const studioTips = [
+    {
+      id: 'studio-welcome',
+      title: 'Welcome to Magic Studio!',
+      description: 'This is where AI magic happens. Choose Magic Match to analyze a crowd, or Magic Set to describe your perfect playlist.'
+    },
+    {
+      id: 'magic-match-tip',
+      title: 'Magic Match - Perfect for Live Events',
+      description: 'Record 5 seconds of crowd noise and get an instant playlist that matches the energy. Great for parties, events, and clubs.'
+    },
+    {
+      id: 'magic-set-tip', 
+      title: 'Magic Set - Describe Your Vision',
+      description: 'Tell AI what you want in words: "energetic house music for a rooftop party" and get a curated playlist with perfect flow.'
+    }
+  ];
 
-      {/* Get Started */}
-      <div className="bg-gradient-to-r from-blue-900/30 to-purple-900/30 border border-blue-600/30 rounded-xl p-6 mb-8">
-        <h2 className="text-2xl font-bold mb-3">🎵 Get Started with DJfly</h2>
-        <p className="text-gray-300 mb-4">
-          Experience AI-powered music discovery instantly
+  return (
+  <div className="min-h-screen bg-club-gradient text-white p-4 sm:p-8">
+    <div className="max-w-6xl mx-auto">
+      {/* Welcome Header */}
+      <motion.div 
+        className="text-center mb-16"
+        initial={{ opacity: 0, y: 30 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.8 }}
+      >
+        <h1 className="text-4xl sm:text-5xl md:text-6xl font-bold mb-6">
+          Welcome to <span className="gradient-text">Magic Studio</span>
+        </h1>
+        <p className="text-xl sm:text-2xl text-gray-300 max-w-3xl mx-auto mb-8 leading-relaxed">
+          Choose your path to the perfect playlist. No experience needed – our AI handles the complexity.
         </p>
-        <div className="flex flex-col sm:flex-row gap-3 justify-center">
-          <Link
-            to="/auth/login"
-            className="bg-green-600 hover:bg-green-700 px-6 py-3 rounded-lg font-semibold transition-colors inline-flex items-center gap-2"
-          >
-            🚀 Sign In
+        
+        {/* Quick Status */}
+        <div className="flex justify-center items-center gap-6 text-sm text-gray-400">
+          <div className="flex items-center gap-2">
+            <div className="w-2 h-2 bg-green-400 rounded-full"></div>
+            <span>AI Ready</span>
+          </div>
+          <div className="flex items-center gap-2">
+            <div className="w-2 h-2 bg-green-400 rounded-full"></div>
+            <span>No Setup Required</span>
+          </div>
+          <div className="flex items-center gap-2">
+            <div className="w-2 h-2 bg-green-400 rounded-full"></div>
+            <span>Instant Results</span>
+          </div>
+        </div>
+      </motion.div>
+
+      {/* Enhanced Feature Cards */}
+      <div className="grid md:grid-cols-2 gap-8 mb-16">
+        <motion.div
+          initial={{ opacity: 0, x: -50 }}
+          animate={{ opacity: 1, x: 0 }}
+          transition={{ duration: 0.8, delay: 0.2 }}
+        >
+          <FeatureComparisonCard 
+            type="magic-match"
+            onSelect={() => handleFeatureSelect('magic-match')}
+            isRecommended={true}
+          />
+        </motion.div>
+
+        <motion.div
+          initial={{ opacity: 0, x: 50 }}
+          animate={{ opacity: 1, x: 0 }}
+          transition={{ duration: 0.8, delay: 0.4 }}
+        >
+          <FeatureComparisonCard 
+            type="magic-set"
+            onSelect={() => handleFeatureSelect('magic-set')}
+          />
+        </motion.div>
+      </div>
+
+      {/* Quick Tips */}
+      <motion.div
+        className="glass-card p-6 mb-8"
+        initial={{ opacity: 0, y: 30 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.8, delay: 0.6 }}
+      >
+        <h3 className="text-xl font-semibold mb-4 flex items-center gap-2">
+          <Zap className="w-5 h-5 text-yellow-400" />
+          Quick Tips for Best Results
+        </h3>
+        <div className="grid sm:grid-cols-2 gap-4 text-sm text-gray-300">
+          <div className="flex items-start gap-2">
+            <CheckCircle className="w-4 h-4 text-green-400 mt-0.5 flex-shrink-0" />
+            <span><strong>Magic Match:</strong> Record during active moments - conversations, laughter, or music for best analysis</span>
+          </div>
+          <div className="flex items-start gap-2">
+            <CheckCircle className="w-4 h-4 text-green-400 mt-0.5 flex-shrink-0" />
+            <span><strong>Magic Set:</strong> Be specific about mood, genre, or occasion - "energetic house for night club" works better than just "dance"</span>
+          </div>
+        </div>
+      </motion.div>
+
+      {/* Recent Activity Placeholder */}
+      <motion.div
+        className="text-center text-gray-400"
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ duration: 0.8, delay: 0.8 }}
+      >
+        <p className="mb-4">Ready to create your first AI-powered playlist?</p>
+        <div className="flex justify-center gap-4">
+          <Link to="/studio/match" className="btn-primary px-6 py-2 text-sm">
+            Try Magic Match
           </Link>
-          <Link
-            to="/auth/signup"
-            className="bg-blue-600 hover:bg-blue-700 px-6 py-3 rounded-lg font-semibold transition-colors"
-          >
-            🎛️ Create Account
+          <Link to="/studio/set" className="btn-secondary px-6 py-2 text-sm">
+            Try Magic Set  
           </Link>
         </div>
-      </div>
-
-      {/* Feature Highlights */}
-      <div className="grid md:grid-cols-3 gap-6 mb-8">
-        <div className="bg-gray-800 p-4 rounded-lg">
-          <h3 className="text-lg font-semibold mb-2 text-blue-400">
-            🤖 AI Music Discovery
-          </h3>
-          <p className="text-sm text-gray-300">
-            Our AI analyzes crowd energy and generates perfect playlists
-            instantly
-          </p>
-        </div>
-        <div className="bg-gray-800 p-4 rounded-lg">
-          <h3 className="text-lg font-semibold mb-2 text-purple-400">
-            🎯 Smart Matching
-          </h3>
-          <p className="text-sm text-gray-300">
-            Record crowd noise to get AI-powered track recommendations
-          </p>
-        </div>
-        <div className="bg-gray-800 p-4 rounded-lg">
-          <h3 className="text-lg font-semibold mb-2 text-green-400">
-            🎧 Professional Tools
-          </h3>
-          <p className="text-sm text-gray-300">
-            Real-time effects, BPM matching, and seamless mixing
-          </p>
-        </div>
-      </div>
-
-      <div className="space-x-4">
-        <Link
-          to="/player"
-          className="bg-purple-600 px-6 py-3 rounded hover:bg-purple-700 transition-colors"
-        >
-          🎵 Player
-        </Link>
-      </div>
+      </motion.div>
     </div>
+    
+    {/* Onboarding Tips */}
+    <OnboardingTips 
+      tips={studioTips} 
+      page="studio" 
+    />
   </div>
-);
-
-const StudioPage = () => (
-  <div className="min-h-screen bg-gray-900 text-white p-8">
-    <div className="max-w-4xl mx-auto text-center">
-      <h1 className="text-3xl font-bold mb-8">Studio</h1>
-      <div className="grid md:grid-cols-2 gap-8">
-        <Link
-          to="/studio/match"
-          className="bg-blue-600 p-8 rounded-xl hover:bg-blue-700 transition-colors"
-        >
-          <h2 className="text-xl font-bold mb-4">🎯 Magic Match</h2>
-          <p>Analyze crowd and generate playlist</p>
-        </Link>
-        <Link
-          to="/studio/set"
-          className="bg-purple-600 p-8 rounded-xl hover:bg-purple-700 transition-colors"
-        >
-          <h2 className="text-xl font-bold mb-4">🎵 Magic Set</h2>
-          <p>Create custom playlist</p>
-        </Link>
-      </div>
-    </div>
-  </div>
-);
+  );
+};
 
 interface AIAnalysis {
   crowdEnergy: number;
@@ -418,6 +470,8 @@ interface AIAnalysis {
 
 const MagicMatchPage = () => {
   const navigate = useNavigate();
+  const { loadPlaylist } = useMusicContext();
+  const { trackFeatureUsage } = useProgressTracking();
   const [status, setStatus] = useState('ready');
   const [aiAnalysis, setAiAnalysis] = useState<AIAnalysis | null>(null);
 
@@ -469,7 +523,8 @@ const MagicMatchPage = () => {
             recommendation,
           });
 
-          appState.queue = recommendation.tracks;
+          loadPlaylist(recommendation.tracks);
+          trackFeatureUsage('playlist_created', { method: 'magic-match', trackCount: recommendation.tracks.length });
         } catch (error) {
           console.warn('AI analysis failed, using fallback:', error);
           // Fallback to existing generator
@@ -477,7 +532,8 @@ const MagicMatchPage = () => {
             'electronic house techno',
             8
           );
-          appState.queue = playlist;
+          loadPlaylist(playlist);
+          trackFeatureUsage('playlist_created', { method: 'magic-match-fallback', trackCount: playlist.length });
         }
       }, 5000); // Record for 5 seconds
     } catch (err) {
@@ -558,25 +614,7 @@ const MagicMatchPage = () => {
               </button>
             </div>
 
-            <div className="text-left">
-              <h3 className="text-xl font-semibold mb-4">Recommended Tracks</h3>
-              <div className="space-y-4">
-                {appState.queue.map((track) => (
-                  <div
-                    key={track.id}
-                    className="bg-gray-800 p-4 rounded-lg flex items-center justify-between"
-                  >
-                    <div>
-                      <p className="font-medium">{track.title}</p>
-                      <p className="text-gray-400 text-sm">{track.artist}</p>
-                    </div>
-                    <div className="text-sm text-gray-400">
-                      {track.bpm} BPM • {track.key}
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </div>
+            <TrackList title="AI Generated Playlist" />
           </div>
         )}
       </div>
@@ -586,6 +624,8 @@ const MagicMatchPage = () => {
 
 const MagicSetPage = () => {
   const navigate = useNavigate();
+  const { loadPlaylist } = useMusicContext();
+  const { trackFeatureUsage } = useProgressTracking();
   const [prompt, setPrompt] = useState('');
   const [status, setStatus] = useState('ready'); // ready, generating, complete
   const [generatedTracks, setGeneratedTracks] = useState<Track[]>([]);
@@ -616,14 +656,16 @@ const MagicSetPage = () => {
       setAiRecommendation(recommendation);
       setGeneratedTracks(recommendation.tracks);
       setStatus('complete');
-      appState.queue = recommendation.tracks;
+      loadPlaylist(recommendation.tracks);
+      trackFeatureUsage('playlist_created', { method: 'magic-set', trackCount: recommendation.tracks.length, prompt });
     } catch (error) {
       console.warn('AI generation failed, using fallback:', error);
       // Fallback to existing generator
       const generatedTracks = await musicLibrary.generatePlaylist(prompt);
       setGeneratedTracks(generatedTracks);
       setStatus('complete');
-      appState.queue = generatedTracks;
+      loadPlaylist(generatedTracks);
+      trackFeatureUsage('playlist_created', { method: 'magic-set-fallback', trackCount: generatedTracks.length, prompt });
     }
   };
 
@@ -854,38 +896,7 @@ const MagicSetPage = () => {
               </div>
             )}
 
-            <div className="bg-gray-800 p-6 rounded-xl">
-              <h3 className="text-xl font-semibold mb-4">
-                Generated Tracks ({generatedTracks.length})
-              </h3>
-              <div className="space-y-3">
-                {generatedTracks.map((track, index) => (
-                  <div key={track.id} className="bg-gray-700 p-4 rounded-lg">
-                    <div className="flex items-center justify-between">
-                      <div className="flex items-center gap-4">
-                        <div className="w-8 h-8 bg-purple-600 rounded-full flex items-center justify-center text-sm font-bold">
-                          {index + 1}
-                        </div>
-                        <div>
-                          <p className="font-medium">{track.title}</p>
-                          <p className="text-gray-400 text-sm">
-                            {track.artist}
-                          </p>
-                        </div>
-                      </div>
-                      <div className="text-right">
-                        <div className="text-sm text-gray-300">
-                          {track.bpm} BPM • {track.key}
-                        </div>
-                        <div className="text-xs text-purple-400">
-                          {track.genre}
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </div>
+            <TrackList title="AI Generated Set" />
           </div>
         )}
       </div>
@@ -989,10 +1000,13 @@ const ProfilePage = () => {
 function App() {
   return (
     <ThemeProvider>
-      <BrowserRouter>
+      <MusicProvider>
+        <BrowserRouter>
         <div className="pb-16">
-          <ApiStatusIndicator />
-          <Routes>
+          <PersistentNavBar />
+          <div className="pt-16">
+            <ApiStatusIndicator />
+            <Routes>
           <Route path="/" element={<HomePage />} />
           <Route path="/studio" element={<StudioPage />} />
           <Route path="/studio/match" element={<MagicMatchPage />} />
@@ -1056,10 +1070,12 @@ function App() {
 
           {/* 404 Page */}
           <Route path="*" element={<NotFoundPage />} />
-        </Routes>
+            </Routes>
+          </div>
         </div>
         <Navigation />
       </BrowserRouter>
+      </MusicProvider>
     </ThemeProvider>
   );
 }

@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { motion } from 'framer-motion';
 import {
   Play,
@@ -10,29 +10,25 @@ import {
   Repeat,
   LogOut,
 } from 'lucide-react';
-import {
-  useAudioState,
-  useAudioActions,
-  useCrowdState,
-  useSessionState,
-} from '@/store';
-import FinishSetModal from '@/components/player/FinishSetModal';
-import { useState } from 'react';
+import { useMusicContext } from '@/contexts/MusicContext';
+import TrackList from '@/components/ui/TrackList';
 import { useNavigate } from 'react-router-dom';
 
 const PlayerPage: React.FC = () => {
   const [isFinishModalOpen, setFinishModalOpen] = useState(false);
+  const [volume, setVolume] = useState(75);
   const navigate = useNavigate();
-  const audioState = useAudioState();
-  const crowdState = useCrowdState();
-  const sessionState = useSessionState();
-  const { togglePlayback, setVolume } = useAudioActions();
+  const {
+    currentTrack,
+    queue,
+    isPlaying,
+    playTrack,
+    setIsPlaying,
+    nextTrack,
+    previousTrack
+  } = useMusicContext();
 
-  const currentTrack = audioState.currentTrack;
-  const progress =
-    audioState.duration > 0
-      ? (audioState.currentTime / audioState.duration) * 100
-      : 0;
+  const progress = 0; // Simplified for now - can add audio time tracking later
 
   const formatTime = (seconds: number) => {
     const mins = Math.floor(seconds / 60);
@@ -40,18 +36,13 @@ const PlayerPage: React.FC = () => {
     return `${mins}:${secs.toString().padStart(2, '0')}`;
   };
 
-  if (!currentTrack) {
-    return (
-      <div className="min-h-screen bg-club-gradient flex items-center justify-center">
-        <div className="text-center">
-          <h2 className="text-2xl font-bold mb-4">No track selected</h2>
-          <p className="text-gray-400 mb-8">
-            Generate a set in Magic Studio to start playing
-          </p>
-        </div>
-      </div>
-    );
-  }
+  const displayTrack = currentTrack || {
+    title: 'No track selected',
+    artist: 'Generate a set in Magic Studio to start playing',
+    bpm: 0,
+    key: '',
+    genre: '',
+  };
 
   const handleConfirmFinish = () => {
     setFinishModalOpen(false);

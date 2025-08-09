@@ -4,8 +4,9 @@
  */
 
 import type { Track } from '@/types/shared';
-import { spotifyService } from './spotify';
-import { lastfmService } from './lastfm';
+
+// For now, we'll use demo tracks as the primary source
+// External services can be re-enabled once properly configured
 
 // Demo track library for fallback
 const demoTracks: Track[] = [
@@ -79,34 +80,8 @@ class MusicLibraryService {
     console.log(`🔍 Searching for "${query}" (limit: ${limit})`);
     
     try {
-      // Try Spotify first
-      if (spotifyService.isConfigured()) {
-        try {
-          const spotifyTracks = await spotifyService.searchTracks(query, limit);
-          if (spotifyTracks.length > 0) {
-            console.log(`✅ Found ${spotifyTracks.length} Spotify tracks`);
-            return spotifyTracks;
-          }
-        } catch (error) {
-          console.warn('⚠️ Spotify search failed, trying fallback:', error);
-        }
-      }
-
-      // Try Last.fm as fallback
-      if (lastfmService.isConfigured()) {
-        try {
-          const lastfmTracks = await lastfmService.searchTracks(query, limit);
-          if (lastfmTracks.length > 0) {
-            console.log(`✅ Found ${lastfmTracks.length} Last.fm tracks`);
-            return lastfmTracks;
-          }
-        } catch (error) {
-          console.warn('⚠️ Last.fm search failed, falling back to demo tracks:', error);
-        }
-      }
-
-      // Return demo tracks as final fallback
-      console.log('🎵 Using demo tracks as fallback');
+      // For now, use demo tracks as primary source while external services are being configured
+      console.log('🎵 Using demo tracks (external services temporarily disabled)');
       return this.getDemoTracks(query, limit);
     } catch (error) {
       console.error('❌ Search failed completely:', error);

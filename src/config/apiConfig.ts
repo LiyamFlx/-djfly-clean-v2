@@ -253,13 +253,15 @@ export const testConnections = {
   },
 
   async youtube(): Promise<boolean> {
-    if (!API_CONFIG.youtube.apiKey) {
+    // Skip API testing in production - assume unavailable unless properly configured
+    if (!API_CONFIG.youtube.apiKey || API_CONFIG.youtube.apiKey.includes('AIzaSyBBD44Gy31o8al3_MoJFksfhVJGI9a7SA')) {
+      console.info('🎥 YouTube API not configured or using invalid demo key - using fallback mode');
       serviceStatus.setServiceStatus('youtube', false);
       return false;
     }
 
     try {
-      // Test YouTube API
+      // Only test if we have what looks like a real API key
       const response = await fetch(
         `${API_CONFIG.youtube.baseUrl}/search?part=snippet&q=test&key=${API_CONFIG.youtube.apiKey}&maxResults=1`
       );
@@ -268,20 +270,22 @@ export const testConnections = {
       serviceStatus.setServiceStatus('youtube', success);
       return success;
     } catch (error) {
-      console.error('YouTube connection test failed:', error);
+      console.info('YouTube connection test failed - using fallback mode:', error);
       serviceStatus.setServiceStatus('youtube', false);
       return false;
     }
   },
 
   async lastfm(): Promise<boolean> {
-    if (!API_CONFIG.lastfm.apiKey) {
+    // Skip API testing with known invalid keys
+    if (!API_CONFIG.lastfm.apiKey || API_CONFIG.lastfm.apiKey.includes('8d3f0ac6611b0146296c5375c9634ef6')) {
+      console.info('🎵 Last.fm API not configured or using invalid demo key - using fallback mode');
       serviceStatus.setServiceStatus('lastfm', false);
       return false;
     }
 
     try {
-      // Test Last.fm API
+      // Only test if we have what looks like a real API key
       const response = await fetch(
         `${API_CONFIG.lastfm.baseUrl}/?method=track.search&track=test&api_key=${API_CONFIG.lastfm.apiKey}&format=json`
       );
@@ -290,7 +294,7 @@ export const testConnections = {
       serviceStatus.setServiceStatus('lastfm', success);
       return success;
     } catch (error) {
-      console.error('Last.fm connection test failed:', error);
+      console.info('Last.fm connection test failed - using fallback mode:', error);
       serviceStatus.setServiceStatus('lastfm', false);
       return false;
     }
