@@ -92,8 +92,7 @@ export function useAudioPlayer(
       setCurrentTime(0);
     };
 
-    // Add event listeners
-    };
+    // Add event listeners - placeholder for now
   }, []);
 
   // Load new source when src changes
@@ -115,13 +114,16 @@ export function useAudioPlayer(
   useEffect(() => {
     if (isPlaying && magicPlayerRef.current) {
       progressIntervalRef.current = window.setInterval(() => {
-
-      return () => {
-        if (progressIntervalRef.current) {
-          clearInterval(progressIntervalRef.current);
-        }
-      };
+        // Update progress tracking - simplified for now
+        setCurrentTime(prev => prev + 0.1);
+      }, 100);
     }
+
+    return () => {
+      if (progressIntervalRef.current) {
+        clearInterval(progressIntervalRef.current);
+      }
+    };
   }, [isPlaying]);
 
   // Play function
@@ -129,7 +131,11 @@ export function useAudioPlayer(
     try {
       setIsLoading(true);
       setError(null);
+      if (magicPlayerRef.current) {
+        magicPlayerRef.current.play('A');
       }
+      setIsPlaying(true);
+      setIsLoading(false);
     } catch {
       setError('Failed to start playback');
       setIsLoading(false);
@@ -138,15 +144,24 @@ export function useAudioPlayer(
 
   // Pause function
   const pause = useCallback(() => {
+    if (magicPlayerRef.current) {
+      magicPlayerRef.current.pause('A');
+    }
+    setIsPlaying(false);
   }, []);
 
   // Stop function
   const stop = useCallback(() => {
+    setIsPlaying(false);
     setCurrentTime(0);
   }, []);
 
   // Seek function
   const seek = useCallback((time: number) => {
+    if (magicPlayerRef.current) {
+      magicPlayerRef.current.seek('A', time);
+    }
+    setCurrentTime(time);
   }, []);
 
   // Volume control
@@ -160,10 +175,12 @@ export function useAudioPlayer(
 
   // Get frequency data for visualization
   const getFrequencyData = useCallback(() => {
+    return new Uint8Array(0); // Placeholder
   }, []);
 
   // Get time domain data for visualization
   const getTimeDomainData = useCallback(() => {
+    return new Uint8Array(0); // Placeholder
   }, []);
 
   return {

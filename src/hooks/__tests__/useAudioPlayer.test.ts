@@ -36,6 +36,7 @@ mockMagicPlayer.addEventListener = vi.fn((event, callback) => {
 
 // Mock the MagicPlayer class
 vi.mock('@/services/MagicPlayer', () => ({
+  default: vi.fn().mockImplementation(() => mockMagicPlayer),
   MagicPlayer: vi.fn().mockImplementation(() => mockMagicPlayer),
 }));
 
