@@ -26,7 +26,7 @@ import ApiStatusIndicator from '@/components/ApiStatusIndicator';
 import SpotifyCallbackPage from '@/pages/auth/SpotifyCallbackPage';
 import { ThemeProvider } from '@/contexts/ThemeContext';
 import { MusicProvider, useMusicContext } from '@/contexts/MusicContext';
-import PersistentNavBar from '@/components/layout/PersistentNavBar';
+import PersistentNavBar from '@/components/Layout/PersistentNavBar';
 
 // Lazy load heavy components for better performance
 const LoginPage = lazy(() => import('@/pages/auth/LoginPage'));
