@@ -1,6 +1,10 @@
 import { useEffect, useRef, useState, useCallback } from 'react';
+<<<<<<< HEAD
 import { MagicPlayer } from '@/services/MagicPlayer';
 import type { Track } from '@/types/audio';
+=======
+import MagicPlayer, { type AudioSource } from '@/services/MagicPlayer';
+>>>>>>> 86165b8 (🎯 Major Architecture Overhaul: AI-Powered DJ Engine)
 
 export interface UseAudioPlayerOptions {
   volume?: number;
@@ -93,6 +97,7 @@ export function useAudioPlayer(
     };
 
     // Add event listeners
+<<<<<<< HEAD
     player.addEventListener('play', handlePlay);
     player.addEventListener('pause', handlePause);
     player.addEventListener('loaded', handleLoaded);
@@ -106,6 +111,21 @@ export function useAudioPlayer(
       player.removeEventListener('loaded', handleLoaded);
       player.removeEventListener('error', handleError);
       player.removeEventListener('ended', handleEnded);
+=======
+    MagicPlayer.on('play', handlePlay);
+    MagicPlayer.on('pause', handlePause);
+    MagicPlayer.on('loaded', handleLoaded);
+    MagicPlayer.on('error', handleError);
+    MagicPlayer.on('ended', handleEnded);
+
+    return () => {
+      // Remove event listeners
+      MagicPlayer.off('play', handlePlay);
+      MagicPlayer.off('pause', handlePause);
+      MagicPlayer.off('loaded', handleLoaded);
+      MagicPlayer.off('error', handleError);
+      MagicPlayer.off('ended', handleEnded);
+>>>>>>> 86165b8 (🎯 Major Architecture Overhaul: AI-Powered DJ Engine)
     };
   }, []);
 
@@ -120,11 +140,27 @@ export function useAudioPlayer(
         setError(null);
         currentTrackRef.current = track;
 
+<<<<<<< HEAD
         // Load track into deck A
         magicPlayerRef.current.loadTrack('A', track).catch(() => {
           setError('Failed to load track');
           setIsLoading(false);
         });
+=======
+        MagicPlayer
+          .load(audioSource, {
+            volume: options.volume,
+            loop: options.loop,
+            preload: true,
+            fadeInDuration: options.fadeInDuration,
+            fadeOutDuration: options.fadeOutDuration,
+          })
+          .catch((error) => {
+            console.error('Failed to load audio source:', error);
+            setError(error.message);
+            setIsLoading(false);
+          });
+>>>>>>> 86165b8 (🎯 Major Architecture Overhaul: AI-Powered DJ Engine)
       }
     }
   }, [src, createTrackFromUrl, options]);
@@ -133,12 +169,25 @@ export function useAudioPlayer(
   useEffect(() => {
     if (isPlaying && magicPlayerRef.current) {
       progressIntervalRef.current = window.setInterval(() => {
+<<<<<<< HEAD
         const deckA = magicPlayerRef.current!.getDeckState('A');
         if (deckA) {
           setCurrentTime(deckA.currentTime);
           setDuration(deckA.duration);
         }
       }, 100);
+=======
+        const analytics = MagicPlayer.getAnalytics();
+        setCurrentTime(analytics.currentTime);
+        setBufferProgress(analytics.bufferProgress);
+      }, 100); // Update every 100ms for smooth progress
+    } else {
+      if (progressIntervalRef.current) {
+        clearInterval(progressIntervalRef.current);
+        progressIntervalRef.current = null;
+      }
+    }
+>>>>>>> 86165b8 (🎯 Major Architecture Overhaul: AI-Powered DJ Engine)
 
       return () => {
         if (progressIntervalRef.current) {
@@ -153,8 +202,18 @@ export function useAudioPlayer(
     try {
       setIsLoading(true);
       setError(null);
+<<<<<<< HEAD
       if (magicPlayerRef.current) {
         magicPlayerRef.current.play('A');
+=======
+      await MagicPlayer.play();
+
+      // Auto-play may require user interaction
+      if (!MagicPlayer.isPlaying()) {
+        console.log(
+          '⏳ Waiting for user interaction to enable audio playback...'
+        );
+>>>>>>> 86165b8 (🎯 Major Architecture Overhaul: AI-Powered DJ Engine)
       }
     } catch {
       setError('Failed to start playback');
@@ -164,29 +223,46 @@ export function useAudioPlayer(
 
   // Pause function
   const pause = useCallback(() => {
+<<<<<<< HEAD
     if (magicPlayerRef.current) {
       magicPlayerRef.current.pause('A');
     }
+=======
+    MagicPlayer.pause();
+>>>>>>> 86165b8 (🎯 Major Architecture Overhaul: AI-Powered DJ Engine)
   }, []);
 
   // Stop function
   const stop = useCallback(() => {
+<<<<<<< HEAD
     if (magicPlayerRef.current) {
       magicPlayerRef.current.stop('A');
     }
+=======
+    MagicPlayer.stop();
+>>>>>>> 86165b8 (🎯 Major Architecture Overhaul: AI-Powered DJ Engine)
     setCurrentTime(0);
   }, []);
 
   // Seek function
   const seek = useCallback((time: number) => {
+<<<<<<< HEAD
     if (magicPlayerRef.current) {
       magicPlayerRef.current.seek('A', time);
     }
+=======
+    MagicPlayer.seek(time);
+    setCurrentTime(time);
+>>>>>>> 86165b8 (🎯 Major Architecture Overhaul: AI-Powered DJ Engine)
   }, []);
 
   // Volume control
   const setVolume = useCallback((newVolume: number) => {
     const clampedVolume = Math.max(0, Math.min(1, newVolume));
+<<<<<<< HEAD
+=======
+    MagicPlayer.setVolume(clampedVolume);
+>>>>>>> 86165b8 (🎯 Major Architecture Overhaul: AI-Powered DJ Engine)
     setVolumeState(clampedVolume);
     if (magicPlayerRef.current) {
       magicPlayerRef.current.setDeckVolume('A', clampedVolume);
@@ -195,18 +271,35 @@ export function useAudioPlayer(
 
   // Get frequency data for visualization
   const getFrequencyData = useCallback(() => {
+<<<<<<< HEAD
     if (magicPlayerRef.current) {
       return new Uint8Array(128); // Placeholder - implement actual frequency data
     }
     return new Uint8Array(128);
+=======
+    return MagicPlayer.getFrequencyData();
+>>>>>>> 86165b8 (🎯 Major Architecture Overhaul: AI-Powered DJ Engine)
   }, []);
 
   // Get time domain data for visualization
   const getTimeDomainData = useCallback(() => {
+<<<<<<< HEAD
     if (magicPlayerRef.current) {
       return new Uint8Array(128); // Placeholder - implement actual time domain data
     }
     return new Uint8Array(128);
+=======
+    return MagicPlayer.getTimeDomainData();
+  }, []);
+
+  // Cleanup on unmount
+  useEffect(() => {
+    return () => {
+      if (progressIntervalRef.current) {
+        clearInterval(progressIntervalRef.current);
+      }
+    };
+>>>>>>> 86165b8 (🎯 Major Architecture Overhaul: AI-Powered DJ Engine)
   }, []);
 
   return {

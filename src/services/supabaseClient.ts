@@ -10,25 +10,24 @@ import type { SetMetrics, SetInsights } from './analytics';
 interface Database {
   public: {
     Tables: {
-      users: {
+      profiles: {
         Row: {
           id: string;
-          email: string;
           username: string;
+          avatar_url?: string;
           created_at: string;
           updated_at: string;
         };
         Insert: {
-          id?: string;
-          email: string;
+          id: string;
           username: string;
+          avatar_url?: string;
           created_at?: string;
           updated_at?: string;
         };
         Update: {
-          id?: string;
-          email?: string;
           username?: string;
+          avatar_url?: string;
           updated_at?: string;
         };
       };
@@ -139,7 +138,7 @@ class SupabaseService {
 
     try {
       const { error } = await this.client
-        .from('users')
+        .from('profiles')
         .select('count')
         .limit(1);
 
