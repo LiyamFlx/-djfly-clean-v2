@@ -58,7 +58,7 @@ const PlayerPage: React.FC = () => {
       {/* End Set Button */}
       <button
         onClick={() => setFinishModalOpen(true)}
-        className="absolute top-6 right-6 glass-card p-3 rounded-full text-light-gray hover:text-pure-white hover:shadow-neon-purple transition-all z-10"
+        className="absolute top-6 right-6 glass-card p-3 rounded-full text-light-gray hover:text-pure-white hover:shadow-neon-purple transition-all z-10 touch-button hover-glow"
         aria-label="End Set"
       >
         <LogOut className="w-5 h-5" />
@@ -99,7 +99,7 @@ const PlayerPage: React.FC = () => {
           >
             {/* Album Art */}
             <motion.div
-              className="relative mb-8"
+              className="relative mb-8 hover-scale"
               animate={{ rotate: isPlaying ? 360 : 0 }}
               transition={{ duration: 20, repeat: Infinity, ease: 'linear' }}
             >
@@ -166,17 +166,17 @@ const PlayerPage: React.FC = () => {
               transition={{ delay: 0.4 }}
               className="flex items-center justify-center gap-6 mb-8"
             >
-              <button className="p-3 text-light-gray hover:text-pure-white hover:shadow-neon-purple transition-colors">
+              <button className="p-3 text-light-gray hover:text-pure-white hover:shadow-neon-purple transition-colors touch-button hover-glow">
                 <Shuffle className="w-6 h-6" />
               </button>
 
-              <button className="p-3 text-light-gray hover:text-pure-white hover:shadow-neon-purple transition-colors">
+              <button className="p-3 text-light-gray hover:text-pure-white hover:shadow-neon-purple transition-colors touch-button hover-glow">
                 <SkipBack className="w-6 h-6" />
               </button>
 
               <button
                 onClick={() => setIsPlaying(!isPlaying)}
-                className="p-6 bg-purple-gradient rounded-full text-pure-black hover:scale-105 hover:shadow-neon-purple-lg transition-all"
+                className="p-6 bg-purple-gradient rounded-full text-pure-black hover:scale-105 hover:shadow-neon-purple-lg transition-all touch-button hover-lift"
               >
                 {isPlaying ? (
                   <Pause className="w-8 h-8" />
@@ -185,11 +185,11 @@ const PlayerPage: React.FC = () => {
                 )}
               </button>
 
-              <button className="p-3 text-light-gray hover:text-pure-white hover:shadow-neon-purple transition-colors">
+              <button className="p-3 text-light-gray hover:text-pure-white hover:shadow-neon-purple transition-colors touch-button hover-glow">
                 <SkipForward className="w-6 h-6" />
               </button>
 
-              <button className="p-3 text-light-gray hover:text-pure-white hover:shadow-neon-purple transition-colors">
+              <button className="p-3 text-light-gray hover:text-pure-white hover:shadow-neon-purple transition-colors touch-button hover-glow">
                 <Repeat className="w-6 h-6" />
               </button>
             </motion.div>

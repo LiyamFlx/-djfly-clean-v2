@@ -57,7 +57,7 @@ const StudioPage: React.FC = () => {
   ];
 
   return (
-    <div className="min-h-screen bg-black-gradient text-white p-8">
+    <div className="min-h-screen bg-black-gradient text-white section-padding">
       <div className="max-w-6xl mx-auto">
         {/* Header */}
         <motion.div
@@ -66,13 +66,13 @@ const StudioPage: React.FC = () => {
           className="text-center mb-12"
         >
           <motion.h1 
-            className="text-5xl lg:text-6xl font-bold mb-6 text-gradient leading-tight"
+            className="heading-primary mb-6 text-gradient leading-tight"
             animate={{ backgroundPosition: ['0% 50%', '100% 50%', '0% 50%'] }}
             transition={{ duration: 6, repeat: Infinity }}
           >
             Magic Studio
           </motion.h1>
-          <p className="text-xl md:text-2xl text-neutral-300 max-w-3xl mx-auto leading-relaxed">
+          <p className="body-large text-neutral-300 max-w-3xl mx-auto">
             Choose your AI-powered music creation method. Both tools use
             advanced machine learning to deliver perfect mixes for any
             situation.
@@ -80,7 +80,7 @@ const StudioPage: React.FC = () => {
         </motion.div>
 
         {/* Feature Comparison */}
-        <div className="grid lg:grid-cols-2 gap-8 mb-12">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-12">
           {features.map((feature, index) => {
             const Icon = feature.icon;
             const isSelected = selectedFeature === feature.id;
@@ -91,12 +91,12 @@ const StudioPage: React.FC = () => {
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: index * 0.2 }}
-                className={`relative group cursor-pointer ${
-                  isSelected ? 'ring-2 ring-primary-400' : ''
+                className={`relative group cursor-pointer hover-lift ${
+                  isSelected ? 'ring-2 ring-neon-purple' : ''
                 }`}
                 onClick={() => setSelectedFeature(feature.id)}
               >
-                <div className="bg-gray-800/50 backdrop-blur-sm border border-gray-700 rounded-2xl p-8 h-full transition-all duration-300 hover:bg-gray-800/70 hover:border-gray-600">
+                <div className="glass-card p-8 h-full hover:border-neon-purple hover-glow">
                   {/* Header */}
                   <div className="flex items-start justify-between mb-6">
                     <div className="flex items-center space-x-4">

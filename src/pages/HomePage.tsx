@@ -38,7 +38,7 @@ const HomePage: React.FC = () => {
   return (
     <div className="min-h-screen overflow-x-hidden">
       {/* Hero Section - Redesigned for immediate engagement */}
-      <section className="relative min-h-screen flex items-center justify-center px-4 sm:px-6 lg:px-8">
+      <section className="relative min-h-screen flex items-center justify-center section-padding">
         {/* Neon Background Effects */}
         <div className="absolute inset-0 overflow-hidden">
           <div className="absolute -top-1/4 -left-1/4 w-96 h-96 bg-neon-purple/20 rounded-full blur-3xl animate-pulse-slow" />
@@ -67,7 +67,7 @@ const HomePage: React.FC = () => {
 
           {/* Compelling Main Title */}
           <motion.h1
-            className="text-4xl sm:text-6xl md:text-7xl lg:text-8xl font-bold tracking-tight mb-8"
+            className="heading-primary mb-8"
             initial={{ opacity: 0, y: 50 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 1, delay: 0.3 }}
@@ -80,7 +80,7 @@ const HomePage: React.FC = () => {
 
           {/* Clear Value Proposition */}
           <motion.p
-            className="text-xl md:text-3xl text-gray-200 max-w-4xl mx-auto mb-16 leading-relaxed font-light"
+            className="body-large text-gray-200 max-w-4xl mx-auto mb-16 font-light"
             initial={{ opacity: 0, y: 30 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 1, delay: 0.5 }}
@@ -91,14 +91,14 @@ const HomePage: React.FC = () => {
 
           {/* Immediate Action CTAs - No barriers */}
           <motion.div
-            className="flex flex-col sm:flex-row gap-6 justify-center mb-16"
+            className="flex-responsive justify-center mb-16"
             initial={{ opacity: 0, y: 30 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 1, delay: 0.7 }}
           >
             <motion.button
               onClick={handleTryNow}
-              className="relative group bg-purple-gradient text-pure-white text-xl font-bold px-12 py-6 rounded-2xl shadow-neon-purple-lg overflow-hidden"
+              className="relative group bg-purple-gradient text-pure-white text-xl font-bold px-12 py-6 rounded-2xl shadow-neon-purple-lg overflow-hidden hover-lift touch-button"
               whileHover={{ scale: 1.05, y: -2 }}
               whileTap={{ scale: 0.98 }}
             >
@@ -120,14 +120,14 @@ const HomePage: React.FC = () => {
             >
               <button
                 onClick={() => handleQuickStart('match')}
-                className="btn-secondary px-6 py-6 text-lg font-semibold flex items-center gap-2 group"
+                className="btn-secondary px-6 py-6 text-lg font-semibold flex items-center gap-2 group hover-glow touch-button"
               >
                 <Mic className="w-5 h-5" />
                 Magic Match
               </button>
               <button
                 onClick={() => handleQuickStart('set')}
-                className="btn-secondary px-6 py-6 text-lg font-semibold flex items-center gap-2 group"
+                className="btn-secondary px-6 py-6 text-lg font-semibold flex items-center gap-2 group hover-glow touch-button"
               >
                 <Sparkles className="w-5 h-5" />
                 Magic Set
@@ -161,7 +161,7 @@ const HomePage: React.FC = () => {
       </section>
 
       {/* How It Works - Visual Journey */}
-      <section className="py-20 px-4 sm:px-6 lg:px-8 bg-gradient-to-b from-transparent to-gray-900/50">
+      <section className="section-padding bg-gradient-to-b from-transparent to-gray-900/50">
         <div className="max-w-6xl mx-auto">
           <motion.div
             className="text-center mb-16"
@@ -169,15 +169,15 @@ const HomePage: React.FC = () => {
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
           >
-            <h2 className="text-4xl md:text-5xl font-bold text-pure-white mb-6">
+            <h2 className="heading-secondary text-pure-white mb-6">
               How It <span className="text-neon-green">Works</span>
             </h2>
-            <p className="text-xl text-gray-300 max-w-2xl mx-auto">
+            <p className="body-large text-gray-300 max-w-2xl mx-auto">
               Three simple steps to perfect music, every time
             </p>
           </motion.div>
 
-          <div className="grid md:grid-cols-3 gap-12 mb-16">
+          <div className="grid-responsive mb-16">
             {[
               {
                 step: '01',
@@ -203,12 +203,11 @@ const HomePage: React.FC = () => {
             ].map((item, index) => (
               <motion.div
                 key={index}
-                className="text-center group"
+                className="text-center group hover-lift"
                 initial={{ opacity: 0, y: 50 }}
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
                 transition={{ delay: index * 0.2 }}
-                whileHover={{ y: -10 }}
               >
                 <div className={`relative mb-6 mx-auto w-24 h-24 bg-${item.color}/20 rounded-full flex items-center justify-center group-hover:bg-${item.color}/30 transition-all duration-300`}>
                   <div className={`text-${item.color}`}>
@@ -218,8 +217,8 @@ const HomePage: React.FC = () => {
                     {item.step}
                   </div>
                 </div>
-                <h3 className="text-2xl font-bold text-pure-white mb-4">{item.title}</h3>
-                <p className="text-gray-300 leading-relaxed">{item.description}</p>
+                <h3 className="heading-tertiary text-pure-white mb-4">{item.title}</h3>
+                <p className="body-medium text-gray-300">{item.description}</p>
               </motion.div>
             ))}
           </div>
@@ -227,7 +226,7 @@ const HomePage: React.FC = () => {
       </section>
 
       {/* Interactive Feature Preview */}
-      <section className="py-20 px-4 sm:px-6 lg:px-8 bg-gray-900/50">
+      <section className="section-padding bg-gray-900/50">
         <div className="max-w-6xl mx-auto">
           <motion.div
             className="text-center mb-16"
@@ -235,15 +234,15 @@ const HomePage: React.FC = () => {
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
           >
-            <h2 className="text-4xl md:text-5xl font-bold text-pure-white mb-6">
+            <h2 className="heading-secondary text-pure-white mb-6">
               Choose Your <span className="text-neon-purple">Style</span>
             </h2>
-            <p className="text-xl text-gray-300 max-w-2xl mx-auto">
+            <p className="body-large text-gray-300 max-w-2xl mx-auto">
               Two powerful ways to create the perfect soundtrack
             </p>
           </motion.div>
 
-          <div className="grid md:grid-cols-2 gap-8">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
             {/* Magic Match Preview */}
             <motion.div
               className={`relative group cursor-pointer transition-all duration-500 ${
@@ -358,24 +357,24 @@ const HomePage: React.FC = () => {
       </section>
 
       {/* Final CTA Section */}
-      <section className="py-20 px-4 sm:px-6 lg:px-8 bg-gradient-to-t from-gray-900 to-transparent">
+      <section className="section-padding bg-gradient-to-t from-gray-900 to-transparent">
         <div className="max-w-4xl mx-auto text-center">
           <motion.div
             initial={{ opacity: 0, y: 30 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
           >
-            <h2 className="text-4xl md:text-6xl font-bold text-pure-white mb-8">
+            <h2 className="heading-primary text-pure-white mb-8">
               Ready to <span className="gradient-text">DJ Like a Pro</span>?
             </h2>
             
-            <p className="text-xl text-gray-300 mb-12 max-w-2xl mx-auto">
+            <p className="body-large text-gray-300 mb-12 max-w-2xl mx-auto">
               Join thousands of DJs, event planners, and music lovers who trust AI to create perfect playlists.
             </p>
 
             <motion.button
               onClick={handleTryNow}
-              className="relative group bg-neon-gradient text-pure-white text-2xl font-bold px-16 py-8 rounded-3xl shadow-neon-purple-lg overflow-hidden"
+              className="relative group bg-neon-gradient text-pure-white text-2xl font-bold px-16 py-8 rounded-3xl shadow-neon-purple-lg overflow-hidden hover-lift touch-button"
               whileHover={{ scale: 1.05, y: -3 }}
               whileTap={{ scale: 0.98 }}
             >

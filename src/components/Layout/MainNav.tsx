@@ -49,9 +49,9 @@ const NavItem: React.FC<NavItemProps> = React.memo(
     return (
       <button
         onClick={handleClick}
-        className={`w-full flex items-center space-x-3 px-4 py-3 rounded-lg transition-all duration-200 ${
+        className={`w-full flex items-center space-x-3 px-4 py-3 rounded-lg transition-all duration-200 touch-button hover-glow focus-visible ${
           isActive
-            ? 'bg-electric-blue/20 text-electric-blue'
+            ? 'bg-neon-purple/20 text-neon-purple shadow-neon-purple'
             : 'text-gray-300 hover:text-white hover:bg-white/10'
         }`}
         aria-label={label}
@@ -109,7 +109,9 @@ const MainNav: React.FC = () => {
             {navItems.map((item) => (
               <NavItem key={item.path} {...item} />
             ))}
-            <ThemeToggle className="ml-2" />
+            <div className="hover-scale">
+              <ThemeToggle className="ml-2" />
+            </div>
           </div>
 
           {/* Mobile menu button */}
@@ -117,7 +119,7 @@ const MainNav: React.FC = () => {
             <ThemeToggle size="sm" />
             <button
               onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-              className="inline-flex items-center justify-center p-2 rounded-md text-gray-400 hover:text-white hover:bg-white/10 focus:outline-none"
+              className="inline-flex items-center justify-center p-2 rounded-md text-gray-400 hover:text-white hover:bg-white/10 focus:outline-none touch-button hover-glow focus-visible"
               aria-expanded={isMobileMenuOpen ? true : false}
               aria-label={isMobileMenuOpen ? 'Close menu' : 'Open menu'}
               aria-haspopup="true"
