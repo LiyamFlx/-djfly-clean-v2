@@ -4,7 +4,7 @@
 
 @layer base {
   body {
-    @apply bg-deep-void text-snow;
+    @apply bg-pure-black text-pure-white;
     font-family:
       system-ui,
       -apple-system,
@@ -17,96 +17,89 @@
 
   /* Light theme styles - for future implementation */
   .light body {
-    @apply bg-snow text-charcoal;
+    @apply bg-pure-white text-pure-black;
   }
 
-  .light .bg-deep-void {
-    @apply bg-snow;
+  .light .bg-pure-black {
+    @apply bg-pure-white;
   }
 
-  .light .bg-charcoal {
+  .light .bg-rich-black {
     @apply bg-gray-50;
   }
 
-  .light .bg-slate-dark {
+  .light .bg-dark-gray {
     @apply bg-gray-100;
   }
 
-  .light .text-snow {
-    @apply text-charcoal;
+  .light .text-pure-white {
+    @apply text-pure-black;
   }
 
-  .light .text-pearl {
-    @apply text-ash;
+  .light .text-off-white {
+    @apply text-gray-800;
   }
 
-  .light .text-silver {
-    @apply text-slate-dark;
-  }
-
-  .light .border-slate-dark {
-    @apply border-gray-200;
-  }
-
-  .light .border-graphite {
-    @apply border-gray-300;
+  .light .text-light-gray {
+    @apply text-gray-600;
   }
 
   .light .glass-card {
-    @apply bg-white/80 backdrop-blur-md border border-gray-200 shadow-lg;
+    @apply bg-white/90 backdrop-blur-md border border-gray-200 shadow-lg;
   }
 
   .light .card {
-    @apply bg-white/90 border border-gray-200 shadow-lg;
+    @apply bg-white border border-gray-200 shadow-lg;
   }
 }
 
 @layer components {
-  /* Button Components - Refined for music UI */
+  /* Button Components - Simple black/white with neon accents */
   .btn-primary {
-    @apply bg-sonic-gradient text-snow font-semibold px-6 py-3 rounded-xl;
+    @apply bg-purple-gradient text-pure-white font-semibold px-6 py-3 rounded-xl;
     @apply transform transition-all duration-300;
-    @apply hover:scale-105 hover:shadow-sonic;
+    @apply hover:scale-105 hover:shadow-neon-purple;
     @apply active:scale-95;
-    @apply focus:outline-none focus:shadow-focus;
+    @apply focus:outline-none focus:shadow-focus-purple;
   }
 
   .btn-secondary {
-    @apply bg-transparent border-2 border-sonic-blue text-sonic-blue;
+    @apply bg-transparent border-2 border-neon-green text-neon-green;
     @apply font-semibold px-6 py-3 rounded-xl;
     @apply transition-all duration-300;
-    @apply hover:bg-sonic-blue hover:text-snow hover:shadow-sonic;
-    @apply focus:outline-none focus:shadow-focus;
+    @apply hover:bg-neon-green hover:text-pure-black hover:shadow-neon-green;
+    @apply focus:outline-none focus:shadow-focus-green;
   }
 
   .control-button {
-    @apply bg-slate-dark/50 text-silver border border-graphite;
+    @apply bg-dark-gray/50 text-light-gray border border-dark-gray;
     @apply rounded-xl transition-all duration-300;
-    @apply hover:bg-graphite/50 hover:text-pearl hover:border-silver;
-    @apply focus:outline-none focus:shadow-focus;
+    @apply hover:bg-rich-black hover:text-pure-white hover:border-neon-purple;
+    @apply focus:outline-none focus:shadow-focus-purple;
   }
 
-  /* Card Components - Sophisticated and minimal */
+  /* Card Components - Simple black cards with neon borders */
   .card {
-    @apply bg-charcoal/80 backdrop-blur-sm border border-slate-dark rounded-2xl;
+    @apply bg-rich-black backdrop-blur-sm border border-dark-gray rounded-2xl;
     @apply shadow-glass;
   }
 
   .card-hover {
     @apply card transition-all duration-300;
-    @apply hover:bg-charcoal hover:shadow-glass-lg hover:-translate-y-1;
-    @apply hover:border-graphite;
+    @apply hover:bg-dark-gray hover:shadow-neon-purple hover:-translate-y-1;
+    @apply hover:border-neon-purple;
   }
 
   .glass-card {
-    @apply bg-charcoal/20 backdrop-blur-md border border-graphite/30 rounded-xl;
+    @apply bg-rich-black/80 backdrop-blur-md border border-dark-gray rounded-xl;
     @apply shadow-glass-lg;
   }
 
   /* Text Components */
   .text-gradient {
-    @apply bg-sonic-gradient bg-clip-text text-transparent;
+    @apply bg-neon-gradient bg-clip-text text-transparent;
     background-size: 200% 200%;
+    animation: gradient-shift 3s ease-in-out infinite;
   }
 
   .gradient-text {
@@ -114,19 +107,23 @@
   }
 
   .text-primary {
-    @apply text-snow;
+    @apply text-pure-white;
   }
 
   .text-secondary {
-    @apply text-pearl;
+    @apply text-off-white;
   }
 
   .text-muted {
-    @apply text-silver;
+    @apply text-light-gray;
   }
 
-  .text-subtle {
-    @apply text-ash;
+  .text-neon-purple {
+    color: #8B5CF6;
+  }
+
+  .text-neon-green {
+    color: #10B981;
   }
 
   /* Layout Components */
@@ -137,13 +134,13 @@
   /* Responsive Navigation */
   .nav-link {
     @apply flex items-center space-x-3 px-4 py-3 rounded-xl;
-    @apply text-silver font-medium transition-all duration-300;
-    @apply hover:bg-charcoal/30 hover:text-pearl;
-    @apply focus:outline-none focus:shadow-focus;
+    @apply text-light-gray font-medium transition-all duration-300;
+    @apply hover:bg-dark-gray/50 hover:text-pure-white hover:shadow-neon-purple;
+    @apply focus:outline-none focus:shadow-focus-purple;
   }
 
   .nav-link.active {
-    @apply bg-sonic-blue/20 text-sonic-blue shadow-sonic;
+    @apply bg-neon-purple/20 text-neon-purple shadow-neon-purple;
   }
 
   /* Responsive Button Sizes */
@@ -186,13 +183,23 @@
     @apply transition-all duration-300 ease-in-out;
   }
 
-  /* Background Gradients - Refined for minimalist aesthetic */
+  /* Background Gradients - Simple black with neon glows */
   .bg-hero-gradient {
-    background: radial-gradient(ellipse at center, rgba(59, 130, 246, 0.05) 0%, rgba(10, 10, 10, 0.9) 50%, #0A0A0A 100%);
+    background: radial-gradient(ellipse at center, rgba(139, 92, 246, 0.1) 0%, rgba(0, 0, 0, 0.9) 50%, #000000 100%);
   }
 
   .bg-club-gradient {
-    background: linear-gradient(135deg, #0A0A0A 0%, rgba(59, 130, 246, 0.03) 50%, #0A0A0A 100%);
+    background: linear-gradient(135deg, #000000 0%, rgba(139, 92, 246, 0.05) 25%, rgba(16, 185, 129, 0.03) 75%, #000000 100%);
+  }
+
+  /* Keyframes for gradient animation */
+  @keyframes gradient-shift {
+    0%, 100% {
+      background-position: 0% 50%;
+    }
+    50% {
+      background-position: 100% 50%;
+    }
   }
 
   /* Mobile Menu Animations */

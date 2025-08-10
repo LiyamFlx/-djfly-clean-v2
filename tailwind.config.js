@@ -4,53 +4,29 @@ export default {
   theme: {
     extend: {
       colors: {
-        // Minimalist Music-Focused Palette
-        // Deep, rich blacks and grays for premium feel
-        'deep-void': '#0A0A0A',        // Almost pure black for deep backgrounds
-        'charcoal': '#1A1A1A',         // Primary dark surfaces
-        'slate-dark': '#2A2A2A',       // Secondary surfaces
-        'graphite': '#3A3A3A',         // Elevated elements
+        // Simple Black & White Base
+        'pure-black': '#000000',       // Pure black backgrounds
+        'rich-black': '#111111',       // Slightly lighter black for surfaces
+        'dark-gray': '#1a1a1a',        // Very dark gray for cards
+        'pure-white': '#FFFFFF',       // Pure white text
+        'off-white': '#F5F5F5',        // Slightly dimmed white
+        'light-gray': '#CCCCCC',       // Light gray for secondary text
         
-        // Sophisticated grays for text hierarchy
-        'ash': '#6B7280',              // Secondary text
-        'silver': '#9CA3AF',           // Tertiary text  
-        'pearl': '#D1D5DB',            // Primary light text
-        'snow': '#F9FAFB',             // Pure white accents
+        // Neon Purple - Primary Accent
+        'neon-purple': '#8B5CF6',      // Bright neon purple
+        'neon-purple-light': '#A78BFA', // Lighter purple
+        'neon-purple-dark': '#7C3AED',  // Darker purple
         
-        // Music-inspired accent colors - calm and focused
-        'sonic-blue': '#3B82F6',       // Primary brand - trustworthy blue
-        'wave-teal': '#0891B2',        // Secondary - ocean depth
-        'rhythm-purple': '#7C3AED',    // Accent - creative energy
-        'beat-green': '#059669',       // Success - natural harmony
+        // Neon Green - Secondary Accent  
+        'neon-green': '#10B981',       // Bright neon green
+        'neon-green-light': '#34D399', // Lighter green
+        'neon-green-dark': '#059669',   // Darker green
         
-        // Warm accents for energy and emotion
-        'melody-orange': '#EA580C',    // Warning/energy
-        'tempo-red': '#DC2626',        // Error/stop
-        'harmony-yellow': '#D97706',   // Highlight/attention
-        
-        // Subtle tints for backgrounds and states
-        'sonic-blue-50': '#EFF6FF',
-        'sonic-blue-100': '#DBEAFE', 
-        'sonic-blue-900': '#1E3A8A',
-        'sonic-blue-950': '#1E2A5E',
-        
-        'wave-teal-50': '#ECFDF5',
-        'wave-teal-900': '#064E3B',
-        
-        'rhythm-purple-50': '#F5F3FF',
-        'rhythm-purple-900': '#581C87',
-        
-        // Semantic colors for clear communication
-        success: '#059669',
-        warning: '#D97706', 
-        error: '#DC2626',
-        info: '#0891B2',
-        
-        // Special music UI elements
-        'waveform': '#3B82F6',         // Audio visualization
-        'progress': '#0891B2',         // Playback progress
-        'accent': '#7C3AED',           // Interactive elements
-        'glow': '#3B82F6',             // Hover/focus states
+        // Semantic colors using neon theme
+        success: '#10B981',            // Neon green for success
+        warning: '#F59E0B',            // Orange for warnings
+        error: '#EF4444',              // Red for errors
+        info: '#8B5CF6',               // Neon purple for info
       },
       fontFamily: {
         display: ['Inter', 'system-ui', 'sans-serif'],
@@ -119,21 +95,21 @@ export default {
         },
       },
       backgroundImage: {
-        // Subtle, sophisticated gradients for music applications
-        'void-gradient': 
-          'linear-gradient(135deg, #0A0A0A 0%, #1A1A1A 50%, #2A2A2A 100%)',
-        'charcoal-gradient':
-          'linear-gradient(135deg, #1A1A1A 0%, #2A2A2A 50%, #3A3A3A 100%)',
-        'sonic-gradient':
-          'linear-gradient(135deg, #3B82F6 0%, #0891B2 100%)',
-        'rhythm-gradient':
-          'linear-gradient(135deg, #7C3AED 0%, #3B82F6 100%)',
-        'wave-gradient':
-          'linear-gradient(135deg, #0891B2 0%, #059669 100%)',
+        // Simple gradients with neon accents
+        'black-gradient': 
+          'linear-gradient(135deg, #000000 0%, #111111 100%)',
+        'purple-gradient':
+          'linear-gradient(135deg, #8B5CF6 0%, #7C3AED 100%)',
+        'green-gradient':
+          'linear-gradient(135deg, #10B981 0%, #059669 100%)',
+        'neon-gradient':
+          'linear-gradient(135deg, #8B5CF6 0%, #10B981 100%)',
         'glass-gradient':
           'linear-gradient(135deg, rgba(255,255,255,0.05) 0%, rgba(255,255,255,0.02) 100%)',
-        'glow-gradient':
-          'radial-gradient(circle, rgba(59,130,246,0.1) 0%, transparent 70%)',
+        'purple-glow':
+          'radial-gradient(circle, rgba(139,92,246,0.3) 0%, transparent 70%)',
+        'green-glow':
+          'radial-gradient(circle, rgba(16,185,129,0.3) 0%, transparent 70%)',
       },
       backdropBlur: {
         xs: '2px',
@@ -148,15 +124,15 @@ export default {
         '5xl': '2.5rem',
       },
       boxShadow: {
-        // Refined shadows for depth and focus
-        'sonic': '0 0 20px rgba(59, 130, 246, 0.3)',
-        'sonic-lg': '0 0 40px rgba(59, 130, 246, 0.4)',
-        'wave': '0 0 20px rgba(8, 145, 178, 0.3)',
-        'rhythm': '0 0 20px rgba(124, 58, 237, 0.3)',
-        'glass': '0 8px 32px rgba(0, 0, 0, 0.5)',
-        'glass-lg': '0 16px 48px rgba(0, 0, 0, 0.7)',
-        'subtle': '0 2px 8px rgba(0, 0, 0, 0.3)',
-        'focus': '0 0 0 2px rgba(59, 130, 246, 0.5)',
+        // Neon glow effects
+        'neon-purple': '0 0 20px rgba(139, 92, 246, 0.5)',
+        'neon-purple-lg': '0 0 40px rgba(139, 92, 246, 0.7), 0 0 80px rgba(139, 92, 246, 0.3)',
+        'neon-green': '0 0 20px rgba(16, 185, 129, 0.5)',
+        'neon-green-lg': '0 0 40px rgba(16, 185, 129, 0.7), 0 0 80px rgba(16, 185, 129, 0.3)',
+        'glass': '0 8px 32px rgba(0, 0, 0, 0.8)',
+        'glass-lg': '0 16px 48px rgba(0, 0, 0, 0.9)',
+        'focus-purple': '0 0 0 2px rgba(139, 92, 246, 0.8)',
+        'focus-green': '0 0 0 2px rgba(16, 185, 129, 0.8)',
       },
       zIndex: {
         60: '60',
