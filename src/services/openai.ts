@@ -48,6 +48,7 @@ export class OpenAIService {
   }
 
   /**
+   * Generate AI-powered playlist recommendations
    */
   async generatePlaylist(
     prompt: string,
@@ -56,6 +57,20 @@ export class OpenAIService {
     try {
       await this.rateLimit();
 
+      const systemPrompt = `You are an expert DJ and music curator. Generate a playlist based on the user's request. 
+      Return a JSON response with this exact format:
+      {
+        "tracks": [
+          {
+            "id": "track_1",
+            "title": "Track Title",
+            "artist": "Artist Name",
+            "duration": 180,
+            "energy": 0.8,
+            "bpm": 128,
+            "genre": "house",
+            "source": "spotify"
+          }
         ],
         "energy": 85,
         "mood": "energetic",

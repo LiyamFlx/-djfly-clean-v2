@@ -1,6 +1,14 @@
-// Re-export all types from their respective files
+// Re-export types from shared first
 export * from './shared';
-export * from './api';
+// Then re-export API-specific types (excluding duplicates)
+export type {
+  SpotifyApiConfig,
+  OpenAIApiConfig,
+  LastFMApiConfig,
+  ApiConfig,
+  ApiError
+} from './api';
+// Session types
 export * from './session';
 
 // Legacy exports for backward compatibility

@@ -12,7 +12,9 @@ export interface Track {
   genre?: string | null;
   image?: string;
   energy?: number; // energy level 0-1
-  source?: 'spotify' | 'youtube' | 'demo' | 'local' | 'lastfm';
+  source?: AudioSource;
+  popularity?: number;
+  spotify_url?: string;
 }
 
 export interface Playlist {
@@ -78,21 +80,30 @@ export interface CrowdState {
   dominantGenres: string[];
   bpmPreference: number;
   lastUpdated: Date | null;
+  isListening: boolean;
+  crowdSize?: number;
+  energyTrend?: 'rising' | 'falling' | 'stable';
 }
 
 export interface SessionState {
   id: string | null;
+  sessionId?: string;
   startTime: Date | null;
   totalTracks: number;
   mixedMinutes: number;
   crowdFeedback: CrowdState | null;
   averageEnergy: number;
   isActive: boolean;
+  averageTrackRating?: number;
+  crowdSatisfaction?: number;
+  setFlow?: 'smooth' | 'choppy' | 'perfect';
 }
 
 // UI Component types
 export type ButtonVariant = 'primary' | 'secondary' | 'ghost' | 'outline';
 export type ButtonSize = 'sm' | 'md' | 'lg' | 'xl';
+
+import React from 'react';
 
 export interface ComponentProps {
   className?: string;
@@ -152,6 +163,43 @@ export interface ServiceStatus {
 }
 
 export type Theme = 'light' | 'dark';
+export type AudioSource =
+  | 'spotify'
+  | 'youtube'
+  | 'demo'
+  | 'local'
+  | 'lastfm'
+  | 'upload';
+
+// AI-powered music recommendation types
+export interface AIRecommendation {
+  tracks: Track[];
+  energy: number;
+  mood: string;
+  reasoning?: string;
+  mixingTips?: string[];
+  energyCurve?: number[];
+  nextTrackSuggestions?: Track[];
+}
+
+// AI and Machine Learning types
+export interface AIState {
+  isAnalyzing: boolean;
+  confidence: number;
+  lastAnalysis: Date | null;
+  recommendations: AIRecommendation[];
+}
+
+export interface UIState {
+  isLoading: boolean;
+  activeModal: string | null;
+  notifications: Array<{
+    id: string;
+    type: 'success' | 'error' | 'warning' | 'info';
+    message: string;
+    timestamp: Date;
+  }>;
+}
 
 // Export utility types
 export type DeepPartial<T> = {

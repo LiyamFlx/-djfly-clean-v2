@@ -10,7 +10,7 @@ interface LoadingSpinnerProps {
 
 export const LoadingSpinner: React.FC<LoadingSpinnerProps> = ({
   size = 'md',
-  color = 'electric-blue',
+  color = 'neon-purple',
   message = 'Loading...',
 }) => {
   const sizeClasses = {
@@ -23,14 +23,14 @@ export const LoadingSpinner: React.FC<LoadingSpinnerProps> = ({
     <div className="flex flex-col items-center justify-center space-y-4">
       <motion.div
         animate={{ rotate: 360 }}
-        transition={{ duration: 1, repeat: Infinity, ease: 'linear' }}
-        className={`${sizeClasses[size]} border-2 border-gray-600 border-t-${color} rounded-full`}
+        transition={{ duration: 2, repeat: Infinity, ease: 'linear' }}
+        className={`${sizeClasses[size]} border-2 border-dark-gray border-t-neon-purple rounded-full`}
       />
       {message && (
         <motion.p
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
-          className="text-gray-400 text-sm"
+          className="text-gray-300 text-sm animate-pulse"
         >
           {message}
         </motion.p>
@@ -49,11 +49,11 @@ export const SkeletonCard: React.FC<SkeletonCardProps> = ({
   lines = 3,
 }) => {
   return (
-    <div className={`bg-gray-800 rounded-xl p-6 ${className}`}>
-      <div className="animate-pulse space-y-4">
-        <div className="h-4 bg-gray-700 rounded w-3/4"></div>
+    <div className={`glass-card p-6 ${className}`}>
+      <div className="space-y-4">
+        <div className="h-4 loading-shimmer rounded w-3/4"></div>
         {Array.from({ length: lines }).map((_, i) => (
-          <div key={i} className="h-3 bg-gray-700 rounded w-full"></div>
+          <div key={i} className="h-3 loading-shimmer rounded w-full"></div>
         ))}
       </div>
     </div>

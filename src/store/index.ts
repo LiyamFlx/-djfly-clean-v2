@@ -66,42 +66,47 @@ export const useDJflyStore = create<DJflyStore>()(
       currentTime: 0,
       duration: 0,
       volume: 0.8,
+      isLoading: false,
+      error: null,
+      repeat: 'none',
+      shuffle: false,
       crossfadeTime: 3,
+      isListening: false,
     },
 
     crowd: {
       isListening: false,
       currentEnergy: 0.5,
-      mood: 'unknown',
+      mood: 'medium',
       engagementLevel: 'medium',
       crowdSize: 0,
-      averageAge: 25,
       energyTrend: 'stable',
+      bpmPreference: 120,
+      dominantGenres: [],
       lastUpdated: null,
     },
 
     ai: {
-      isGenerating: false,
-      prompt: '',
-      generatedTracks: [],
-      error: null,
-      progress: 0,
+      isAnalyzing: false,
+      confidence: 0,
+      lastAnalysis: null,
+      recommendations: [],
     },
 
     session: {
-      sessionId: '',
+      id: null,
       startTime: null,
       totalTracks: 0,
-      averageTrackRating: 0,
-      setFlow: 'maintain',
-      crowdSatisfaction: 0.7,
+      mixedMinutes: 0,
+      crowdFeedback: null,
+      averageEnergy: 0,
+      isActive: false,
     },
 
     ui: {
-      currentPage: 'home',
-      showOnboarding: true,
-      theme: 'dark',
-      isMobileView: false,
+      isLoading: false,
+      activeModal: null,
+      notifications: [],
     },
 
     // Audio actions
@@ -162,11 +167,9 @@ export const useDJflyStore = create<DJflyStore>()(
     // AI actions
     generateSet: async (prompt) => {
       set((state) => {
-        state.ai.isGenerating = true;
-        state.ai.prompt = prompt;
-        state.ai.error = null;
-        state.ai.progress = 0;
-        state.ai.generatedTracks = [];
+        state.ai.isAnalyzing = true;
+        state.ai.confidence = 0;
+        state.ai.recommendations = [];
       });
 
       try {
@@ -174,18 +177,14 @@ export const useDJflyStore = create<DJflyStore>()(
         const tracks: Track[] = [];
 
         set((state) => {
-          state.ai.generatedTracks = tracks;
-          state.ai.isGenerating = false;
-          state.ai.progress = 100;
+          state.ai.recommendations = [{ tracks, energy: 85, mood: 'energetic' }];
+          state.ai.isAnalyzing = false;
+          state.ai.confidence = 0.9;
         });
       } catch (_error) {
         console.error('Error in generateSet store action:', _error);
         set((state) => {
-          state.ai.error =
-            _error instanceof Error
-              ? _error.message
-              : 'An unknown error occurred during set generation.';
-          state.ai.isGenerating = false;
+          state.ai.isAnalyzing = false;
         });
       }
     },
@@ -254,19 +253,14 @@ export const useDJflyStore = create<DJflyStore>()(
       }),
 
     // UI actions
-    setCurrentPage: (page) =>
+    setLoading: (isLoading: boolean) =>
       set((state) => {
-        state.ui.currentPage = page;
+        state.ui.isLoading = isLoading;
       }),
 
-    toggleOnboarding: () =>
+    setActiveModal: (modalId: string | null) =>
       set((state) => {
-        state.ui.showOnboarding = !state.ui.showOnboarding;
-      }),
-
-    setMobileView: (isMobile) =>
-      set((state) => {
-        state.ui.isMobileView = isMobile;
+        state.ui.activeModal = modalId;
       }),
   }))
 );
