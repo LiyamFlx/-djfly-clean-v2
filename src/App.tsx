@@ -1002,79 +1002,76 @@ function App() {
     <ThemeProvider>
       <MusicProvider>
         <BrowserRouter>
-        <div className="pb-16">
-          <PersistentNavBar />
-          <div className="pt-16">
+          <div className="min-h-screen bg-pure-black">
             <ApiStatusIndicator />
             <Routes>
-          <Route path="/" element={<HomePage />} />
-          <Route path="/studio" element={<StudioPage />} />
-          <Route path="/studio/match" element={<MagicMatchPage />} />
-          <Route path="/studio/set" element={<MagicSetPage />} />
-          <Route
-            path="/player"
-            element={
-              <Suspense
-                fallback={<LoadingSpinner message="Loading DJ Player..." />}
-              >
-                <PlayerPage />
-              </Suspense>
-            }
-          />
-          <Route path="/profile" element={<ProfilePage />} />
+              <Route path="/" element={<HomePage />} />
+              <Route path="/studio" element={<StudioPage />} />
+              <Route path="/studio/match" element={<MagicMatchPage />} />
+              <Route path="/studio/set" element={<MagicSetPage />} />
+              <Route
+                path="/player"
+                element={
+                  <Suspense
+                    fallback={<LoadingSpinner message="Loading DJ Player..." />}
+                  >
+                    <PlayerPage />
+                  </Suspense>
+                }
+              />
+              <Route path="/profile" element={<ProfilePage />} />
 
-          {/* Authentication Routes */}
-          <Route
-            path="/auth/login"
-            element={
-              <Suspense
-                fallback={<LoadingSpinner message="Loading login..." />}
-              >
-                <LoginPage />
-              </Suspense>
-            }
-          />
-          <Route
-            path="/auth/signup"
-            element={
-              <Suspense
-                fallback={<LoadingSpinner message="Loading signup..." />}
-              >
-                <SignupPage />
-              </Suspense>
-            }
-          />
-          <Route
-            path="/auth/forgot-password"
-            element={<ForgotPasswordPage />}
-          />
-          <Route path="/auth/reset-password" element={<ResetPasswordPage />} />
-          <Route
-            path="/auth/spotify/callback"
-            element={<SpotifyCallbackPage />}
-          />
+              {/* Authentication Routes */}
+              <Route
+                path="/auth/login"
+                element={
+                  <Suspense
+                    fallback={<LoadingSpinner message="Loading login..." />}
+                  >
+                    <LoginPage />
+                  </Suspense>
+                }
+              />
+              <Route
+                path="/auth/signup"
+                element={
+                  <Suspense
+                    fallback={<LoadingSpinner message="Loading signup..." />}
+                  >
+                    <SignupPage />
+                  </Suspense>
+                }
+              />
+              <Route
+                path="/auth/forgot-password"
+                element={<ForgotPasswordPage />}
+              />
+              <Route path="/auth/reset-password" element={<ResetPasswordPage />} />
+              <Route
+                path="/auth/spotify/callback"
+                element={<SpotifyCallbackPage />}
+              />
 
-          {/* Producer Analytics */}
-          <Route path="/producer" element={<ProducerAnalyticsPage />} />
+              {/* Producer Analytics */}
+              <Route path="/producer" element={<ProducerAnalyticsPage />} />
 
-          {/* Legal Pages */}
-          <Route path="/legal/terms" element={<TermsPage />} />
-          <Route path="/legal/privacy" element={<PrivacyPage />} />
+              {/* Legal Pages */}
+              <Route path="/legal/terms" element={<TermsPage />} />
+              <Route path="/legal/privacy" element={<PrivacyPage />} />
 
-          {/* Support Pages */}
-          <Route path="/support/help" element={<HelpPage />} />
-          <Route path="/support/contact" element={<ContactPage />} />
+              {/* Support Pages */}
+              <Route path="/support/help" element={<HelpPage />} />
+              <Route path="/support/contact" element={<ContactPage />} />
 
-          {/* Documentation */}
-          <Route path="/docs" element={<DocsPage />} />
+              {/* Documentation */}
+              <Route path="/docs" element={<DocsPage />} />
 
-          {/* 404 Page */}
-          <Route path="*" element={<NotFoundPage />} />
+              {/* 404 Page */}
+              <Route path="*" element={<NotFoundPage />} />
             </Routes>
           </div>
-        </div>
-        <Navigation />
-      </BrowserRouter>
+          <Navigation />
+        </BrowserRouter>
       </MusicProvider>
     </ThemeProvider>
   );
