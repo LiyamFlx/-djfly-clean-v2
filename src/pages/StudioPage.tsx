@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import {
   Sparkles,
@@ -11,43 +11,51 @@ import {
   TrendingUp,
   Clock,
   Star,
+  ArrowRight,
+  Mic,
+  Settings,
+  Activity,
+  Radio,
 } from 'lucide-react';
-// import { ROUTES } from '@/constants/routes';
+import Button from '@/components/ui/button';
 
 const StudioPage: React.FC = () => {
   const [selectedFeature, setSelectedFeature] = useState<string | null>(null);
+  const navigate = useNavigate();
 
   const features = [
     {
       id: 'magic-match',
-      title: 'Magic Match',
-      subtitle: 'AI Crowd Analysis',
+      title: 'AI Magic Match',
+      subtitle: 'Instant Crowd Analysis',
       icon: Target,
-      color: 'from-blue-500 to-cyan-500',
-      description: 'Record crowd noise to get AI-powered track recommendations',
+      color: 'neon-purple',
+      gradient: 'from-neon-purple to-neon-purple-light',
+      description: 'Record crowd energy and get AI-powered track recommendations in real-time',
       benefits: [
         'Real-time crowd energy analysis',
-        'Instant playlist generation',
-        'Perfect for live events',
-        'No manual track selection needed',
+        'Instant perfect track matches',
+        'Professional venue optimization',
+        'No manual selection needed',
       ],
       timeEstimate: '30 seconds',
       difficulty: 'Beginner',
-      bestFor: 'Live DJing & Events',
+      bestFor: 'Live Events & Clubs',
       route: '/studio/match',
     },
     {
       id: 'magic-set',
-      title: 'Magic Set',
-      subtitle: 'Custom Playlist Creator',
-      icon: Music,
-      color: 'from-purple-500 to-pink-500',
-      description: 'Create custom playlists with AI assistance',
+      title: 'AI Set Generator',
+      subtitle: 'Complete Mix Creation',
+      icon: Radio,
+      color: 'neon-green',
+      gradient: 'from-neon-green to-neon-green-light',
+      description: 'Generate complete DJ sets tailored to your venue, time, and crowd preferences',
       benefits: [
-        'Custom mood and venue selection',
-        'Advanced track filtering',
-        'BPM and key matching',
-        'Professional set planning',
+        'Full set playlist generation',
+        'Venue-specific optimization',
+        'BPM and energy flow control',
+        'Professional transition suggestions',
       ],
       timeEstimate: '2-3 minutes',
       difficulty: 'Intermediate',
@@ -56,174 +64,243 @@ const StudioPage: React.FC = () => {
     },
   ];
 
+  const stats = [
+    { icon: Users, label: 'Active DJs', value: '50,000+', color: 'text-neon-purple' },
+    { icon: Music, label: 'Tracks Analyzed', value: '1M+', color: 'text-neon-green' },
+    { icon: TrendingUp, label: 'Success Rate', value: '98%', color: 'text-neon-purple' },
+    { icon: Clock, label: 'Avg Response', value: '0.5s', color: 'text-neon-green' },
+  ];
+
+  const handleFeatureSelect = (feature: typeof features[0]) => {
+    navigate(feature.route);
+  };
+
   return (
-    <div className="min-h-screen bg-black-gradient text-white section-padding">
-      <div className="max-w-6xl mx-auto">
-        {/* Header */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          className="text-center mb-12"
-        >
-          <motion.h1 
-            className="heading-primary mb-6 text-gradient leading-tight"
-            animate={{ backgroundPosition: ['0% 50%', '100% 50%', '0% 50%'] }}
-            transition={{ duration: 6, repeat: Infinity }}
+    <div className="min-h-screen bg-gradient-to-br from-pure-black via-rich-black to-pure-black">
+      {/* Header */}
+      <div className="section-padding-sm bg-gradient-to-r from-neon-purple/10 to-neon-green/10 border-b border-white/10">
+        <div className="container-responsive">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="text-center"
           >
-            Magic Studio
-          </motion.h1>
-          <p className="body-large text-neutral-300 max-w-3xl mx-auto">
-            Choose your AI-powered music creation method. Both tools use
-            advanced machine learning to deliver perfect mixes for any
-            situation.
-          </p>
-        </motion.div>
+            <div className="text-6xl mb-6">🎛️</div>
+            <h1 className="heading-display gradient-text mb-6">
+              AI Studio
+            </h1>
+            <p className="body-large text-gray-300 max-w-2xl mx-auto mb-8">
+              Professional AI tools for modern DJs. Analyze crowds, generate perfect sets, and create unforgettable experiences.
+            </p>
+            
+            {/* Quick Stats */}
+            <div className="grid-responsive-4 max-w-4xl mx-auto">
+              {stats.map((stat, index) => (
+                <motion.div
+                  key={stat.label}
+                  className="glass-card text-center p-4"
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: index * 0.1 }}
+                >
+                  <stat.icon className={`w-6 h-6 mx-auto mb-2 ${stat.color}`} />
+                  <div className={`heading-tertiary ${stat.color} mb-1`}>{stat.value}</div>
+                  <div className="caption text-gray-400">{stat.label}</div>
+                </motion.div>
+              ))}
+            </div>
+          </motion.div>
+        </div>
+      </div>
 
-        {/* Feature Comparison */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-12">
-          {features.map((feature, index) => {
-            const Icon = feature.icon;
-            const isSelected = selectedFeature === feature.id;
+      {/* Main Features */}
+      <div className="section-padding">
+        <div className="container-responsive">
+          <motion.div
+            className="text-center mb-12"
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+          >
+            <h2 className="heading-primary mb-4">Choose Your AI Tool</h2>
+            <p className="body-large text-gray-300">
+              Select the perfect AI assistant for your DJing needs
+            </p>
+          </motion.div>
 
-            return (
+          <div className="grid-responsive-2 gap-8 max-w-5xl mx-auto">
+            {features.map((feature, index) => (
               <motion.div
                 key={feature.id}
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: index * 0.2 }}
-                className={`relative group cursor-pointer hover-lift ${
-                  isSelected ? 'ring-2 ring-neon-purple' : ''
+                className={`feature-card group relative overflow-hidden ${
+                  selectedFeature === feature.id ? 'ring-2 ring-' + feature.color : ''
                 }`}
-                onClick={() => setSelectedFeature(feature.id)}
+                initial={{ opacity: 0, y: 40 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ delay: index * 0.2 }}
+                onHoverStart={() => setSelectedFeature(feature.id)}
+                onHoverEnd={() => setSelectedFeature(null)}
               >
-                <div className="glass-card p-8 h-full hover:border-neon-purple hover-glow">
+                {/* Background Gradient */}
+                <div className={`absolute inset-0 bg-gradient-to-br ${feature.gradient} opacity-5 group-hover:opacity-10 transition-opacity`} />
+                
+                <div className="relative z-10 p-8">
                   {/* Header */}
                   <div className="flex items-start justify-between mb-6">
-                    <div className="flex items-center space-x-4">
-                      <div
-                        className={`w-16 h-16 rounded-xl bg-gradient-to-r ${feature.color} flex items-center justify-center`}
-                      >
-                        <Icon className="w-8 h-8 text-white" />
+                    <div className="flex items-center gap-4">
+                      <div className={`p-4 rounded-2xl bg-${feature.color}/10 border border-${feature.color}/30`}>
+                        <feature.icon className={`w-8 h-8 text-${feature.color}`} />
                       </div>
                       <div>
-                        <h3 className="text-2xl font-bold">{feature.title}</h3>
-                        <p className="text-gray-400">{feature.subtitle}</p>
+                        <h3 className="heading-tertiary mb-2">{feature.title}</h3>
+                        <p className={`body-small text-${feature.color} font-medium`}>{feature.subtitle}</p>
                       </div>
-                    </div>
-                    <div className="flex items-center space-x-2">
-                      <Clock className="w-4 h-4 text-gray-400" />
-                      <span className="text-sm text-gray-400">
-                        {feature.timeEstimate}
-                      </span>
                     </div>
                   </div>
 
                   {/* Description */}
-                  <p className="text-gray-300 mb-6 leading-relaxed">
+                  <p className="body-medium text-gray-300 mb-6">
                     {feature.description}
                   </p>
 
                   {/* Benefits */}
-                  <div className="space-y-3 mb-6">
-                    {feature.benefits.map((benefit, i) => (
-                      <motion.div
-                        key={i}
-                        initial={{ opacity: 0, x: -10 }}
-                        animate={{ opacity: 1, x: 0 }}
-                        transition={{ delay: index * 0.2 + i * 0.1 }}
-                        className="flex items-center space-x-3"
-                      >
-                        <div className="w-2 h-2 bg-primary-400 rounded-full"></div>
-                        <span className="text-sm text-gray-300">{benefit}</span>
-                      </motion.div>
-                    ))}
-                  </div>
-
-                  {/* Metadata */}
-                  <div className="flex items-center justify-between text-sm text-gray-400 mb-6">
-                    <div className="flex items-center space-x-4">
-                      <span className="flex items-center space-x-1">
-                        <Star className="w-4 h-4" />
-                        <span>{feature.difficulty}</span>
-                      </span>
-                      <span className="flex items-center space-x-1">
-                        <Users className="w-4 h-4" />
-                        <span>{feature.bestFor}</span>
-                      </span>
+                  <div className="mb-8">
+                    <h4 className="body-medium font-semibold mb-4">Key Features:</h4>
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                      {feature.benefits.map((benefit, i) => (
+                        <div key={i} className="flex items-center gap-2 text-sm text-gray-300">
+                          <div className={`w-1.5 h-1.5 rounded-full bg-${feature.color}`} />
+                          {benefit}
+                        </div>
+                      ))}
                     </div>
                   </div>
 
-                  {/* CTA Button */}
-                  <Link
-                    to={feature.route}
-                    className={`block w-full py-4 px-6 rounded-xl text-center font-semibold transition-all duration-300 ${
-                      isSelected
-                        ? 'btn-primary'
-                        : 'bg-neutral-700 hover:bg-neutral-600 text-white'
-                    }`}
+                  {/* Meta Information */}
+                  <div className="flex flex-wrap gap-4 mb-8">
+                    <div className="badge bg-pure-white/10 text-gray-300">
+                      ⏱️ {feature.timeEstimate}
+                    </div>
+                    <div className="badge bg-pure-white/10 text-gray-300">
+                      📊 {feature.difficulty}
+                    </div>
+                    <div className="badge bg-pure-white/10 text-gray-300">
+                      🎯 {feature.bestFor}
+                    </div>
+                  </div>
+
+                  {/* CTA */}
+                  <Button
+                    variant={feature.color === 'neon-purple' ? 'primary' : 'accent'}
+                    size="lg"
+                    fullWidth
+                    icon={ArrowRight}
+                    onClick={() => handleFeatureSelect(feature)}
+                    className="group-hover:scale-105 transition-transform"
                   >
-                    {isSelected
-                      ? 'Selected - Click to Continue'
-                      : `Try ${feature.title}`}
-                  </Link>
+                    Start {feature.title}
+                  </Button>
                 </div>
-
-                {/* Selection Indicator */}
-                {isSelected && (
-                  <motion.div
-                    initial={{ scale: 0 }}
-                    animate={{ scale: 1 }}
-                    className="absolute -top-2 -right-2 w-8 h-8 bg-primary-500 rounded-full flex items-center justify-center"
-                  >
-                    <Sparkles className="w-4 h-4 text-rich-black" />
-                  </motion.div>
-                )}
               </motion.div>
-            );
-          })}
-        </div>
-
-        {/* Quick Actions */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.6 }}
-          className="bg-gray-800/30 backdrop-blur-sm border border-gray-700 rounded-xl p-6"
-        >
-          <h3 className="text-lg font-semibold mb-4 flex items-center space-x-2">
-            <Zap className="w-5 h-5 text-primary-400" />
-            <span>Quick Actions</span>
-          </h3>
-          <div className="grid sm:grid-cols-3 gap-4">
-            <button className="flex items-center justify-center space-x-2 py-3 px-4 bg-gradient-to-r from-green-500 to-emerald-600 rounded-lg hover:from-green-600 hover:to-emerald-700 transition-all">
-              <Brain className="w-4 h-4" />
-              <span>AI Quick Mix</span>
-            </button>
-            <button className="flex items-center justify-center space-x-2 py-3 px-4 bg-gradient-to-r from-purple-500 to-pink-600 rounded-lg hover:from-purple-600 hover:to-pink-700 transition-all">
-              <TrendingUp className="w-4 h-4" />
-              <span>Trending Now</span>
-            </button>
-            <button className="flex items-center justify-center space-x-2 py-3 px-4 bg-gradient-to-r from-orange-500 to-red-600 rounded-lg hover:from-orange-600 hover:to-red-700 transition-all">
-              <Music className="w-4 h-4" />
-              <span>My Library</span>
-            </button>
+            ))}
           </div>
-        </motion.div>
+        </div>
+      </div>
 
-        {/* Help Section */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.8 }}
-          className="mt-8 text-center"
-        >
-          <p className="text-gray-400 text-sm">
-            Need help choosing?
-            <button className="text-primary-400 hover:text-secondary-400 ml-1 underline">
-              Watch our tutorial
-            </button>
-          </p>
-        </motion.div>
+      {/* How It Works */}
+      <div className="section-padding bg-rich-black/50">
+        <div className="container-responsive">
+          <motion.div
+            className="text-center mb-12"
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+          >
+            <h2 className="heading-primary mb-4">How AI Studio Works</h2>
+            <p className="body-large text-gray-300 max-w-2xl mx-auto">
+              Our advanced AI analyzes musical patterns, crowd energy, and venue acoustics to deliver perfect recommendations
+            </p>
+          </motion.div>
+
+          <div className="grid-responsive gap-8">
+            {[
+              {
+                step: '01',
+                title: 'Input Analysis',
+                description: 'Upload audio, describe your event, or record crowd noise for real-time analysis',
+                icon: Mic,
+                color: 'neon-purple'
+              },
+              {
+                step: '02', 
+                title: 'AI Processing',
+                description: 'Advanced algorithms analyze energy levels, BPM, key signatures, and crowd preferences',
+                icon: Brain,
+                color: 'neon-green'
+              },
+              {
+                step: '03',
+                title: 'Smart Recommendations',
+                description: 'Receive curated track suggestions with mixing cues and transition timing',
+                icon: Activity,
+                color: 'neon-purple'
+              }
+            ].map((step, index) => (
+              <motion.div
+                key={step.step}
+                className="glass-card text-center p-8"
+                initial={{ opacity: 0, y: 40 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ delay: index * 0.2 }}
+              >
+                <div className={`w-16 h-16 mx-auto mb-6 bg-${step.color}/10 border border-${step.color}/30 rounded-2xl flex-center`}>
+                  <step.icon className={`w-8 h-8 text-${step.color}`} />
+                </div>
+                <div className={`text-2xl font-bold text-${step.color} mb-4`}>{step.step}</div>
+                <h3 className="heading-tertiary mb-4">{step.title}</h3>
+                <p className="body-medium text-gray-300">{step.description}</p>
+              </motion.div>
+            ))}
+          </div>
+        </div>
+      </div>
+
+      {/* CTA Section */}
+      <div className="section-padding">
+        <div className="container-narrow text-center">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+          >
+            <h2 className="heading-primary mb-6">
+              Ready to revolutionize your DJ sets?
+            </h2>
+            <p className="body-large text-gray-300 mb-8">
+              Join thousands of professional DJs using AI to create unforgettable experiences
+            </p>
+            <div className="flex-responsive justify-center gap-4">
+              <Button
+                variant="primary"
+                size="xl"
+                icon={Target}
+                onClick={() => navigate('/studio/match')}
+              >
+                Try Magic Match
+              </Button>
+              <Button
+                variant="accent"
+                size="xl"
+                icon={Radio}
+                onClick={() => navigate('/studio/set')}
+              >
+                Generate Set
+              </Button>
+            </div>
+          </motion.div>
+        </div>
       </div>
     </div>
   );
