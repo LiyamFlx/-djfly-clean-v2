@@ -5,7 +5,7 @@ import { ROUTES } from '@/constants/routes';
 
 const NotFoundPage: React.FC = () => {
   return (
-    <div className="min-h-screen bg-club-gradient flex items-center justify-center">
+    <div className="min-h-screen bg-black-gradient flex items-center justify-center">
       <div className="text-center">
         <div className="text-6xl mb-8">🎵</div>
         <h1 className="text-4xl font-bold mb-4">404 - Track Not Found</h1>

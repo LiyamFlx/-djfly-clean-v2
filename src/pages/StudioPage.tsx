@@ -57,7 +57,7 @@ const StudioPage: React.FC = () => {
   ];
 
   return (
-    <div className="min-h-screen bg-club-gradient text-white p-8">
+    <div className="min-h-screen bg-black-gradient text-white p-8">
       <div className="max-w-6xl mx-auto">
         {/* Header */}
         <motion.div
