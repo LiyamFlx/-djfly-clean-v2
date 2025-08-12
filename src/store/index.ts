@@ -44,6 +44,7 @@ interface DJflyStore {
   // AI actions
   generateSet: (prompt: string) => Promise<void>;
   analyzeAudio: (audioData: ArrayBuffer) => Promise<void>;
+  getReplacementTrack: (trackToReplace: Track, context: any) => Promise<void>;
 
   // Session actions
   startSession: () => void;
@@ -91,6 +92,7 @@ export const useDJflyStore = create<DJflyStore>()(
       confidence: 0,
       lastAnalysis: null,
       recommendations: [],
+      replacementSuggestion: null,
     },
 
     session: {
@@ -234,6 +236,30 @@ export const useDJflyStore = create<DJflyStore>()(
       }
     },
 
+    getReplacementTrack: async (trackToReplace, context) => {
+      set((state) => {
+        state.ai.isAnalyzing = true;
+        state.ai.replacementSuggestion = null;
+      });
+
+      try {
+        const { aiMusicEngine } = await import('@/services/aiMusicEngine');
+        const replacement = await aiMusicEngine.getReplacementTrack(
+          trackToReplace,
+          context
+        );
+        set((state) => {
+          state.ai.replacementSuggestion = replacement;
+          state.ai.isAnalyzing = false;
+        });
+      } catch (error) {
+        console.error('Error getting replacement track:', error);
+        set((state) => {
+          state.ai.isAnalyzing = false;
+        });
+      }
+    },
+
     // Session actions
     startSession: () =>
       set((state) => {
@@ -300,6 +326,7 @@ export const useAIActions = () =>
     useShallow((state) => ({
       generateSet: state.generateSet,
       analyzeAudio: state.analyzeAudio,
+      getReplacementTrack: state.getReplacementTrack,
     }))
   );
 

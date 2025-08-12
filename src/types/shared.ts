@@ -188,6 +188,7 @@ export interface AIState {
   confidence: number;
   lastAnalysis: Date | null;
   recommendations: AIRecommendation[];
+  replacementSuggestion: Track | null;
 }
 
 export interface UIState {
