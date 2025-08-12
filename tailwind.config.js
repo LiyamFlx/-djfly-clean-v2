@@ -5,36 +5,34 @@ export default {
     extend: {
       colors: {
         // Simple Black & White Base
-        'pure-black': '#000000',       // Pure black backgrounds
-        'rich-black': '#111111',       // Slightly lighter black for surfaces
-        'dark-gray': '#1a1a1a',        // Very dark gray for cards
-        'pure-white': '#FFFFFF',       // Pure white text
-        'off-white': '#F5F5F5',        // Slightly dimmed white
-        'light-gray': '#CCCCCC',       // Light gray for secondary text
-        
-        // Neon Purple - Primary Accent
-        'neon-purple': '#8B5CF6',      // Bright neon purple
-        'neon-purple-light': '#A78BFA', // Lighter purple
-        'neon-purple-dark': '#7C3AED',  // Darker purple
-        
-        // Neon Green - Secondary Accent  
-        'neon-green': '#10B981',       // Bright neon green
-        'neon-green-light': '#34D399', // Lighter green
-        'neon-green-dark': '#059669',   // Darker green
-        
-        // Semantic colors using neon theme
-        success: '#10B981',            // Neon green for success
-        warning: '#F59E0B',            // Orange for warnings
-        error: '#EF4444',              // Red for errors
-        info: '#8B5CF6',               // Neon purple for info
+        'pure-black': '#000000',
+        'rich-black': '#0D0D0D', // Updated to match README
+        'dark-gray': '#1a1a1a',
+        'pure-white': '#FFFFFF',
+        'off-white': '#F5F5F5',
+        'light-gray': '#CCCCCC',
+
+        // Brand Colors - updated to match README vision
+        'neon-purple': '#00D4FF', // Electric Blue
+        'neon-purple-light': '#66E5FF',
+        'neon-purple-dark': '#00A9CC',
+
+        'neon-green': '#00FFCC', // Bright Turquoise
+        'neon-green-light': '#66FFDD',
+        'neon-green-dark': '#00CCA3',
+
+        'laser-pink': '#FF0080', // Laser Pink
+
+        // Semantic colors using updated theme
+        success: '#00FFCC', // Now Bright Turquoise
+        warning: '#F59E0B',
+        error: '#FF0080', // Now Laser Pink
+        info: '#00D4FF', // Now Electric Blue
       },
       fontFamily: {
-        display: ['Inter', 'system-ui', 'sans-serif'],
+        sans: ['Inter', 'system-ui', 'sans-serif'],
+        display: ['Oxanium', 'Inter', 'system-ui', 'sans-serif'],
         mono: ['JetBrains Mono', 'Fira Code', 'monospace'],
-        // Enhanced typography
-        heading: ['Inter', 'system-ui', 'sans-serif'],
-        body: ['Inter', 'system-ui', 'sans-serif'],
-        ui: ['Inter', 'system-ui', 'sans-serif'],
       },
       fontSize: {
         // Custom font sizes for better hierarchy
@@ -95,21 +93,15 @@ export default {
         },
       },
       backgroundImage: {
-        // Simple gradients with neon accents
-        'black-gradient': 
-          'linear-gradient(135deg, #000000 0%, #111111 100%)',
-        'purple-gradient':
-          'linear-gradient(135deg, #8B5CF6 0%, #7C3AED 100%)',
-        'green-gradient':
-          'linear-gradient(135deg, #10B981 0%, #059669 100%)',
-        'neon-gradient':
-          'linear-gradient(135deg, #8B5CF6 0%, #10B981 100%)',
+        // Gradients updated with new brand colors
+        'black-gradient': 'linear-gradient(135deg, #000000 0%, #0D0D0D 100%)',
+        'purple-gradient': 'linear-gradient(135deg, #00D4FF 0%, #00A9CC 100%)',
+        'green-gradient': 'linear-gradient(135deg, #00FFCC 0%, #00CCA3 100%)',
+        'neon-gradient': 'linear-gradient(135deg, #00D4FF 0%, #00FFCC 100%)',
         'glass-gradient':
           'linear-gradient(135deg, rgba(255,255,255,0.05) 0%, rgba(255,255,255,0.02) 100%)',
-        'purple-glow':
-          'radial-gradient(circle, rgba(139,92,246,0.3) 0%, transparent 70%)',
-        'green-glow':
-          'radial-gradient(circle, rgba(16,185,129,0.3) 0%, transparent 70%)',
+        'purple-glow': 'radial-gradient(circle, rgba(0, 212, 255, 0.3) 0%, transparent 70%)',
+        'green-glow': 'radial-gradient(circle, rgba(0, 255, 204, 0.3) 0%, transparent 70%)',
       },
       backdropBlur: {
         xs: '2px',
@@ -124,15 +116,17 @@ export default {
         '5xl': '2.5rem',
       },
       boxShadow: {
-        // Neon glow effects
-        'neon-purple': '0 0 20px rgba(139, 92, 246, 0.5)',
-        'neon-purple-lg': '0 0 40px rgba(139, 92, 246, 0.7), 0 0 80px rgba(139, 92, 246, 0.3)',
-        'neon-green': '0 0 20px rgba(16, 185, 129, 0.5)',
-        'neon-green-lg': '0 0 40px rgba(16, 185, 129, 0.7), 0 0 80px rgba(16, 185, 129, 0.3)',
+        // Neon glow effects updated with new brand colors
+        'neon-purple': '0 0 20px rgba(0, 212, 255, 0.5)',
+        'neon-purple-lg': '0 0 40px rgba(0, 212, 255, 0.7), 0 0 80px rgba(0, 212, 255, 0.3)',
+        'neon-green': '0 0 20px rgba(0, 255, 204, 0.5)',
+        'neon-green-lg': '0 0 40px rgba(0, 255, 204, 0.7), 0 0 80px rgba(0, 255, 204, 0.3)',
+        'laser-pink': '0 0 20px rgba(255, 0, 128, 0.5)',
+        'laser-pink-lg': '0 0 40px rgba(255, 0, 128, 0.7), 0 0 80px rgba(255, 0, 128, 0.3)',
         'glass': '0 8px 32px rgba(0, 0, 0, 0.8)',
         'glass-lg': '0 16px 48px rgba(0, 0, 0, 0.9)',
-        'focus-purple': '0 0 0 2px rgba(139, 92, 246, 0.8)',
-        'focus-green': '0 0 0 2px rgba(16, 185, 129, 0.8)',
+        'focus-purple': '0 0 0 2px rgba(0, 212, 255, 0.8)',
+        'focus-green': '0 0 0 2px rgba(0, 255, 204, 0.8)',
       },
       zIndex: {
         60: '60',
