@@ -297,6 +297,36 @@ class AIMusicEngine {
   }
 
   /**
+   * Get a single track recommendation to replace a specific track in a playlist
+   */
+  async getReplacementTrack(
+    trackToReplace: Track,
+    context: AIPlaylistRequest
+  ): Promise<Track | null> {
+    const replacementPrompt = `The track "${trackToReplace.title}" by ${trackToReplace.artist} had low engagement. Find a single replacement track that fits the following context: ${context.prompt}. The replacement should have higher energy and be harmonically compatible with the previous tracks.`;
+
+    const recommendationRequest: AIPlaylistRequest = {
+      ...context,
+      prompt: replacementPrompt,
+      duration: 5, // We only need one track
+    };
+
+    const recommendation = await this.generateIntelligentPlaylist(
+      recommendationRequest
+    );
+
+    if (recommendation.tracks.length > 0) {
+      // Ensure the replacement is not the same as the track being replaced
+      if (recommendation.tracks[0].id === trackToReplace.id && recommendation.tracks.length > 1) {
+        return recommendation.tracks[1];
+      }
+      return recommendation.tracks[0];
+    }
+
+    return null;
+  }
+
+  /**
    * Private helper methods
    */
   private buildSystemPrompt(): string {

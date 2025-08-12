@@ -117,32 +117,31 @@
 
   /* === BUTTON SYSTEM === */
   .btn {
-    @apply inline-flex items-center justify-center px-6 py-3 text-base font-semibold rounded-xl transition-all duration-200 ease-in-out focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-offset-pure-black disabled:opacity-50 disabled:cursor-not-allowed;
-    font-family: 'Inter', sans-serif;
+    @apply inline-flex items-center justify-center px-6 py-3 text-base rounded-xl transition-all duration-300 ease-in-out focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-offset-rich-black disabled:opacity-50 disabled:cursor-not-allowed transform-gpu;
+    font-family: theme('fontFamily.display');
+    font-weight: 700;
     text-decoration: none;
+    letter-spacing: 0.05em;
   }
 
   .btn-primary {
-    @apply btn bg-neon-purple text-pure-white hover:bg-neon-purple-dark hover:shadow-neon-purple focus-visible:ring-neon-purple active:scale-95;
-    box-shadow: 0 4px 20px rgba(139, 92, 246, 0.3);
+    @apply btn bg-purple-gradient text-pure-white hover:shadow-neon-purple-lg focus-visible:ring-neon-purple active:scale-95;
   }
 
   .btn-secondary {
-    @apply btn bg-transparent border-2 border-neon-purple text-neon-purple hover:bg-neon-purple hover:text-pure-white focus-visible:ring-neon-purple active:scale-95;
+    @apply btn bg-transparent border-2 border-neon-purple text-neon-purple hover:bg-neon-purple hover:text-rich-black focus-visible:ring-neon-purple active:scale-95;
   }
 
   .btn-accent {
-    @apply btn bg-neon-green text-pure-black hover:bg-neon-green-dark hover:shadow-neon-green focus-visible:ring-neon-green active:scale-95;
-    box-shadow: 0 4px 20px rgba(16, 185, 129, 0.3);
+    @apply btn bg-green-gradient text-rich-black hover:shadow-neon-green-lg focus-visible:ring-neon-green active:scale-95;
   }
 
   .btn-ghost {
-    @apply btn bg-transparent text-pure-white hover:bg-pure-white/10 focus-visible:ring-pure-white/50 active:scale-95;
+    @apply btn bg-transparent text-light-gray hover:bg-dark-gray hover:text-pure-white focus-visible:ring-light-gray active:scale-95;
   }
 
   .btn-danger {
-    @apply btn bg-red-600 text-pure-white hover:bg-red-700 hover:shadow-lg focus-visible:ring-red-500 active:scale-95;
-    box-shadow: 0 4px 20px rgba(220, 38, 38, 0.3);
+    @apply btn bg-laser-pink text-pure-white hover:shadow-laser-pink-lg focus-visible:ring-laser-pink active:scale-95;
   }
 
   .btn-sm {
@@ -233,6 +232,32 @@
   .textarea {
     @apply input min-h-[120px];
     resize: vertical;
+  }
+
+  /* === SLIDER SYSTEM === */
+  .slider {
+    @apply h-2 w-full cursor-pointer appearance-none rounded-full bg-dark-gray outline-none transition-all;
+  }
+  .slider:hover {
+    @apply bg-gray-700;
+  }
+  .slider::-webkit-slider-thumb {
+    @apply h-5 w-5 cursor-grab appearance-none rounded-full border-2 border-pure-white bg-neon-purple shadow-md transition-all;
+    margin-top: -6px; /* Center thumb */
+  }
+  .slider:active::-webkit-slider-thumb {
+    @apply cursor-grabbing scale-110;
+  }
+  .slider::-moz-range-thumb {
+    @apply h-5 w-5 cursor-grab rounded-full border-2 border-pure-white bg-neon-purple shadow-md;
+  }
+  .slider:active::-moz-range-thumb {
+    @apply cursor-grabbing scale-110;
+  }
+
+  .slider-vertical {
+    writing-mode: bt-lr; /* IE */
+    -webkit-appearance: slider-vertical; /* WebKit */
   }
 
   /* === ANIMATION UTILITIES === */
@@ -391,6 +416,36 @@
   .border-glow {
     box-shadow: inset 0 0 0 1px rgba(139, 92, 246, 0.3), 0 0 10px rgba(139, 92, 246, 0.2);
   }
+
+  /* === SKIN SYSTEM === */
+
+  /* Minimalist Skin */
+  [data-skin='minimalist'] .glass-card {
+    @apply bg-gray-100 border-gray-200 text-gray-800 shadow-lg;
+  }
+  [data-skin='minimalist'] .text-neon-purple { @apply text-blue-600; }
+  [data-skin='minimalist'] .text-neon-green { @apply text-emerald-600; }
+  [data-skin='minimalist'] .bg-neon-purple { @apply bg-blue-600; }
+  [data-skin='minimalist'] .bg-neon-green { @apply bg-emerald-600; }
+  [data-skin='minimalist'] .btn-primary { @apply bg-blue-600 text-white; }
+  [data-skin='minimalist'] .btn-accent { @apply bg-emerald-600 text-white; }
+  [data-skin='minimalist'] .slider::-webkit-slider-thumb { @apply bg-blue-600; }
+  [data-skin='minimalist'] .slider { @apply bg-gray-300; }
+
+  /* Retro Skin */
+  [data-skin='retro'] {
+    font-family: 'Press Start 2P', cursive;
+  }
+  [data-skin='retro'] .glass-card { @apply bg-gray-800 border-gray-700 rounded-none; }
+  [data-skin='retro'] .text-neon-purple { @apply text-red-500; }
+  [data-skin='retro'] .text-neon-green { @apply text-lime-400; }
+  [data-skin='retro'] .bg-neon-purple { @apply bg-red-500; }
+  [data-skin='retro'] .bg-neon-green { @apply bg-lime-400; }
+  [data-skin='retro'] .btn { @apply rounded-none; }
+  [data-skin='retro'] .btn-primary { @apply bg-red-500 text-white; }
+  [data-skin='retro'] .btn-accent { @apply bg-lime-400 text-black; }
+  [data-skin='retro'] .slider { @apply rounded-none; }
+  [data-skin='retro'] .slider::-webkit-slider-thumb { @apply bg-red-500 rounded-none; }
 }
 
 @layer utilities {

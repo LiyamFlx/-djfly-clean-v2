@@ -1,11 +1,55 @@
 import React from 'react';
 import { motion } from 'framer-motion';
 import { BarChart, TrendingUp, Users, Clock, Award } from 'lucide-react';
-import { useSessionState, useCrowdState } from '@/store';
+import { useSessionState, useCrowdState, useAIActions, useAIState, useAudioState } from '@/store';
+import { useMusicContext } from '@/contexts/MusicContext';
+import { Button } from '@/components/ui';
+import { Lightbulb } from 'lucide-react';
 
 const ProducerPage: React.FC = () => {
   const sessionState = useSessionState();
   const crowdState = useCrowdState();
+  const { queue } = useAudioState();
+  const { getReplacementTrack } = useAIActions();
+  const { replacementSuggestion, isAnalyzing } = useAIState();
+  const { savePlaylist } = useMusicContext();
+
+  // Mock logic to find a weak track
+  const findWeakSpot = () => {
+    // In a real app, this would be based on analytics data
+    if (queue.length > 2) {
+      return queue[1];
+    }
+    return null;
+  };
+
+  const weakTrack = findWeakSpot();
+
+  const handleGetSuggestion = () => {
+    if (weakTrack) {
+      getReplacementTrack(weakTrack, {
+        prompt: `Find a replacement for ${weakTrack.title} by ${weakTrack.artist} that has higher energy.`,
+        previousTracks: queue.slice(0, queue.indexOf(weakTrack)),
+      });
+    }
+  };
+
+  const handleApplySuggestion = () => {
+    if (weakTrack && replacementSuggestion) {
+      const weakTrackIndex = queue.findIndex((t) => t.id === weakTrack.id);
+      if (weakTrackIndex !== -1) {
+        const newQueue = [...queue];
+        newQueue[weakTrackIndex] = replacementSuggestion;
+
+        // For simplicity, we'll give the new playlist a generated name.
+        // In a real app, we might prompt the user for a name.
+        const newPlaylistName = `My Set v${Math.floor(Math.random() * 100)}`;
+        savePlaylist(newPlaylistName, newQueue);
+
+        alert(`New playlist "${newPlaylistName}" created with the suggested track!`);
+      }
+    }
+  };
 
   return (
     <div className="min-h-screen py-8">
@@ -274,6 +318,46 @@ const ProducerPage: React.FC = () => {
               </p>
             </div>
           </div>
+        </motion.div>
+
+        {/* Improve This Set */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.8 }}
+          className="mt-8 glass-card p-6 rounded-xl"
+        >
+          <h3 className="text-xl font-semibold mb-6 flex items-center gap-2">
+            <Lightbulb className="w-5 h-5 text-yellow-400" />
+            Improve This Set
+          </h3>
+          {weakTrack ? (
+            <div className="space-y-4">
+              <p className="text-gray-300">
+                AI has identified a potential weak spot in your set: <strong className="text-white">{weakTrack.title}</strong> by <strong className="text-white">{weakTrack.artist}</strong>.
+              </p>
+              <Button onClick={handleGetSuggestion} disabled={isAnalyzing}>
+                {isAnalyzing ? 'Analyzing...' : 'Get AI Suggestion'}
+              </Button>
+
+              {replacementSuggestion && (
+                <motion.div
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  className="mt-4 p-4 bg-rich-black/50 rounded-lg"
+                >
+                  <p className="text-gray-300 mb-2">
+                    Suggestion: Replace with <strong className="text-white">{replacementSuggestion.title}</strong> by <strong className="text-white">{replacementSuggestion.artist}</strong>.
+                  </p>
+                  <Button variant="accent" onClick={handleApplySuggestion}>
+                    Apply & Create New Version
+                  </Button>
+                </motion.div>
+              )}
+            </div>
+          ) : (
+            <p className="text-gray-400">Play a set to get AI improvement suggestions.</p>
+          )}
         </motion.div>
       </div>
     </div>

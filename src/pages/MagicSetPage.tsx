@@ -11,8 +11,16 @@ const MagicSetPage: React.FC = () => {
   const [prompt, setPrompt] = useState('');
 
   const { generateSet } = useAIActions();
-  const { setQueue, setCurrentTrack } = useAudioActions();
+  const { setQueue, setCurrentTrack, setIsPlaying, playTrack } = useAudioActions();
   const aiState = useAIState();
+
+  React.useEffect(() => {
+    if (aiState.generatedTracks.length > 0 && !aiState.isGenerating) {
+      setQueue(aiState.generatedTracks);
+      setCurrentTrack(aiState.generatedTracks[0]);
+      setIsPlaying(true);
+    }
+  }, [aiState.generatedTracks, aiState.isGenerating, setQueue, setCurrentTrack, setIsPlaying]);
 
   const handleGenerateSet = async () => {
     if (!prompt.trim()) return;
@@ -24,12 +32,9 @@ const MagicSetPage: React.FC = () => {
     }
   };
 
-  const handlePlaySet = () => {
-    if (aiState.generatedTracks.length > 0) {
-      setQueue(aiState.generatedTracks);
-      setCurrentTrack(aiState.generatedTracks[0]);
-      navigate(ROUTES.PLAYER);
-    }
+  const handlePlayFromTrack = (track: Track) => {
+    setQueue(aiState.generatedTracks);
+    playTrack(track);
   };
 
   const removeTrack = (trackId: string) => {
@@ -122,15 +127,6 @@ const MagicSetPage: React.FC = () => {
           >
             <div className="flex items-center justify-between mb-6">
               <h3 className="text-xl font-semibold">Generated Set</h3>
-              <div className="flex gap-2">
-                <button
-                  onClick={handlePlaySet}
-                  className="club-button flex items-center gap-2"
-                >
-                  <Play className="w-4 h-4" />
-                  Play Set
-                </button>
-              </div>
             </div>
 
             <div className="space-y-3">
@@ -140,7 +136,7 @@ const MagicSetPage: React.FC = () => {
                   initial={{ opacity: 0, x: -20 }}
                   animate={{ opacity: 1, x: 0 }}
                   transition={{ delay: index * 0.1 }}
-                  className="flex items-center gap-4 p-4 bg-rich-black/30 rounded-lg hover:bg-rich-black/50 transition-colors"
+                  className="flex items-center gap-4 p-4 bg-rich-black/30 rounded-lg hover:bg-rich-black/50 transition-colors group"
                 >
                   <div className="text-sm text-gray-400 w-8">{index + 1}.</div>
 
@@ -168,6 +164,14 @@ const MagicSetPage: React.FC = () => {
                     )}
                   </div>
 
+                  <motion.button
+                    onClick={() => handlePlayFromTrack(track)}
+                    className="p-2 rounded-full bg-white/10 text-white opacity-0 group-hover:opacity-100 transition-opacity"
+                    whileHover={{ scale: 1.1 }}
+                    whileTap={{ scale: 0.9 }}
+                  >
+                    <Play className="w-5 h-5" />
+                  </motion.button>
                   <button
                     onClick={() => removeTrack(track.id)}
                     className="p-2 text-gray-400 hover:text-red-400 transition-colors"

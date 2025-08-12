@@ -4,6 +4,7 @@ import { useNavigate } from 'react-router-dom';
 import { Mic, Play, Zap, BarChart3 } from 'lucide-react';
 import { useAIActions, useAIState, useAudioActions } from '@/store';
 import { ROUTES } from '@/constants/routes';
+import type { Track } from '@/types';
 
 const MagicMatchPage: React.FC = () => {
   const navigate = useNavigate();
@@ -11,7 +12,7 @@ const MagicMatchPage: React.FC = () => {
   const [recordingProgress, setRecordingProgress] = useState(0);
 
   const { generateMatch } = useAIActions();
-  const { setQueue, setCurrentTrack } = useAudioActions();
+  const { setQueue, setCurrentTrack, setIsPlaying, playTrack } = useAudioActions();
   const aiState = useAIState();
 
   const handleStartRecording = async () => {
@@ -50,7 +51,9 @@ const MagicMatchPage: React.FC = () => {
           
           if (aiState.generatedTracks.length > 0) {
             setQueue(aiState.generatedTracks);
-            setCurrentTrack(aiState.generatedTracks[0]);
+            const firstTrack = aiState.generatedTracks[0];
+            setCurrentTrack(firstTrack);
+            setIsPlaying(true);
           }
           
           setStatus('complete');
@@ -67,10 +70,11 @@ const MagicMatchPage: React.FC = () => {
     }
   };
 
-  const handlePlayRecommendations = () => {
-    if (aiState.generatedTracks.length > 0) {
-      navigate(ROUTES.PLAYER);
-    }
+  const { playTrack } = useAudioActions();
+
+  const handlePlayFromTrack = (track: Track) => {
+    setQueue(aiState.generatedTracks);
+    playTrack(track);
   };
 
   const resetAnalysis = () => {
@@ -247,16 +251,6 @@ const MagicMatchPage: React.FC = () => {
 
               <div className="flex gap-4 justify-center">
                 <motion.button
-                  onClick={handlePlayRecommendations}
-                  className="btn-primary px-8 py-4 flex items-center gap-3"
-                  whileHover={{ scale: 1.05 }}
-                  whileTap={{ scale: 0.95 }}
-                >
-                  <Play className="w-5 h-5" />
-                  Play Now
-                </motion.button>
-                
-                <motion.button
                   onClick={resetAnalysis}
                   className="btn-secondary px-8 py-4"
                   whileHover={{ scale: 1.05 }}
@@ -271,13 +265,13 @@ const MagicMatchPage: React.FC = () => {
             <div className="card p-8 rounded-2xl">
               <h4 className="text-xl font-bold mb-6">Recommended Tracks</h4>
               <div className="space-y-3">
-                {aiState.generatedTracks.slice(0, 5).map((track, index) => (
+                {aiState.generatedTracks.map((track, index) => (
                   <motion.div
                     key={track.id}
                     initial={{ opacity: 0, x: -20 }}
                     animate={{ opacity: 1, x: 0 }}
                     transition={{ delay: index * 0.1 }}
-                    className="flex items-center gap-4 p-4 bg-neutral-800/30 rounded-xl hover:bg-neutral-800/50 transition-all duration-300"
+                    className="flex items-center gap-4 p-4 bg-neutral-800/30 rounded-xl hover:bg-neutral-800/50 transition-all duration-300 group"
                   >
                     <div className="text-sm text-neutral-400 w-8">{index + 1}.</div>
                     <img
@@ -294,6 +288,14 @@ const MagicMatchPage: React.FC = () => {
                         {track.bpm} BPM
                       </span>
                     )}
+                    <motion.button
+                      onClick={() => handlePlayFromTrack(track)}
+                      className="p-2 rounded-full bg-white/10 text-white opacity-0 group-hover:opacity-100 transition-opacity"
+                      whileHover={{ scale: 1.1 }}
+                      whileTap={{ scale: 0.9 }}
+                    >
+                      <Play className="w-5 h-5" />
+                    </motion.button>
                   </motion.div>
                 ))}
               </div>
