@@ -100,7 +100,7 @@ const EnhancedPlayer: React.FC<EnhancedPlayerProps> = ({ className = '' }) => {
           <motion.div
             animate={{ rotate: trackInfo.isPlaying ? 360 : 0 }}
             transition={{ duration: 20, repeat: Infinity, ease: 'linear' }}
-            className="w-16 h-16 bg-gradient-to-r from-electric-blue to-bright-turquoise rounded-full flex items-center justify-center"
+            className="w-16 h-16 bg-gradient-to-r from-neon-purple to-neon-green rounded-full flex items-center justify-center"
           >
             <Music className="w-8 h-8 text-rich-black" />
           </motion.div>
@@ -143,7 +143,7 @@ const EnhancedPlayer: React.FC<EnhancedPlayerProps> = ({ className = '' }) => {
               </div>
               <div>
                 <div className="flex items-center justify-center space-x-2 mb-2">
-                  <Zap className="w-4 h-4 text-laser-pink" />
+                  <Zap className="w-4 h-4 text-neon-purple" />
                   <span className="text-sm text-gray-400">Energy</span>
                 </div>
                 <p
@@ -154,7 +154,7 @@ const EnhancedPlayer: React.FC<EnhancedPlayerProps> = ({ className = '' }) => {
               </div>
               <div>
                 <div className="flex items-center justify-center space-x-2 mb-2">
-                  <TrendingUp className="w-4 h-4 text-cyber-green" />
+                  <TrendingUp className="w-4 h-4 text-neon-green" />
                   <span className="text-sm text-gray-400">Key</span>
                 </div>
                 <p className="text-xl font-bold text-white">{trackInfo.key}</p>
@@ -180,7 +180,7 @@ const EnhancedPlayer: React.FC<EnhancedPlayerProps> = ({ className = '' }) => {
                 repeat: Infinity,
                 delay: index * 0.02,
               }}
-              className="w-1 bg-gradient-to-t from-electric-blue to-bright-turquoise rounded-full"
+              className="w-1 bg-gradient-to-t from-neon-purple to-neon-green rounded-full"
               style={{ height: `${height * 60}px` }}
             />
           ))}
@@ -209,7 +209,7 @@ const EnhancedPlayer: React.FC<EnhancedPlayerProps> = ({ className = '' }) => {
           }}
         >
           <motion.div
-            className="h-full bg-gradient-to-r from-electric-blue to-bright-turquoise"
+            className="h-full bg-gradient-to-r from-neon-purple to-neon-green"
             initial={{ width: 0 }}
             animate={{ width: `${progress}%` }}
             transition={{ duration: 0.1 }}
@@ -230,7 +230,7 @@ const EnhancedPlayer: React.FC<EnhancedPlayerProps> = ({ className = '' }) => {
             onClick={togglePlay}
             whileHover={{ scale: 1.1 }}
             whileTap={{ scale: 0.9 }}
-            className="w-12 h-12 bg-gradient-to-r from-electric-blue to-bright-turquoise rounded-full flex items-center justify-center text-rich-black font-bold"
+            className="w-12 h-12 bg-gradient-to-r from-neon-purple to-neon-green rounded-full flex items-center justify-center text-rich-black font-bold"
           >
             {trackInfo.isPlaying ? (
               <Pause className="w-6 h-6" />
@@ -260,7 +260,7 @@ const EnhancedPlayer: React.FC<EnhancedPlayerProps> = ({ className = '' }) => {
           </button>
           <div className="w-24 h-2 bg-gray-700 rounded-full overflow-hidden">
             <motion.div
-              className="h-full bg-gradient-to-r from-electric-blue to-bright-turquoise"
+              className="h-full bg-gradient-to-r from-neon-purple to-neon-green"
               initial={{ width: 0 }}
               animate={{ width: `${isMuted ? 0 : volume * 100}%` }}
               transition={{ duration: 0.2 }}

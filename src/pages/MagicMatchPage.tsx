@@ -70,8 +70,6 @@ const MagicMatchPage: React.FC = () => {
     }
   };
 
-  const { playTrack } = useAudioActions();
-
   const handlePlayFromTrack = (track: Track) => {
     setQueue(aiState.generatedTracks);
     playTrack(track);

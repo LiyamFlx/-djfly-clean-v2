@@ -3,7 +3,7 @@ import { motion } from 'framer-motion';
 import { BarChart, TrendingUp, Users, Clock, Award } from 'lucide-react';
 import { useSessionState, useCrowdState, useAIActions, useAIState, useAudioState } from '@/store';
 import { useMusicContext } from '@/contexts/MusicContext';
-import { Button } from '@/components/ui';
+import Button from '@/components/ui/button';
 import { Lightbulb } from 'lucide-react';
 
 const ProducerPage: React.FC = () => {

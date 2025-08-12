@@ -2,11 +2,11 @@
 
 /* Enhanced Button Hierarchy */
 .btn-hero {
-  @apply bg-gradient-to-r from-electric-blue via-bright-turquoise to-laser-pink;
+  @apply bg-gradient-to-r from-neon-purple via-neon-green to-neon-purple;
   @apply text-white font-bold text-xl px-12 py-6 rounded-2xl;
   @apply shadow-2xl transform transition-all duration-300;
   @apply hover:scale-105 hover:shadow-glow active:scale-95;
-  @apply focus:outline-none focus:ring-4 focus:ring-bright-turquoise focus:ring-opacity-50;
+  @apply focus:outline-none focus:ring-4 focus:ring-neon-green focus:ring-opacity-50;
   position: relative;
   overflow: hidden;
 }
@@ -28,8 +28,8 @@
 
 /* Improved Focus States */
 .interactive-focus {
-  @apply focus:outline-none focus:ring-3 focus:ring-electric-blue focus:ring-opacity-60;
-  @apply focus:border-electric-blue transition-all duration-200;
+  @apply focus:outline-none focus:ring-3 focus:ring-neon-purple focus:ring-opacity-60;
+  @apply focus:border-neon-purple transition-all duration-200;
 }
 
 /* Loading State Enhancements */
@@ -45,7 +45,7 @@
   left: -100%;
   width: 100%;
   height: 100%;
-  background: linear-gradient(90deg, transparent, rgba(0, 212, 255, 0.3), transparent);
+  background: linear-gradient(90deg, transparent, rgba(157, 78, 221, 0.3), transparent);
   animation: shimmer 2s infinite;
 }
 
@@ -58,13 +58,13 @@
 .card-interactive {
   @apply transition-all duration-300 ease-out;
   @apply hover:scale-[1.02] hover:shadow-2xl;
-  @apply hover:border-electric-blue hover:border-opacity-60;
+  @apply hover:border-neon-purple hover:border-opacity-60;
 }
 
 /* Improved Typography Scale */
 .heading-hero {
   @apply text-6xl md:text-7xl lg:text-8xl font-black;
-  @apply bg-gradient-to-r from-white via-electric-blue to-bright-turquoise bg-clip-text text-transparent;
+  @apply bg-gradient-to-r from-white via-neon-purple to-neon-green bg-clip-text text-transparent;
   @apply leading-none tracking-tight;
 }
 

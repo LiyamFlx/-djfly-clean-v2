@@ -10,24 +10,24 @@ export default {
         'dark-gray': '#1a1a1a',
         'pure-white': '#FFFFFF',
         'off-white': '#F5F5F5',
-        'light-gray': '#CCCCCC',
+        'light-gray': '#dee2e6',
 
-        // Brand Colors - updated to match README vision
-        'neon-purple': '#00D4FF', // Electric Blue
-        'neon-purple-light': '#66E5FF',
-        'neon-purple-dark': '#00A9CC',
+        // Brand Colors - updated to new palette
+        'neon-purple': '#9d4edd', // Purple
+        'neon-purple-light': '#b766ea',
+        'neon-purple-dark': '#7c2fcf',
 
-        'neon-green': '#00FFCC', // Bright Turquoise
-        'neon-green-light': '#66FFDD',
-        'neon-green-dark': '#00CCA3',
+        'neon-green': '#abff4f', // Green
+        'neon-green-light': '#c4ff7a',
+        'neon-green-dark': '#8bcc2f',
 
-        'laser-pink': '#FF0080', // Laser Pink
+        'laser-pink': '#9d4edd', // Using purple instead of pink
 
         // Semantic colors using updated theme
-        success: '#00FFCC', // Now Bright Turquoise
+        success: '#abff4f', // Now Green
         warning: '#F59E0B',
-        error: '#FF0080', // Now Laser Pink
-        info: '#00D4FF', // Now Electric Blue
+        error: '#9d4edd', // Now Purple
+        info: '#9d4edd', // Now Purple
       },
       fontFamily: {
         sans: ['Inter', 'system-ui', 'sans-serif'],
@@ -88,20 +88,20 @@ export default {
           '50%': { transform: 'translateY(-10px)' },
         },
         glow: {
-          '0%': { boxShadow: '0 0 5px #00D4FF' },
-          '100%': { boxShadow: '0 0 20px #00D4FF, 0 0 30px #00D4FF' },
+          '0%': { boxShadow: '0 0 5px #9d4edd' },
+          '100%': { boxShadow: '0 0 20px #9d4edd, 0 0 30px #9d4edd' },
         },
       },
       backgroundImage: {
         // Gradients updated with new brand colors
         'black-gradient': 'linear-gradient(135deg, #000000 0%, #0D0D0D 100%)',
-        'purple-gradient': 'linear-gradient(135deg, #00D4FF 0%, #00A9CC 100%)',
-        'green-gradient': 'linear-gradient(135deg, #00FFCC 0%, #00CCA3 100%)',
-        'neon-gradient': 'linear-gradient(135deg, #00D4FF 0%, #00FFCC 100%)',
+        'purple-gradient': 'linear-gradient(135deg, #9d4edd 0%, #7c2fcf 100%)',
+        'green-gradient': 'linear-gradient(135deg, #abff4f 0%, #8bcc2f 100%)',
+        'neon-gradient': 'linear-gradient(135deg, #9d4edd 0%, #abff4f 100%)',
         'glass-gradient':
           'linear-gradient(135deg, rgba(255,255,255,0.05) 0%, rgba(255,255,255,0.02) 100%)',
-        'purple-glow': 'radial-gradient(circle, rgba(0, 212, 255, 0.3) 0%, transparent 70%)',
-        'green-glow': 'radial-gradient(circle, rgba(0, 255, 204, 0.3) 0%, transparent 70%)',
+        'purple-glow': 'radial-gradient(circle, rgba(157, 78, 221, 0.3) 0%, transparent 70%)',
+        'green-glow': 'radial-gradient(circle, rgba(171, 255, 79, 0.3) 0%, transparent 70%)',
       },
       backdropBlur: {
         xs: '2px',
@@ -117,16 +117,16 @@ export default {
       },
       boxShadow: {
         // Neon glow effects updated with new brand colors
-        'neon-purple': '0 0 20px rgba(0, 212, 255, 0.5)',
-        'neon-purple-lg': '0 0 40px rgba(0, 212, 255, 0.7), 0 0 80px rgba(0, 212, 255, 0.3)',
-        'neon-green': '0 0 20px rgba(0, 255, 204, 0.5)',
-        'neon-green-lg': '0 0 40px rgba(0, 255, 204, 0.7), 0 0 80px rgba(0, 255, 204, 0.3)',
-        'laser-pink': '0 0 20px rgba(255, 0, 128, 0.5)',
-        'laser-pink-lg': '0 0 40px rgba(255, 0, 128, 0.7), 0 0 80px rgba(255, 0, 128, 0.3)',
+        'neon-purple': '0 0 20px rgba(157, 78, 221, 0.5)',
+        'neon-purple-lg': '0 0 40px rgba(157, 78, 221, 0.7), 0 0 80px rgba(157, 78, 221, 0.3)',
+        'neon-green': '0 0 20px rgba(171, 255, 79, 0.5)',
+        'neon-green-lg': '0 0 40px rgba(171, 255, 79, 0.7), 0 0 80px rgba(171, 255, 79, 0.3)',
+        'laser-pink': '0 0 20px rgba(157, 78, 221, 0.5)',
+        'laser-pink-lg': '0 0 40px rgba(157, 78, 221, 0.7), 0 0 80px rgba(157, 78, 221, 0.3)',
         'glass': '0 8px 32px rgba(0, 0, 0, 0.8)',
         'glass-lg': '0 16px 48px rgba(0, 0, 0, 0.9)',
-        'focus-purple': '0 0 0 2px rgba(0, 212, 255, 0.8)',
-        'focus-green': '0 0 0 2px rgba(0, 255, 204, 0.8)',
+        'focus-purple': '0 0 0 2px rgba(157, 78, 221, 0.8)',
+        'focus-green': '0 0 0 2px rgba(171, 255, 79, 0.8)',
       },
       zIndex: {
         60: '60',

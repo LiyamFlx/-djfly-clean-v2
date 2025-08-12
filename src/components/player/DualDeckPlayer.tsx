@@ -49,7 +49,7 @@ const TransitionRing: React.FC<{ score: number }> = ({ score }) => {
   const circumference = 2 * Math.PI * radius;
   const offset = circumference - (score / 100) * circumference;
 
-  const color = score > 80 ? '#00FFCC' : score > 60 ? '#F59E0B' : '#FF0080';
+  const color = score > 80 ? '#abff4f' : score > 60 ? '#F59E0B' : '#9d4edd';
 
   return (
     <div className="relative w-32 h-32">
