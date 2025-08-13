@@ -1,13 +1,10 @@
-<<<<<<< HEAD
 /**
  * API Status Indicator Component
  * Shows the connection status of all integrated services
  */
 
 import React, { useState, useEffect, useCallback } from 'react';
-=======
 import React, { useState, useEffect } from 'react';
->>>>>>> fix-spotify-connection
 import { motion, AnimatePresence } from 'framer-motion';
 import {
   runAllHealthChecks,
@@ -23,7 +20,6 @@ const ApiStatusIndicator: React.FC = () => {
   const [isExpanded, setIsExpanded] = useState(false);
   const [isTesting, setIsTesting] = useState(false);
 
-<<<<<<< HEAD
   const updateServiceStatus = () => {
     setServices({
       spotify: serviceStatus.getServiceStatus('spotify'),
@@ -38,7 +34,6 @@ const ApiStatusIndicator: React.FC = () => {
       // Test connections but don't throw errors for demo mode
       await testConnections.all();
       updateServiceStatus();
-=======
   useEffect(() => {
     // Initial status check on mount
     testAllConnections();
@@ -53,7 +48,6 @@ const ApiStatusIndicator: React.FC = () => {
         newState[result.service] = result;
       });
       setServices(newState);
->>>>>>> fix-spotify-connection
     } catch (error) {
       console.info(
         'Connection test completed with some services unavailable (demo mode)'
@@ -77,7 +71,6 @@ const ApiStatusIndicator: React.FC = () => {
     return () => clearInterval(interval);
   }, [testAllConnections]);
 
-<<<<<<< HEAD
   const getOverallStatus = () => {
     const connectedServices = Object.values(services).filter(Boolean).length;
     const totalServices = Object.keys(services).length;
@@ -85,14 +78,12 @@ const ApiStatusIndicator: React.FC = () => {
     if (connectedServices === totalServices) return 'all';
     if (connectedServices > 0) return 'partial';
     return 'demo'; // Change from 'none' to 'demo' for better UX
-=======
   const getOverallStatus = (): ServiceStatus => {
     const statuses = Object.values(services).map((s) => s?.status);
     if (statuses.every((s) => s === 'connected')) return 'connected';
     if (statuses.some((s) => s === 'connected')) return 'degraded';
     if (statuses.every((s) => s === 'demo')) return 'demo';
     return 'disconnected';
->>>>>>> fix-spotify-connection
   };
 
   const getStatusColor = (status: ServiceStatus) => {
@@ -102,11 +93,8 @@ const ApiStatusIndicator: React.FC = () => {
       case 'degraded':
         return 'text-yellow-400';
       case 'demo':
-<<<<<<< HEAD
         return 'text-blue-400'; // Use blue for demo mode instead of red
-=======
         return 'text-blue-400';
->>>>>>> fix-spotify-connection
       default:
         return 'text-red-400';
     }
@@ -119,11 +107,8 @@ const ApiStatusIndicator: React.FC = () => {
       case 'degraded':
         return '🟡';
       case 'demo':
-<<<<<<< HEAD
         return '🔵'; // Use blue circle for demo mode
-=======
         return '🔵';
->>>>>>> fix-spotify-connection
       default:
         return '🔴';
     }

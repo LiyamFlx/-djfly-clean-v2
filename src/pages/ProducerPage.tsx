@@ -1,5 +1,4 @@
 import React from 'react';
-<<<<<<< HEAD
 import { motion } from 'framer-motion';
 import { BarChart, TrendingUp, Users, Clock, Award } from 'lucide-react';
 import {
@@ -156,7 +155,6 @@ const ProducerPage: React.FC = () => {
               </div>
             </div>
           </motion.div>
-=======
 
 const ProducerAnalyticsPage = () => (
   <div className="min-h-screen bg-gray-900 text-white p-8">
@@ -166,7 +164,6 @@ const ProducerAnalyticsPage = () => (
         <div className="bg-gray-800 p-6 rounded-xl">
           <h3 className="text-lg font-semibold mb-2">Total Plays</h3>
           <p className="text-3xl font-bold text-blue-400">1,337</p>
->>>>>>> fix-spotify-connection
         </div>
         <div className="bg-gray-800 p-6 rounded-xl">
           <h3 className="text-lg font-semibold mb-2">Active Sets</h3>
@@ -194,7 +191,6 @@ const ProducerAnalyticsPage = () => (
             )
           )}
         </div>
-<<<<<<< HEAD
 
         {/* Recommendations */}
         <motion.div
@@ -315,8 +311,6 @@ const ProducerAnalyticsPage = () => (
             </p>
           )}
         </motion.div>
-=======
->>>>>>> fix-spotify-connection
       </div>
     </div>
   </div>

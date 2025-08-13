@@ -195,7 +195,6 @@ export const testConnections = {
     const isConnected = result.status === 'connected';
     serviceStatus.setServiceStatus('supabase', isConnected);
     return isConnected;
-<<<<<<< HEAD
   },
 
   async openai(): Promise<boolean> {
@@ -269,7 +268,6 @@ export const testConnections = {
       serviceStatus.setServiceStatus('lastfm', false);
       return false;
     }
-=======
   },
 
   async openai(): Promise<boolean> {
@@ -277,7 +275,6 @@ export const testConnections = {
     const isConnected = result.status === 'connected';
     serviceStatus.setServiceStatus('openai', isConnected);
     return isConnected;
->>>>>>> fix-spotify-connection
   },
 
   async all(): Promise<Record<string, boolean>> {

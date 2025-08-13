@@ -14,7 +14,6 @@ vi.mock('@/config/apiConfig', () => ({
 
 // Mock the music library to have predictable data
 vi.mock('@/services/musicLibrary', () => ({
-<<<<<<< HEAD
   MUSIC_LIBRARY: [
     {
       id: 'track1',
@@ -51,7 +50,6 @@ describe('AIMusicEngine', () => {
 
   it('should generate a fallback playlist when the OpenAI API call fails', async () => {
     fetchSpy = vi.spyOn(global, 'fetch').mockImplementation(() => {
-=======
     MUSIC_LIBRARY: [
         { id: 'track1', title: 'Mock Track 1', artist: 'Mock Artist 1', genre: 'Electronic', bpm: 128, key: 'A minor', energy: 0.8 },
         { id: 'track2', title: 'Mock Track 2', artist: 'Mock Artist 2', genre: 'House', bpm: 125, key: 'C major', energy: 0.7 },
@@ -73,7 +71,6 @@ describe('AIMusicEngine', () => {
 
   it('should generate a fallback playlist when the OpenAI API call fails', async () => {
     fetchSpy = vi.spyOn(globalThis, 'fetch').mockImplementation(() => {
->>>>>>> fix-spotify-connection
       return Promise.reject(new Error('API is down'));
     });
 
@@ -89,7 +86,6 @@ describe('AIMusicEngine', () => {
 
   it('should successfully call OpenAI API and return a mapped playlist', async () => {
     const mockApiResponse = {
-<<<<<<< HEAD
       ok: true,
       json: () =>
         Promise.resolve({
@@ -119,7 +115,6 @@ describe('AIMusicEngine', () => {
     fetchSpy = vi
       .spyOn(global, 'fetch')
       .mockResolvedValue(mockApiResponse as Response);
-=======
         ok: true,
         json: () => Promise.resolve({
             choices: [{
@@ -138,7 +133,6 @@ describe('AIMusicEngine', () => {
     };
 
     fetchSpy = vi.spyOn(globalThis, 'fetch').mockResolvedValue(mockApiResponse as Response);
->>>>>>> fix-spotify-connection
 
     const engine = new AIMusicEngine();
     const request: AIPlaylistRequest = { prompt: 'Test prompt' };

@@ -31,16 +31,13 @@ interface MoodAnalysis {
   description: string;
 }
 
-<<<<<<< HEAD
 interface CacheItem {
   data: AIRecommendation | MoodAnalysis;
   timestamp: number;
 }
 
 class AIMusicEngine {
-=======
 export class AIMusicEngine {
->>>>>>> fix-spotify-connection
   private apiKey: string;
   private baseUrl: string;
   private cache = new Map<string, CacheItem>();

@@ -8,7 +8,6 @@ const PlayerPage: React.FC = () => {
   const navigate = useNavigate();
 
   return (
-<<<<<<< HEAD
     <div className="min-h-screen bg-gradient-to-br from-pure-black via-rich-black to-pure-black p-4">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex justify-end mb-4">
         <Button
@@ -22,7 +21,6 @@ const PlayerPage: React.FC = () => {
       </div>
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <DualDeckPlayer />
-=======
     <div className="min-h-screen bg-club-gradient">
       {/* End Set Button */}
       <button
@@ -280,7 +278,6 @@ const PlayerPage: React.FC = () => {
             </div>
           </motion.div>
         )}
->>>>>>> fix-spotify-connection
       </div>
     </div>
   );

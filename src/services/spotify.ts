@@ -151,7 +151,6 @@ export class SpotifyService {
   /**
    * Get valid access token
    */
-<<<<<<< HEAD
   private async getValidToken(): Promise<string | null> {
     // Check if token is expired or will expire soon
     if (!this.accessToken || Date.now() >= this.tokenExpiry - 60000) {
@@ -162,7 +161,6 @@ export class SpotifyService {
     }
 
     return this.accessToken;
-=======
   private getDemoTracks(query: string, limit: number = 20): Track[] {
     const cacheKey = `demo_tracks_${query}_${limit}`;
     const cachedTracks = cache.get<Track[]>(cacheKey);
@@ -252,7 +250,6 @@ export class SpotifyService {
     const result = demoTracks.slice(0, limit);
     cache.set(cacheKey, result, 300000); // Cache for 5 minutes
     return result;
->>>>>>> fix-spotify-connection
   }
 
   /**

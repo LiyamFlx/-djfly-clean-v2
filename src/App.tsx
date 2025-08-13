@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 import { Suspense, lazy } from 'react';
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import { ThemeProvider } from '@/contexts/ThemeContext';
@@ -32,12 +31,10 @@ const ContactPage = lazy(() => import('@/pages/support/ContactPage'));
 const NotFoundPage = lazy(() => import('@/pages/errors/NotFoundPage'));
 
 // --- Components ---
-=======
 import React, { Suspense } from 'react';
 import AppRouter from './components/AppRouter';
 import ApiStatusIndicator from './components/ApiStatusIndicator';
 
->>>>>>> fix-spotify-connection
 const LoadingSpinner = ({ message = 'Loading...' }: { message?: string }) => (
   <div className="min-h-screen bg-black-gradient flex items-center justify-center">
     <div className="text-center">
@@ -47,7 +44,6 @@ const LoadingSpinner = ({ message = 'Loading...' }: { message?: string }) => (
   </div>
 );
 
-<<<<<<< HEAD
 const AppRoutes = () => {
   const { queue } = useMusicContext();
 
@@ -106,8 +102,6 @@ function App() {
     </ThemeProvider>
   );
 }
-
-=======
 const App: React.FC = () => {
   return (
     <Suspense fallback={<LoadingSpinner />}>
@@ -117,5 +111,4 @@ const App: React.FC = () => {
   );
 };
 
->>>>>>> fix-spotify-connection
 export default App;

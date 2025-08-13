@@ -15,7 +15,6 @@ const LoginPage: React.FC = () => {
     setError('');
 
     try {
-<<<<<<< HEAD
       const result = await authService.signIn({ email, password });
 
       if (result.success) {
@@ -25,12 +24,10 @@ const LoginPage: React.FC = () => {
       }
     } catch {
       setError('An unexpected error occurred');
-=======
       await authService.mockLogin(formData.email);
       navigate('/');
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Login failed');
->>>>>>> fix-spotify-connection
     } finally {
       setIsLoading(false);
     }
@@ -42,14 +39,12 @@ const LoginPage: React.FC = () => {
   };
 
   return (
-<<<<<<< HEAD
     <div className="min-h-screen bg-gray-900 text-white flex items-center justify-center p-4">
       <div className="max-w-md w-full">
         <div className="text-center mb-8">
           <h1 className="text-4xl font-bold text-blue-400 mb-2">DJfly</h1>
           <p className="text-gray-400">Sign in to your account</p>
         </div>
-=======
     <div className="min-h-screen bg-ui-bg-deep text-ui-text flex items-center justify-center p-4">
       <motion.div
         initial={{ opacity: 0, y: 20 }}
@@ -70,7 +65,6 @@ const LoginPage: React.FC = () => {
               <p className="text-error text-sm">{error}</p>
             </div>
           )}
->>>>>>> fix-spotify-connection
 
         <div className="bg-gray-800 rounded-xl p-8">
           <form onSubmit={handleSubmit} className="space-y-6">
@@ -81,42 +75,33 @@ const LoginPage: React.FC = () => {
             )}
 
             <div>
-<<<<<<< HEAD
               <label htmlFor="email" className="block text-sm font-medium mb-2">
                 Email
-=======
               <label
                 className="block text-sm font-medium mb-2 text-ui-text-dim"
                 htmlFor="email"
               >
                 Email Address
->>>>>>> fix-spotify-connection
               </label>
               <input
                 id="email"
-<<<<<<< HEAD
                 type="email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 required
                 className="w-full px-4 py-3 bg-gray-700 border border-gray-600 rounded-lg focus:border-blue-500 focus:outline-none transition-colors"
-=======
                 value={formData.email}
                 onChange={(e) =>
                   setFormData({ ...formData, email: e.target.value })
                 }
                 className="w-full px-4 py-3 bg-ui-bg-hover border border-ui-border rounded-lg focus:border-electric-blue focus:outline-none transition-colors"
->>>>>>> fix-spotify-connection
                 placeholder="your@email.com"
               />
             </div>
 
             <div>
               <label
-<<<<<<< HEAD
-=======
                 className="block text-sm font-medium mb-2 text-ui-text-dim"
->>>>>>> fix-spotify-connection
                 htmlFor="password"
                 className="block text-sm font-medium mb-2"
               >
@@ -124,26 +109,20 @@ const LoginPage: React.FC = () => {
               </label>
               <input
                 id="password"
-<<<<<<< HEAD
                 type="password"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-=======
                 value={formData.password}
                 onChange={(e) =>
                   setFormData({ ...formData, password: e.target.value })
                 }
                 className="w-full px-4 py-3 bg-ui-bg-hover border border-ui-border rounded-lg focus:border-electric-blue focus:outline-none transition-colors"
                 placeholder="Enter your password"
->>>>>>> fix-spotify-connection
                 required
                 className="w-full px-4 py-3 bg-gray-700 border border-gray-600 rounded-lg focus:border-blue-500 focus:outline-none transition-colors"
                 placeholder="••••••••"
               />
             </div>
-
-<<<<<<< HEAD
-=======
             <div className="flex items-center justify-between">
               <label className="flex items-center">
                 <input type="checkbox" className="accent-electric-blue mr-2" />
@@ -157,7 +136,6 @@ const LoginPage: React.FC = () => {
               </Link>
             </div>
 
->>>>>>> fix-spotify-connection
             <button
               type="submit"
               disabled={isLoading}
@@ -173,17 +151,13 @@ const LoginPage: React.FC = () => {
                 <div className="w-full border-t border-ui-border"></div>
               </div>
               <div className="relative flex justify-center text-sm">
-<<<<<<< HEAD
                 <span className="px-2 bg-gray-800 text-gray-400">
-=======
                 <span className="bg-ui-bg px-4 text-ui-text-dim">
->>>>>>> fix-spotify-connection
                   Or continue with
                 </span>
               </div>
             </div>
 
-<<<<<<< HEAD
             <button
               onClick={handleSpotifyLogin}
               className="w-full mt-4 py-3 bg-green-600 hover:bg-green-700 rounded-lg font-semibold transition-colors flex items-center justify-center gap-2"
@@ -212,7 +186,6 @@ const LoginPage: React.FC = () => {
             >
               Sign up
             </Link>
-=======
             <div className="grid grid-cols-3 gap-3">
               <button
                 onClick={() => handleOAuthLogin('google')}
@@ -248,7 +221,6 @@ const LoginPage: React.FC = () => {
                 Sign up
               </Link>
             </p>
->>>>>>> fix-spotify-connection
           </div>
         </div>
       </div>

@@ -101,11 +101,8 @@ const HomePage: React.FC = () => {
   ];
 
   return (
-<<<<<<< HEAD
     <div className="min-h-screen overflow-x-hidden">
-=======
     <div className="min-h-screen bg-ui-bg-deep text-ui-text">
->>>>>>> fix-spotify-connection
       {/* Hero Section */}
       <section className="relative min-h-screen flex-center section-padding">
         {/* Animated Background */}
@@ -128,12 +125,9 @@ const HomePage: React.FC = () => {
           />
         </div>
 
-<<<<<<< HEAD
         <div className="relative container-responsive text-center">
           {/* Logo & Brand */}
-=======
         <div className="relative max-w-4xl mx-auto text-center">
->>>>>>> fix-spotify-connection
           <motion.div
             className="mb-12"
             initial={{ scale: 0, rotate: -180 }}
@@ -147,20 +141,16 @@ const HomePage: React.FC = () => {
             </div>
           </motion.div>
 
-<<<<<<< HEAD
           {/* Main CTA */}
           <motion.div
             className="flex-responsive justify-center items-center mb-16"
             initial={{ opacity: 0, y: 40 }}
-=======
           <motion.h1
             className="text-5xl sm:text-6xl md:text-7xl font-bold tracking-tight mb-8"
             initial={{ opacity: 0, y: 30 }}
->>>>>>> fix-spotify-connection
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, delay: 0.3 }}
           >
-<<<<<<< HEAD
             <Button
               variant="primary"
               size="xl"
@@ -362,7 +352,6 @@ const HomePage: React.FC = () => {
             <span className="body-small">
               Trusted by 50,000+ professional DJs worldwide
             </span>
-=======
             <span className="block text-ui-text mb-2">AI DJ That Reads</span>
             <span className="block gradient-text animate-pulse">
               Any Room Instantly
@@ -473,7 +462,6 @@ const HomePage: React.FC = () => {
                 Real-time crowd insights and performance analytics
               </p>
             </div>
->>>>>>> fix-spotify-connection
           </motion.div>
         </div>
       </section>

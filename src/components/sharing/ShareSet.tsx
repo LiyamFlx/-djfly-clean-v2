@@ -214,23 +214,17 @@ const ShareSet: React.FC<ShareSetProps> = ({
         {/* Quick Share URL */}
         {shareLink && (
           <div>
-<<<<<<< HEAD
             <label
               htmlFor="share-link"
               className="block text-sm font-medium text-gray-300 mb-2"
             >
-=======
             <label htmlFor="share-link-input" className="block text-sm font-medium text-gray-300 mb-2">
->>>>>>> fix-spotify-connection
               Share Link
             </label>
             <div className="flex items-center gap-2">
               <input
-<<<<<<< HEAD
                 id="share-link"
-=======
                 id="share-link-input"
->>>>>>> fix-spotify-connection
                 type="text"
                 value={shareLink.shortUrl}
                 readOnly
@@ -258,7 +252,6 @@ const ShareSet: React.FC<ShareSetProps> = ({
 
         {/* Social Media Buttons */}
         <div>
-<<<<<<< HEAD
           <label
             htmlFor="social-share"
             className="block text-sm font-medium text-gray-300 mb-2"
@@ -269,12 +262,10 @@ const ShareSet: React.FC<ShareSetProps> = ({
             id="social-share"
             className="grid grid-cols-2 sm:grid-cols-4 gap-2"
           >
-=======
           <div className="block text-sm font-medium text-gray-300 mb-2">
             Share on Social Media
           </div>
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
->>>>>>> fix-spotify-connection
             <button
               onClick={() => shareToTwitter(shareLink?.shortUrl || '')}
               className="flex items-center justify-center gap-2 bg-blue-500 hover:bg-blue-600 text-white px-3 py-2 rounded-lg transition-colors text-sm"
@@ -339,23 +330,17 @@ const ShareSet: React.FC<ShareSetProps> = ({
               exit={{ opacity: 0, height: 0 }}
               className="space-y-2"
             >
-<<<<<<< HEAD
               <label
                 htmlFor="embed-code"
                 className="block text-sm font-medium text-gray-300"
               >
-=======
               <label htmlFor="embed-code-textarea" className="block text-sm font-medium text-gray-300">
->>>>>>> fix-spotify-connection
                 Embed Code (Copy & Paste)
               </label>
               <div className="flex items-start gap-2">
                 <textarea
-<<<<<<< HEAD
                   id="embed-code"
-=======
                   id="embed-code-textarea"
->>>>>>> fix-spotify-connection
                   value={shareLink.embedCode}
                   readOnly
                   rows={3}

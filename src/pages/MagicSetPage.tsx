@@ -16,7 +16,6 @@ const MagicSetPage = () => {
   const [generatedTracks, setGeneratedTracks] = useState<Track[]>([]);
   const [aiRecommendation, setAiRecommendation] = useState<any>(null);
 
-<<<<<<< HEAD
   const { generateSet } = useAIActions();
   const { setQueue, setCurrentTrack, setIsPlaying, playTrack } =
     useAudioActions();
@@ -38,7 +37,6 @@ const MagicSetPage = () => {
 
   const handleGenerateSet = async () => {
     if (!prompt.trim()) return;
-=======
   const generatePlaylist = async () => {
     if (!prompt.trim()) {
       alert('Please describe the playlist you want to create!');
@@ -46,7 +44,6 @@ const MagicSetPage = () => {
     }
 
     setStatus('generating');
->>>>>>> fix-spotify-connection
 
     try {
       const { aiMusicEngine } = await import('@/services/aiMusicEngine');
@@ -71,11 +68,9 @@ const MagicSetPage = () => {
     }
   };
 
-<<<<<<< HEAD
   const handlePlayFromTrack = (track: Track) => {
     setQueue(aiState.generatedTracks);
     playTrack(track);
-=======
   const detectMoodFromPrompt = (
     prompt: string
   ): 'energetic' | 'chill' | 'progressive' | 'mixed' => {
@@ -87,7 +82,6 @@ const MagicSetPage = () => {
     if (lowerPrompt.includes('progressive') || lowerPrompt.includes('build'))
       return 'progressive';
     return 'mixed';
->>>>>>> fix-spotify-connection
   };
 
   const detectVenueFromPrompt = (
@@ -131,7 +125,6 @@ const MagicSetPage = () => {
         <div className="text-center">
           <p className="animate-pulse">🤖 AI is Generating Your Playlist...</p>
         </div>
-<<<<<<< HEAD
 
         {/* Prompt Input */}
         <div className="glass-card p-6 rounded-xl">
@@ -168,7 +161,6 @@ const MagicSetPage = () => {
                   {idea}
                 </button>
               ))}
-=======
       )}
       {status === 'complete' && (
         <div>
@@ -194,10 +186,8 @@ const MagicSetPage = () => {
               >
                 🔄 Create Another
               </button>
->>>>>>> fix-spotify-connection
             </div>
           </div>
-<<<<<<< HEAD
         </div>
 
         {/* Generated Set */}
@@ -210,25 +200,19 @@ const MagicSetPage = () => {
             <div className="flex items-center justify-between mb-6">
               <h3 className="text-xl font-semibold">Generated Set</h3>
             </div>
-
-=======
           <div className="bg-gray-800 p-6 rounded-xl">
             <h3 className="text-xl font-semibold mb-4">
               Generated Tracks ({generatedTracks.length})
             </h3>
->>>>>>> fix-spotify-connection
             <div className="space-y-3">
               {generatedTracks.map((track, _index) => (
                 <div
                   key={track.id}
-<<<<<<< HEAD
                   initial={{ opacity: 0, x: -20 }}
                   animate={{ opacity: 1, x: 0 }}
                   transition={{ delay: index * 0.1 }}
                   className="flex items-center gap-4 p-4 bg-rich-black/30 rounded-lg hover:bg-rich-black/50 transition-colors group"
-=======
                   className="bg-gray-700 p-4 rounded-lg flex items-center justify-between"
->>>>>>> fix-spotify-connection
                 >
                   <div>
                     <p className="font-medium">{track.title}</p>
@@ -237,7 +221,6 @@ const MagicSetPage = () => {
                   <div className="text-sm text-gray-300">
                     {track.bpm} BPM • {track.key}
                   </div>
-<<<<<<< HEAD
 
                   <motion.button
                     onClick={() => handlePlayFromTrack(track)}
@@ -351,14 +334,12 @@ const MagicSetPage = () => {
           </motion.div>
         )}
       </motion.div>
-=======
                 </div>
               ))}
             </div>
           </div>
         </div>
       )}
->>>>>>> fix-spotify-connection
     </div>
   );
 };

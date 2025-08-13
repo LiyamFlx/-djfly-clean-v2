@@ -1,5 +1,4 @@
 import React, { useState } from 'react';
-<<<<<<< HEAD
 import { motion } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
 import { Mic, Play, Zap, BarChart3 } from 'lucide-react';
@@ -68,7 +67,6 @@ const MagicMatchPage: React.FC = () => {
       }, 5000);
     } catch (error) {
       console.error('Microphone access denied:', error);
-=======
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { PlaylistGenerator } from '@/services/musicLibrary';
@@ -130,7 +128,6 @@ const MagicMatchPage = () => {
       }, 5000);
     } catch (err) {
       console.error('Microphone access denied:', err);
->>>>>>> fix-spotify-connection
       alert(
         'Microphone access is required for Magic Match. Please allow access and try again.'
       );
@@ -138,7 +135,6 @@ const MagicMatchPage = () => {
     }
   };
 
-<<<<<<< HEAD
   const handlePlayFromTrack = (track: Track) => {
     setQueue(aiState.generatedTracks);
     playTrack(track);
@@ -390,7 +386,6 @@ const MagicMatchPage = () => {
           </motion.div>
         )}
       </motion.div>
-=======
   return (
     <div className="text-white p-8">
       <h1 className="text-3xl font-bold mb-8 text-center">🎯 Magic Match</h1>
@@ -476,7 +471,6 @@ const MagicMatchPage = () => {
           </div>
         </div>
       )}
->>>>>>> fix-spotify-connection
     </div>
   );
 };

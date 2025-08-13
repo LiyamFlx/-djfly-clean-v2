@@ -4,7 +4,6 @@ export default {
   theme: {
     extend: {
       colors: {
-<<<<<<< HEAD
         // Simple Black & White Base
         'pure-black': '#000000',
         'rich-black': '#0D0D0D', // Updated to match README
@@ -29,7 +28,6 @@ export default {
         warning: '#F59E0B',
         error: '#9d4edd', // Now Purple
         info: '#9d4edd', // Now Purple
-=======
         // Brand Colors
         'electric-blue': '#00D4FF',
         'bright-turquoise': '#00FFCC',
@@ -48,7 +46,6 @@ export default {
         success: '#00FF80',
         warning: '#FFD700',
         error: '#FF4D4D',
->>>>>>> fix-spotify-connection
       },
       fontFamily: {
         sans: ['Inter', 'system-ui', 'sans-serif'],

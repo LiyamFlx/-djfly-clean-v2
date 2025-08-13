@@ -42,16 +42,13 @@ const AppRouter: React.FC = () => {
           <Route index element={<HomePage />} />
 
           {/* Studio routes */}
-<<<<<<< HEAD
           <Route path={ROUTES.STUDIO} element={<StudioPage />}>
             <Route path="set" element={<MagicSetPage />} />
             <Route path="match" element={<MagicMatchPage />} />
           </Route>
-=======
           <Route path={ROUTES.STUDIO} element={<StudioPage />} />
           <Route path={ROUTES.STUDIO_MATCH} element={<MagicMatchPage />} />
           <Route path={ROUTES.STUDIO_SET} element={<MagicSetPage />} />
->>>>>>> fix-spotify-connection
 
           {/* Main app pages */}
           <Route path={ROUTES.PLAYER} element={<PlayerPage />} />

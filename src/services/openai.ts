@@ -1,14 +1,11 @@
-<<<<<<< HEAD
 /**
  * Real OpenAI API Integration
  * Production-ready with proper authentication, error handling, and rate limiting
  */
-=======
 import { Track } from '@/types';
 import { spotifyService } from './spotify';
 import { API_CONFIG } from '@/config/apiConfig';
 import { cache } from '@/utils/cache';
->>>>>>> fix-spotify-connection
 
 import { API_CONFIG } from '@/config/apiConfig';
 import type { Track, AIRecommendation } from '@/types/shared';
@@ -47,10 +44,7 @@ export class OpenAIService {
 
   constructor() {
     this.apiKey = API_CONFIG.openai.apiKey || '';
-<<<<<<< HEAD
     this.baseUrl = API_CONFIG.openai.baseUrl || 'https://api.openai.com/v1';
-=======
->>>>>>> fix-spotify-connection
 
     if (!this.apiKey) {
       console.error('❌ OpenAI API key not configured');
@@ -70,7 +64,6 @@ export class OpenAIService {
       const systemPrompt = `You are an expert DJ and music curator. Generate a playlist based on the user's request. 
       Return a JSON response with this exact format:
       {
-<<<<<<< HEAD
         "tracks": [
           {
             "id": "track_1",
@@ -82,7 +75,6 @@ export class OpenAIService {
             "genre": "house",
             "source": "spotify"
           }
-=======
         role: 'system',
         content: `You are an AI DJ assistant analyzing crowd response. Based on crowd analytics, suggest the next 5-8 tracks that would best match the current vibe and energy level.
 
@@ -411,7 +403,6 @@ export class OpenAIService {
         suggestions: [
           'Add more tracks for better flow analysis',
           'Consider BPM progression',
->>>>>>> fix-spotify-connection
         ],
         "energy": 85,
         "mood": "energetic",
