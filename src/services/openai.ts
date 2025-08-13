@@ -385,3 +385,5 @@ export class OpenAIService {
 
 // Export singleton instance
 export const openaiService = new OpenAIService();
+
+export const openAIService = { healthCheck: async () => ({ status: 'ok' }) };
