@@ -1,7 +1,14 @@
+<<<<<<< HEAD
 /**
  * Real OpenAI API Integration
  * Production-ready with proper authentication, error handling, and rate limiting
  */
+=======
+import { Track } from '@/types';
+import { spotifyService } from './spotify';
+import { API_CONFIG } from '@/config/apiConfig';
+import { cache } from '@/utils/cache';
+>>>>>>> fix-spotify-connection
 
 import { API_CONFIG } from '@/config/apiConfig';
 import type { Track, AIRecommendation } from '@/types/shared';
@@ -40,7 +47,10 @@ export class OpenAIService {
 
   constructor() {
     this.apiKey = API_CONFIG.openai.apiKey || '';
+<<<<<<< HEAD
     this.baseUrl = API_CONFIG.openai.baseUrl || 'https://api.openai.com/v1';
+=======
+>>>>>>> fix-spotify-connection
 
     if (!this.apiKey) {
       console.error('❌ OpenAI API key not configured');
@@ -60,6 +70,7 @@ export class OpenAIService {
       const systemPrompt = `You are an expert DJ and music curator. Generate a playlist based on the user's request. 
       Return a JSON response with this exact format:
       {
+<<<<<<< HEAD
         "tracks": [
           {
             "id": "track_1",
@@ -71,6 +82,336 @@ export class OpenAIService {
             "genre": "house",
             "source": "spotify"
           }
+=======
+        role: 'system',
+        content: `You are an AI DJ assistant analyzing crowd response. Based on crowd analytics, suggest the next 5-8 tracks that would best match the current vibe and energy level.
+
+        Consider:
+        - Energy level: ${crowdData.energy}/1.0 (0 = low energy, 1 = high energy)
+        - Mood: ${crowdData.mood}
+        - Engagement: ${crowdData.engagement}
+        - Musical progression and flow
+        
+        ${currentTracksContext}
+        
+        Return ONLY a JSON object with 'tracks' array containing strings in format 'Artist - Song Title'.`,
+      },
+      {
+        role: 'user',
+        content: `The crowd energy is ${crowdData.energy}, mood is ${crowdData.mood}, and engagement is ${crowdData.engagement}. What tracks should I play next?`,
+      },
+    ];
+
+    try {
+      const response = await fetch(`${this.baseUrl}/chat/completions`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${this.apiKey}`,
+        },
+        body: JSON.stringify({
+          model: 'gpt-4',
+          messages,
+          response_format: { type: 'json_object' },
+          temperature: 0.7,
+          max_tokens: 800,
+        }),
+      });
+
+      onProgress(50);
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(
+          `OpenAI API error: ${errorData.error?.message || 'Unknown error'}`
+        );
+      }
+
+      const data: OpenAIResponse = await response.json();
+      const content = JSON.parse(data.choices[0].message.content);
+      const trackQueries: string[] = content.tracks || [];
+
+      // Search for tracks
+      const trackPromises = trackQueries.map(async (query, index) => {
+        try {
+          const tracks = await spotifyService.searchTracks(query, 1);
+          onProgress(50 + Math.round(((index + 1) / trackQueries.length) * 40));
+          return tracks.length > 0 ? tracks[0] : null;
+        } catch (error) {
+          console.error(`Failed to find suggested track: ${query}`, error);
+          return null;
+        }
+      });
+
+      const tracks = await Promise.all(trackPromises);
+      const validTracks = tracks.filter(
+        (track): track is Track => track !== null
+      );
+
+      onProgress(100);
+      return validTracks;
+    } catch (error) {
+      console.error('Crowd analysis failed:', error);
+      throw error;
+    }
+  }
+
+  /**
+   * Generate mix transitions and BPM suggestions
+   */
+  async suggestTransitions(
+    currentTrack: Track,
+    nextTrack: Track
+  ): Promise<{
+    suggestion: string;
+    bpmAdjustment?: number;
+    crossfadePoint?: number;
+    effects?: string[];
+  }> {
+    if (!this.apiKey || this.apiKey === 'demo_openai_key') {
+      return this.getDemoTransitionSuggestion(currentTrack, nextTrack);
+    }
+
+    const messages: OpenAIMessage[] = [
+      {
+        role: 'system',
+        content: `You are a professional DJ mixing consultant. Analyze two tracks and provide specific mixing advice including BPM adjustments, crossfade timing, and effects suggestions.
+        
+        Consider:
+        - Key compatibility (harmonic mixing)
+        - BPM differences and sync strategies
+        - Energy flow and crowd psychology
+        - Optimal crossfade points
+        - Effects that would enhance the transition`,
+      },
+      {
+        role: 'user',
+        content: `Help me transition from "${currentTrack.artist} - ${currentTrack.title}" (${currentTrack.bpm || 'unknown'} BPM, ${currentTrack.key || 'unknown'} key) to "${nextTrack.artist} - ${nextTrack.title}" (${nextTrack.bpm || 'unknown'} BPM, ${nextTrack.key || 'unknown'} key). Provide JSON with: suggestion (string), bpmAdjustment (number), crossfadePoint (seconds), effects (array).`,
+      },
+    ];
+
+    try {
+      const response = await fetch(`${this.baseUrl}/chat/completions`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${this.apiKey}`,
+        },
+        body: JSON.stringify({
+          model: 'gpt-4',
+          messages,
+          response_format: { type: 'json_object' },
+          temperature: 0.6,
+          max_tokens: 500,
+        }),
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to get transition suggestions');
+      }
+
+      const data: OpenAIResponse = await response.json();
+      return JSON.parse(data.choices[0].message.content);
+    } catch (error) {
+      console.error('Transition suggestion failed:', error);
+      return {
+        suggestion: 'Standard crossfade recommended',
+        crossfadePoint: 30,
+      };
+    }
+  }
+
+  /**
+   * Analyze playlist flow and suggest improvements
+   */
+  async analyzePlaylistFlow(tracks: Track[]): Promise<{
+    score: number;
+    suggestions: string[];
+    reorderedTracks?: Track[];
+  }> {
+    if (
+      !this.apiKey ||
+      this.apiKey === 'demo_openai_key' ||
+      tracks.length < 3
+    ) {
+      return this.getDemoPlaylistAnalysis(tracks);
+    }
+
+    const trackList = tracks
+      .map(
+        (t, i) =>
+          `${i + 1}. ${t.artist} - ${t.title} (${t.bpm || '?'} BPM, ${t.key || '?'} key, Energy: ${t.energy || '?'})`
+      )
+      .join('\n');
+
+    const messages: OpenAIMessage[] = [
+      {
+        role: 'system',
+        content: `You are a DJ consultant analyzing playlist flow. Rate the playlist flow from 0-1 and provide specific suggestions for improvement. Consider BPM progression, key harmony, energy curves, and crowd psychology.`,
+      },
+      {
+        role: 'user',
+        content: `Analyze this playlist flow:\n${trackList}\n\nProvide JSON with: score (0-1), suggestions (array of strings).`,
+      },
+    ];
+
+    try {
+      const response = await fetch(`${this.baseUrl}/chat/completions`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${this.apiKey}`,
+        },
+        body: JSON.stringify({
+          model: 'gpt-4',
+          messages,
+          response_format: { type: 'json_object' },
+          temperature: 0.5,
+          max_tokens: 600,
+        }),
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to analyze playlist flow');
+      }
+
+      const data: OpenAIResponse = await response.json();
+      return JSON.parse(data.choices[0].message.content);
+    } catch (error) {
+      console.error('Playlist analysis failed:', error);
+      return {
+        score: 0.7,
+        suggestions: ['Consider BPM progression and key harmony'],
+      };
+    }
+  }
+
+  /**
+   * Get demo playlist when OpenAI is not available
+   */
+  private async getDemoPlaylist(
+    prompt: string,
+    onProgress: (progress: number) => void
+  ): Promise<Track[]> {
+    const cacheKey = `demo_playlist_${prompt}`;
+    const cachedPlaylist = cache.get<Track[]>(cacheKey);
+    if (cachedPlaylist) {
+      onProgress(100);
+      return cachedPlaylist;
+    }
+
+    onProgress(20);
+
+    // Simulate API delay
+    await new Promise((resolve) => setTimeout(resolve, 1000));
+    onProgress(50);
+
+    // Demo tracks based on prompt keywords
+    const demoTracks: Track[] = [
+      {
+        id: 'demo1',
+        title: 'Electronic Dreams',
+        artist: 'Demo Artist',
+        duration: 180,
+        image: 'https://via.placeholder.com/300x300/6366f1/ffffff?text=🎵',
+        source: 'demo' as const,
+        genre: 'Electronic',
+        bpm: 128,
+        key: 'A minor',
+        energy: 0.8,
+        preview_url: '/demo-track-1.mp3',
+      },
+      {
+        id: 'demo2',
+        title: 'Future Bass Flow',
+        artist: 'AI Generated',
+        duration: 200,
+        image: 'https://via.placeholder.com/300x300/8b5cf6/ffffff?text=🎶',
+        source: 'demo' as const,
+        genre: 'Future Bass',
+        bpm: 140,
+        key: 'C major',
+        energy: 0.9,
+        preview_url: '/demo-track-1.mp3',
+      },
+    ];
+
+    onProgress(100);
+    console.info('🎵 Using demo playlist for prompt:', prompt);
+    cache.set(cacheKey, demoTracks, 300000); // Cache for 5 minutes
+    return demoTracks;
+  }
+
+  /**
+   * Get demo crowd suggestions when OpenAI is not available
+   */
+  private async getDemoCrowdSuggestions(
+    crowdData: { energy: number; mood: string; engagement: string },
+    onProgress: (progress: number) => void
+  ): Promise<Track[]> {
+    onProgress(30);
+    await new Promise((resolve) => setTimeout(resolve, 800));
+
+    // Return demo tracks based on crowd energy
+    const tracks = await spotifyService.searchTracks(
+      'demo electronic house',
+      5
+    );
+    onProgress(100);
+
+    console.info('🎵 Demo crowd suggestions based on:', crowdData);
+    return tracks;
+  }
+
+  /**
+   * Get demo transition suggestion when OpenAI is not available
+   */
+  private getDemoTransitionSuggestion(
+    currentTrack: Track,
+    nextTrack: Track
+  ): {
+    suggestion: string;
+    bpmAdjustment?: number;
+    crossfadePoint?: number;
+    effects?: string[];
+  } {
+    const currentBpm = currentTrack.bpm || 128;
+    const nextBpm = nextTrack.bpm || 128;
+    const bpmDiff = Math.abs(currentBpm - nextBpm);
+
+    console.info(
+      '🎵 Demo transition suggestion between tracks:',
+      currentTrack.title,
+      '→',
+      nextTrack.title
+    );
+
+    return {
+      suggestion:
+        bpmDiff > 10
+          ? 'Use pitch adjustment to match BPMs, then apply a smooth crossfade'
+          : 'Perfect BPM match! Use a standard crossfade transition',
+      bpmAdjustment: bpmDiff > 10 ? (nextBpm - currentBpm) / currentBpm : 0,
+      crossfadePoint: 32,
+      effects: bpmDiff > 5 ? ['reverb', 'filter'] : ['filter'],
+    };
+  }
+
+  /**
+   * Get demo playlist analysis when OpenAI is not available
+   */
+  private getDemoPlaylistAnalysis(tracks: Track[]): {
+    score: number;
+    suggestions: string[];
+    reorderedTracks?: Track[];
+  } {
+    if (tracks.length < 3) {
+      return {
+        score: 0.6,
+        suggestions: [
+          'Add more tracks for better flow analysis',
+          'Consider BPM progression',
+>>>>>>> fix-spotify-connection
         ],
         "energy": 85,
         "mood": "energetic",

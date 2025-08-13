@@ -1,27 +1,29 @@
+<<<<<<< HEAD
 /**
  * API Status Indicator Component
  * Shows the connection status of all integrated services
  */
 
 import React, { useState, useEffect, useCallback } from 'react';
+=======
+import React, { useState, useEffect } from 'react';
+>>>>>>> fix-spotify-connection
 import { motion, AnimatePresence } from 'framer-motion';
-import { serviceStatus, testConnections } from '@/config/apiConfig';
+import {
+  runAllHealthChecks,
+  HealthCheckResult,
+  ServiceName,
+  ServiceStatus,
+} from '@/utils/apiHealth';
 
-interface ServiceStatus {
-  spotify: boolean;
-  supabase: boolean;
-  openai: boolean;
-}
+type ServiceState = Partial<Record<ServiceName, HealthCheckResult>>;
 
 const ApiStatusIndicator: React.FC = () => {
-  const [services, setServices] = useState<ServiceStatus>({
-    spotify: false,
-    supabase: false,
-    openai: false,
-  });
+  const [services, setServices] = useState<ServiceState>({});
   const [isExpanded, setIsExpanded] = useState(false);
   const [isTesting, setIsTesting] = useState(false);
 
+<<<<<<< HEAD
   const updateServiceStatus = () => {
     setServices({
       spotify: serviceStatus.getServiceStatus('spotify'),
@@ -36,6 +38,22 @@ const ApiStatusIndicator: React.FC = () => {
       // Test connections but don't throw errors for demo mode
       await testConnections.all();
       updateServiceStatus();
+=======
+  useEffect(() => {
+    // Initial status check on mount
+    testAllConnections();
+  }, []);
+
+  const testAllConnections = async () => {
+    setIsTesting(true);
+    try {
+      const results = await runAllHealthChecks();
+      const newState: ServiceState = {};
+      results.forEach((result) => {
+        newState[result.service] = result;
+      });
+      setServices(newState);
+>>>>>>> fix-spotify-connection
     } catch (error) {
       console.info(
         'Connection test completed with some services unavailable (demo mode)'
@@ -59,6 +77,7 @@ const ApiStatusIndicator: React.FC = () => {
     return () => clearInterval(interval);
   }, [testAllConnections]);
 
+<<<<<<< HEAD
   const getOverallStatus = () => {
     const connectedServices = Object.values(services).filter(Boolean).length;
     const totalServices = Object.keys(services).length;
@@ -66,29 +85,45 @@ const ApiStatusIndicator: React.FC = () => {
     if (connectedServices === totalServices) return 'all';
     if (connectedServices > 0) return 'partial';
     return 'demo'; // Change from 'none' to 'demo' for better UX
+=======
+  const getOverallStatus = (): ServiceStatus => {
+    const statuses = Object.values(services).map((s) => s?.status);
+    if (statuses.every((s) => s === 'connected')) return 'connected';
+    if (statuses.some((s) => s === 'connected')) return 'degraded';
+    if (statuses.every((s) => s === 'demo')) return 'demo';
+    return 'disconnected';
+>>>>>>> fix-spotify-connection
   };
 
-  const getStatusColor = (status: string) => {
+  const getStatusColor = (status: ServiceStatus) => {
     switch (status) {
-      case 'all':
+      case 'connected':
         return 'text-green-400';
-      case 'partial':
+      case 'degraded':
         return 'text-yellow-400';
       case 'demo':
+<<<<<<< HEAD
         return 'text-blue-400'; // Use blue for demo mode instead of red
+=======
+        return 'text-blue-400';
+>>>>>>> fix-spotify-connection
       default:
         return 'text-red-400';
     }
   };
 
-  const getStatusIcon = (status: string) => {
+  const getStatusIcon = (status: ServiceStatus) => {
     switch (status) {
-      case 'all':
+      case 'connected':
         return '🟢';
-      case 'partial':
+      case 'degraded':
         return '🟡';
       case 'demo':
+<<<<<<< HEAD
         return '🔵'; // Use blue circle for demo mode
+=======
+        return '🔵';
+>>>>>>> fix-spotify-connection
       default:
         return '🔴';
     }
@@ -104,10 +139,9 @@ const ApiStatusIndicator: React.FC = () => {
         animate={{ opacity: 1, x: 0 }}
         transition={{ duration: 0.3 }}
       >
-        {/* Status Toggle */}
         <button
           onClick={() => setIsExpanded(!isExpanded)}
-          className={`flex items-center space-x-2 p-3 rounded-lg transition-colors hover:bg-gray-700 ${getStatusColor(overallStatus)}`}
+          className={`flex items-center space-x-2 p-3 rounded-lg transition-colors hover:bg-gray-700 w-full text-left ${getStatusColor(overallStatus)}`}
         >
           <span className="text-sm font-medium">
             {getStatusIcon(overallStatus)} API Status
@@ -120,7 +154,6 @@ const ApiStatusIndicator: React.FC = () => {
           </motion.div>
         </button>
 
-        {/* Expanded Status Details */}
         <AnimatePresence>
           {isExpanded && (
             <motion.div
@@ -131,26 +164,23 @@ const ApiStatusIndicator: React.FC = () => {
               className="border-t border-gray-700 overflow-hidden"
             >
               <div className="p-4 space-y-3">
-                {/* Service Status List */}
                 <div className="space-y-2">
                   <ServiceStatusRow
+                    result={services.spotify}
                     name="Spotify"
-                    status={services.spotify}
                     description="Music data & tracks"
                   />
                   <ServiceStatusRow
+                    result={services.supabase}
                     name="Supabase"
-                    status={services.supabase}
                     description="Database & storage"
                   />
                   <ServiceStatusRow
+                    result={services.openai}
                     name="OpenAI"
-                    status={services.openai}
                     description="AI recommendations"
                   />
                 </div>
-
-                {/* Test Button */}
                 <button
                   onClick={testAllConnections}
                   disabled={isTesting}
@@ -168,12 +198,6 @@ const ApiStatusIndicator: React.FC = () => {
                     </>
                   )}
                 </button>
-
-                {/* Summary */}
-                <div className="text-xs text-gray-400 text-center pt-2 border-t border-gray-700">
-                  {Object.values(services).filter(Boolean).length} of{' '}
-                  {Object.keys(services).length} services connected
-                </div>
               </div>
             </motion.div>
           )}
@@ -184,30 +208,42 @@ const ApiStatusIndicator: React.FC = () => {
 };
 
 const ServiceStatusRow: React.FC<{
+  result: HealthCheckResult | undefined;
   name: string;
-  status: boolean;
   description: string;
-}> = ({ name, status, description }) => (
-  <div className="flex items-center justify-between">
-    <div className="flex-1">
-      <div className="flex items-center space-x-2">
-        <span
-          className={`text-sm font-medium ${status ? 'text-white' : 'text-gray-400'}`}
-        >
-          {name}
-        </span>
-        <span className="text-xs">{status ? '✅' : '❌'}</span>
+}> = ({ result, name, description }) => {
+  const status = result?.status || 'disconnected';
+  const _message = result?.message || 'Not tested';
+
+  const statusStyles: Record<ServiceStatus, string> = {
+    connected: 'bg-green-900 text-green-300',
+    disconnected: 'bg-red-900 text-red-300',
+    degraded: 'bg-yellow-900 text-yellow-300',
+    demo: 'bg-blue-900 text-blue-300',
+  };
+
+  return (
+    <div className="flex items-center justify-between">
+      <div className="flex-1">
+        <div className="flex items-center space-x-2">
+          <span
+            className={`text-sm font-medium ${status !== 'disconnected' ? 'text-white' : 'text-gray-400'}`}
+          >
+            {name}
+          </span>
+          <span className="text-xs">
+            {status === 'connected' ? '✅' : status === 'demo' ? '🔵' : '❌'}
+          </span>
+        </div>
+        <div className="text-xs text-gray-500">{description}</div>
       </div>
-      <div className="text-xs text-gray-500">{description}</div>
+      <div
+        className={`px-2 py-1 rounded text-xs font-medium capitalize ${statusStyles[status]}`}
+      >
+        {status}
+      </div>
     </div>
-    <div
-      className={`px-2 py-1 rounded text-xs font-medium ${
-        status ? 'bg-green-900 text-green-300' : 'bg-red-900 text-red-300'
-      }`}
-    >
-      {status ? 'Connected' : 'Offline'}
-    </div>
-  </div>
-);
+  );
+};
 
 export default ApiStatusIndicator;

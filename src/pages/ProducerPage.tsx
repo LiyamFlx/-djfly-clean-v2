@@ -1,4 +1,5 @@
 import React from 'react';
+<<<<<<< HEAD
 import { motion } from 'framer-motion';
 import { BarChart, TrendingUp, Users, Clock, Award } from 'lucide-react';
 import {
@@ -155,110 +156,45 @@ const ProducerPage: React.FC = () => {
               </div>
             </div>
           </motion.div>
+=======
+
+const ProducerAnalyticsPage = () => (
+  <div className="min-h-screen bg-gray-900 text-white p-8">
+    <div className="max-w-6xl mx-auto">
+      <h1 className="text-3xl font-bold mb-8">📊 Producer Analytics</h1>
+      <div className="grid md:grid-cols-3 gap-6 mb-8">
+        <div className="bg-gray-800 p-6 rounded-xl">
+          <h3 className="text-lg font-semibold mb-2">Total Plays</h3>
+          <p className="text-3xl font-bold text-blue-400">1,337</p>
+>>>>>>> fix-spotify-connection
         </div>
-
-        <div className="grid lg:grid-cols-2 gap-8">
-          {/* Performance Chart */}
-          <motion.div
-            initial={{ opacity: 0, x: -20 }}
-            animate={{ opacity: 1, x: 0 }}
-            transition={{ delay: 0.5 }}
-            className="glass-card p-6 rounded-xl"
-          >
-            <h3 className="text-xl font-semibold mb-6">Performance Timeline</h3>
-
-            {/* Mock Chart Placeholder */}
-            <div className="h-64 bg-rich-black/30 rounded-lg flex items-center justify-center">
-              <div className="text-center text-gray-400">
-                <BarChart className="w-16 h-16 mx-auto mb-4 opacity-50" />
-                <p>Performance chart would display here</p>
-                <p className="text-sm">
-                  Track energy, crowd response over time
-                </p>
-              </div>
-            </div>
-          </motion.div>
-
-          {/* Crowd Insights */}
-          <motion.div
-            initial={{ opacity: 0, x: 20 }}
-            animate={{ opacity: 1, x: 0 }}
-            transition={{ delay: 0.6 }}
-            className="glass-card p-6 rounded-xl"
-          >
-            <h3 className="text-xl font-semibold mb-6">Crowd Insights</h3>
-
-            <div className="space-y-4">
-              <div className="flex justify-between items-center">
-                <span className="text-gray-300">Current Energy</span>
-                <div className="flex items-center gap-2">
-                  <div className="w-24 bg-rich-black/50 rounded-full h-2">
-                    <div
-                      className="bg-electric-blue h-2 rounded-full transition-all duration-500"
-                      style={{ width: `${crowdState.currentEnergy * 100}%` }}
-                    />
-                  </div>
-                  <span className="text-sm font-semibold">
-                    {Math.round(crowdState.currentEnergy * 100)}%
-                  </span>
-                </div>
-              </div>
-
-              <div className="flex justify-between items-center">
-                <span className="text-gray-300">Engagement Level</span>
-                <span className="px-3 py-1 bg-bright-turquoise/20 rounded-full text-sm capitalize">
-                  {crowdState.engagementLevel}
-                </span>
-              </div>
-
-              <div className="flex justify-between items-center">
-                <span className="text-gray-300">Mood</span>
-                <span className="px-3 py-1 bg-laser-pink/20 rounded-full text-sm capitalize">
-                  {crowdState.mood} {crowdState.mood === 'excited' && '🎉'}
-                </span>
-              </div>
-
-              <div className="flex justify-between items-center">
-                <span className="text-gray-300">Energy Trend</span>
-                <span
-                  className={`px-3 py-1 rounded-full text-sm capitalize ${
-                    crowdState.energyTrend === 'rising'
-                      ? 'bg-green-500/20 text-green-400'
-                      : crowdState.energyTrend === 'falling'
-                        ? 'bg-red-500/20 text-red-400'
-                        : 'bg-yellow-500/20 text-yellow-400'
-                  }`}
-                >
-                  {crowdState.energyTrend}{' '}
-                  {crowdState.energyTrend === 'rising' && '📈'}
-                </span>
-              </div>
-
-              <div className="flex justify-between items-center">
-                <span className="text-gray-300">Crowd Satisfaction</span>
-                <div className="flex items-center gap-2">
-                  <div className="flex">
-                    {[1, 2, 3, 4, 5].map((star) => (
-                      <span
-                        key={star}
-                        className={`text-lg ${
-                          star <= Math.round(sessionState.crowdSatisfaction * 5)
-                            ? 'text-yellow-400'
-                            : 'text-gray-600'
-                        }`}
-                      >
-                        ★
-                      </span>
-                    ))}
-                  </div>
-                  <span className="text-sm">
-                    {(sessionState.crowdSatisfaction * 5).toFixed(1)}/5
-                  </span>
-                </div>
-              </div>
-            </div>
-          </motion.div>
+        <div className="bg-gray-800 p-6 rounded-xl">
+          <h3 className="text-lg font-semibold mb-2">Active Sets</h3>
+          <p className="text-3xl font-bold text-purple-400">42</p>
         </div>
+        <div className="bg-gray-800 p-6 rounded-xl">
+          <h3 className="text-lg font-semibold mb-2">Followers</h3>
+          <p className="text-3xl font-bold text-green-400">89</p>
+        </div>
+      </div>
+      <div className="bg-gray-800 p-6 rounded-xl">
+        <h3 className="text-xl font-semibold mb-4">Popular Tracks</h3>
+        <div className="space-y-3">
+          {['Electronic Dreams', 'Bass Drop Madness', 'Synth Wave Sunset'].map(
+            (track, i) => (
+              <div
+                key={i}
+                className="flex items-center justify-between p-3 bg-gray-700 rounded-lg"
+              >
+                <span>{track}</span>
+                <span className="text-blue-400">
+                  {Math.floor(Math.random() * 500)} plays
+                </span>
+              </div>
+            )
+          )}
+        </div>
+<<<<<<< HEAD
 
         {/* Recommendations */}
         <motion.div
@@ -379,9 +315,11 @@ const ProducerPage: React.FC = () => {
             </p>
           )}
         </motion.div>
+=======
+>>>>>>> fix-spotify-connection
       </div>
     </div>
-  );
-};
+  </div>
+);
 
-export default ProducerPage;
+export default ProducerAnalyticsPage;

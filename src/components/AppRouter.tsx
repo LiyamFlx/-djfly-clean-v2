@@ -12,6 +12,8 @@ import MagicSetPage from '@/pages/MagicSetPage';
 import MagicMatchPage from '@/pages/MagicMatchPage';
 import PlayerPage from '@/pages/PlayerPage';
 import ProducerPage from '@/pages/ProducerPage';
+import PlannerPage from '@/pages/PlannerPage'; // Added for QA checklist
+import DancerPage from '@/pages/DancerPage'; // Added for QA checklist
 import ProfilePage from '@/pages/ProfilePage';
 import LibraryPage from '@/pages/LibraryPage';
 import DocsPage from '@/pages/DocsPage';
@@ -40,14 +42,22 @@ const AppRouter: React.FC = () => {
           <Route index element={<HomePage />} />
 
           {/* Studio routes */}
+<<<<<<< HEAD
           <Route path={ROUTES.STUDIO} element={<StudioPage />}>
             <Route path="set" element={<MagicSetPage />} />
             <Route path="match" element={<MagicMatchPage />} />
           </Route>
+=======
+          <Route path={ROUTES.STUDIO} element={<StudioPage />} />
+          <Route path={ROUTES.STUDIO_MATCH} element={<MagicMatchPage />} />
+          <Route path={ROUTES.STUDIO_SET} element={<MagicSetPage />} />
+>>>>>>> fix-spotify-connection
 
           {/* Main app pages */}
           <Route path={ROUTES.PLAYER} element={<PlayerPage />} />
           <Route path={ROUTES.PRODUCER} element={<ProducerPage />} />
+          <Route path={ROUTES.PLANNER} element={<PlannerPage />} />
+          <Route path={ROUTES.DANCER} element={<DancerPage />} />
           <Route path={ROUTES.PROFILE} element={<ProfilePage />} />
           <Route path={ROUTES.LIBRARY} element={<LibraryPage />} />
           <Route path={ROUTES.DOCS} element={<DocsPage />} />
