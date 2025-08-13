@@ -169,17 +169,24 @@ const PlayerPage: React.FC = () => {
               transition={{ delay: 0.4 }}
               className="flex items-center justify-center gap-6 mb-8"
             >
-              <button className="p-3 text-gray-400 hover:text-white transition-colors">
+              <button
+                className="p-3 text-gray-400 hover:text-white transition-colors"
+                aria-label="Shuffle"
+              >
                 <Shuffle className="w-6 h-6" />
               </button>
 
-              <button className="p-3 text-gray-400 hover:text-white transition-colors">
+              <button
+                className="p-3 text-gray-400 hover:text-white transition-colors"
+                aria-label="Previous Track"
+              >
                 <SkipBack className="w-6 h-6" />
               </button>
 
               <button
                 onClick={togglePlayback}
                 className="p-6 bg-gradient-to-r from-electric-blue to-bright-turquoise rounded-full text-rich-black hover:scale-105 transition-transform"
+                aria-label={audioState.isPlaying ? 'Pause' : 'Play'}
               >
                 {audioState.isPlaying ? (
                   <Pause className="w-8 h-8" />
@@ -188,11 +195,17 @@ const PlayerPage: React.FC = () => {
                 )}
               </button>
 
-              <button className="p-3 text-gray-400 hover:text-white transition-colors">
+              <button
+                className="p-3 text-gray-400 hover:text-white transition-colors"
+                aria-label="Next Track"
+              >
                 <SkipForward className="w-6 h-6" />
               </button>
 
-              <button className="p-3 text-gray-400 hover:text-white transition-colors">
+              <button
+                className="p-3 text-gray-400 hover:text-white transition-colors"
+                aria-label="Repeat"
+              >
                 <Repeat className="w-6 h-6" />
               </button>
             </motion.div>

@@ -214,11 +214,12 @@ const ShareSet: React.FC<ShareSetProps> = ({
         {/* Quick Share URL */}
         {shareLink && (
           <div>
-            <label className="block text-sm font-medium text-gray-300 mb-2">
+            <label htmlFor="share-link-input" className="block text-sm font-medium text-gray-300 mb-2">
               Share Link
             </label>
             <div className="flex items-center gap-2">
               <input
+                id="share-link-input"
                 type="text"
                 value={shareLink.shortUrl}
                 readOnly
@@ -246,9 +247,9 @@ const ShareSet: React.FC<ShareSetProps> = ({
 
         {/* Social Media Buttons */}
         <div>
-          <label className="block text-sm font-medium text-gray-300 mb-2">
+          <div className="block text-sm font-medium text-gray-300 mb-2">
             Share on Social Media
-          </label>
+          </div>
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
             <button
               onClick={() => shareToTwitter(shareLink?.shortUrl || '')}
@@ -314,11 +315,12 @@ const ShareSet: React.FC<ShareSetProps> = ({
               exit={{ opacity: 0, height: 0 }}
               className="space-y-2"
             >
-              <label className="block text-sm font-medium text-gray-300">
+              <label htmlFor="embed-code-textarea" className="block text-sm font-medium text-gray-300">
                 Embed Code (Copy & Paste)
               </label>
               <div className="flex items-start gap-2">
                 <textarea
+                  id="embed-code-textarea"
                   value={shareLink.embedCode}
                   readOnly
                   rows={3}

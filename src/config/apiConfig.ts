@@ -206,7 +206,11 @@ export const validateApiConfig = () => {
   return validations;
 };
 
-import { testSpotifyConnection, testSupabaseConnection, testOpenAIConnection } from '@/utils/apiHealth';
+import {
+  testSpotifyConnection,
+  testSupabaseConnection,
+  testOpenAIConnection,
+} from '@/utils/apiHealth';
 
 // Connection Testing
 export const testConnections = {

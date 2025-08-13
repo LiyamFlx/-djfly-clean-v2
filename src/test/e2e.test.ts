@@ -32,9 +32,7 @@ import { spotifyService } from '../services/spotify';
 import { openAIService } from '../services/openai';
 import { supabaseService } from '../services/supabaseClient';
 
-
 describe('E2E Demo & Fallback Tests', () => {
-
   beforeEach(() => {
     // Suppress console logs for cleaner test output
     vi.spyOn(console, 'info').mockImplementation(() => {});
@@ -56,7 +54,10 @@ describe('E2E Demo & Fallback Tests', () => {
 
   it('OpenAI service should return a demo playlist in demo mode', async () => {
     const onProgress = vi.fn();
-    const playlist = await openAIService.generatePlaylist('any prompt', onProgress);
+    const playlist = await openAIService.generatePlaylist(
+      'any prompt',
+      onProgress
+    );
     expect(playlist).toBeInstanceOf(Array);
     expect(playlist.length).toBeGreaterThan(0);
     expect(playlist[0].artist).toBe('Demo Artist');
@@ -85,5 +86,4 @@ describe('E2E Demo & Fallback Tests', () => {
 
     localStorage.removeItem(storageKey);
   });
-
 });

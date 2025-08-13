@@ -1,6 +1,7 @@
 import { Track } from '@/types';
 import { spotifyService } from './spotify';
 import { API_CONFIG } from '@/config/apiConfig';
+import { cache } from '@/utils/cache';
 
 interface OpenAIMessage {
   role: 'system' | 'user' | 'assistant';

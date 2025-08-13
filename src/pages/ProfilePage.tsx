@@ -16,7 +16,9 @@ const ProfilePage = () => {
           <div className="flex items-center justify-between">
             <div>
               <p className="text-gray-300">Supabase Connection</p>
-              <p className="text-sm text-gray-400">Demo mode - database disabled</p>
+              <p className="text-sm text-gray-400">
+                Demo mode - database disabled
+              </p>
             </div>
             <div className="flex items-center gap-2">
               <div className="w-3 h-3 bg-yellow-500 rounded-full"></div>
@@ -28,15 +30,21 @@ const ProfilePage = () => {
           <h2 className="text-xl font-semibold mb-4">📊 Stats</h2>
           <div className="grid grid-cols-3 gap-4">
             <div className="text-center">
-              <div className="text-2xl font-bold text-blue-400">{userStats.playlists}</div>
+              <div className="text-2xl font-bold text-blue-400">
+                {userStats.playlists}
+              </div>
               <div className="text-sm text-gray-400">Playlists</div>
             </div>
             <div className="text-center">
-              <div className="text-2xl font-bold text-purple-400">{userStats.tracks}</div>
+              <div className="text-2xl font-bold text-purple-400">
+                {userStats.tracks}
+              </div>
               <div className="text-sm text-gray-400">Tracks</div>
             </div>
             <div className="text-center">
-              <div className="text-2xl font-bold text-green-400">{userStats.mixTime}</div>
+              <div className="text-2xl font-bold text-green-400">
+                {userStats.mixTime}
+              </div>
               <div className="text-sm text-gray-400">Mix Time</div>
             </div>
           </div>

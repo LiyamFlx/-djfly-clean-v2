@@ -34,8 +34,8 @@ describe('AIMusicEngine', () => {
     });
 
   it('should generate a fallback playlist when the OpenAI API call fails', async () => {
-    fetchSpy = vi.spyOn(global, 'fetch').mockImplementation(() => {
-        return Promise.reject(new Error('API is down'));
+    fetchSpy = vi.spyOn(globalThis, 'fetch').mockImplementation(() => {
+      return Promise.reject(new Error('API is down'));
     });
 
     const engine = new AIMusicEngine();
@@ -67,7 +67,7 @@ describe('AIMusicEngine', () => {
         })
     };
 
-    fetchSpy = vi.spyOn(global, 'fetch').mockResolvedValue(mockApiResponse as Response);
+    fetchSpy = vi.spyOn(globalThis, 'fetch').mockResolvedValue(mockApiResponse as Response);
 
     const engine = new AIMusicEngine();
     const request: AIPlaylistRequest = { prompt: 'Test prompt' };

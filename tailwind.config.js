@@ -4,11 +4,24 @@ export default {
   theme: {
     extend: {
       colors: {
-        // DJfly brand colors
+        // Brand Colors
         'electric-blue': '#00D4FF',
         'bright-turquoise': '#00FFCC',
         'laser-pink': '#FF0080',
         'rich-black': '#0D0D0D',
+
+        // UI & Grayscale Palette
+        'ui-bg-deep': '#0D0D0D',
+        'ui-bg': '#1A1A2E',
+        'ui-bg-hover': '#2A2A4E',
+        'ui-border': '#3A3A6E',
+        'ui-text': '#FFFFFF',
+        'ui-text-dim': '#A0A0C0',
+
+        // Semantic Colors
+        success: '#00FF80',
+        warning: '#FFD700',
+        error: '#FF4D4D',
       },
       fontFamily: {
         display: ['Inter', 'system-ui', 'sans-serif'],
