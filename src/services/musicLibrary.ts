@@ -23,7 +23,7 @@ const demoTracks: Track[] = [
     source: 'demo',
   },
   {
-    id: 'demo_002', 
+    id: 'demo_002',
     title: 'Neon Dreams',
     artist: 'SynthWave Masters',
     duration: 268,
@@ -78,10 +78,12 @@ class MusicLibraryService {
    */
   async searchTracks(query: string, limit: number = 10): Promise<Track[]> {
     console.log(`🔍 Searching for "${query}" (limit: ${limit})`);
-    
+
     try {
       // For now, use demo tracks as primary source while external services are being configured
-      console.log('🎵 Using demo tracks (external services temporarily disabled)');
+      console.log(
+        '🎵 Using demo tracks (external services temporarily disabled)'
+      );
       return this.getDemoTracks(query, limit);
     } catch (error) {
       console.error('❌ Search failed completely:', error);
@@ -94,11 +96,11 @@ class MusicLibraryService {
    */
   async generatePlaylist(prompt: string): Promise<Track[]> {
     console.log(`🎯 Generating playlist from prompt: "${prompt}"`);
-    
+
     // Extract keywords from prompt for search
     const keywords = this.extractKeywordsFromPrompt(prompt);
     const searchQuery = keywords.join(' ');
-    
+
     try {
       const tracks = await this.searchTracks(searchQuery, 12);
       return this.shuffleArray(tracks).slice(0, 8);
@@ -113,19 +115,20 @@ class MusicLibraryService {
    */
   private getDemoTracks(query: string = '', limit: number = 10): Track[] {
     let tracks = [...demoTracks];
-    
+
     // Filter by query if provided
     if (query) {
       const searchTerms = query.toLowerCase().split(' ');
-      tracks = tracks.filter(track => 
-        searchTerms.some(term => 
-          track.title.toLowerCase().includes(term) ||
-          track.artist.toLowerCase().includes(term) ||
-          track.genre?.toLowerCase().includes(term)
+      tracks = tracks.filter((track) =>
+        searchTerms.some(
+          (term) =>
+            track.title.toLowerCase().includes(term) ||
+            track.artist.toLowerCase().includes(term) ||
+            track.genre?.toLowerCase().includes(term)
         )
       );
     }
-    
+
     return tracks.slice(0, limit);
   }
 
@@ -134,21 +137,21 @@ class MusicLibraryService {
    */
   private extractKeywordsFromPrompt(prompt: string): string[] {
     const genreMap: Record<string, string[]> = {
-      'electronic': ['electronic', 'edm', 'techno', 'house'],
-      'house': ['house', 'deep house', 'tech house'],
-      'techno': ['techno', 'minimal', 'industrial'],
-      'trance': ['trance', 'progressive', 'uplifting'],
-      'dubstep': ['dubstep', 'bass', 'wobble'],
-      'drum': ['drum and bass', 'dnb', 'jungle'],
-      'ambient': ['ambient', 'chill', 'atmospheric'],
-      'synthwave': ['synthwave', 'retrowave', 'neon'],
+      electronic: ['electronic', 'edm', 'techno', 'house'],
+      house: ['house', 'deep house', 'tech house'],
+      techno: ['techno', 'minimal', 'industrial'],
+      trance: ['trance', 'progressive', 'uplifting'],
+      dubstep: ['dubstep', 'bass', 'wobble'],
+      drum: ['drum and bass', 'dnb', 'jungle'],
+      ambient: ['ambient', 'chill', 'atmospheric'],
+      synthwave: ['synthwave', 'retrowave', 'neon'],
     };
 
     const moodMap: Record<string, string[]> = {
-      'energetic': ['energetic', 'high energy', 'upbeat', 'party'],
-      'chill': ['chill', 'relaxed', 'calm', 'mellow'],
-      'dark': ['dark', 'aggressive', 'hard', 'intense'],
-      'uplifting': ['uplifting', 'positive', 'happy', 'euphoric'],
+      energetic: ['energetic', 'high energy', 'upbeat', 'party'],
+      chill: ['chill', 'relaxed', 'calm', 'mellow'],
+      dark: ['dark', 'aggressive', 'hard', 'intense'],
+      uplifting: ['uplifting', 'positive', 'happy', 'euphoric'],
     };
 
     const keywords: string[] = [];
@@ -156,14 +159,14 @@ class MusicLibraryService {
 
     // Extract genre keywords
     Object.entries(genreMap).forEach(([genre, terms]) => {
-      if (terms.some(term => lowerPrompt.includes(term))) {
+      if (terms.some((term) => lowerPrompt.includes(term))) {
         keywords.push(genre);
       }
     });
 
     // Extract mood keywords
     Object.entries(moodMap).forEach(([mood, terms]) => {
-      if (terms.some(term => lowerPrompt.includes(term))) {
+      if (terms.some((term) => lowerPrompt.includes(term))) {
         keywords.push(mood);
       }
     });

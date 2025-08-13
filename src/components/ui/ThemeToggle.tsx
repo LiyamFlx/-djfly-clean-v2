@@ -8,9 +8,9 @@ interface ThemeToggleProps {
   size?: 'sm' | 'md' | 'lg';
 }
 
-const ThemeToggle: React.FC<ThemeToggleProps> = ({ 
-  className = '', 
-  size = 'md' 
+const ThemeToggle: React.FC<ThemeToggleProps> = ({
+  className = '',
+  size = 'md',
 }) => {
   const { theme, toggleTheme } = useTheme();
 
@@ -71,9 +71,10 @@ const ThemeToggle: React.FC<ThemeToggleProps> = ({
       <motion.div
         className="absolute inset-0 rounded-xl"
         animate={{
-          boxShadow: theme === 'dark' 
-            ? '0 0 10px rgba(0, 212, 255, 0.2)' 
-            : '0 0 10px rgba(255, 193, 7, 0.2)'
+          boxShadow:
+            theme === 'dark'
+              ? '0 0 10px rgba(0, 212, 255, 0.2)'
+              : '0 0 10px rgba(255, 193, 7, 0.2)',
         }}
         transition={{ duration: 0.3 }}
       />

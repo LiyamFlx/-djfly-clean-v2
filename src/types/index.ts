@@ -6,7 +6,7 @@ export type {
   OpenAIApiConfig,
   LastFMApiConfig,
   ApiConfig,
-  ApiError
+  ApiError,
 } from './api';
 // Session types
 export * from './session';

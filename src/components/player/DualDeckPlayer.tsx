@@ -1,6 +1,14 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Play, Pause, Volume2, Settings, Zap, BarChart3, ChevronDown } from 'lucide-react';
+import {
+  Play,
+  Pause,
+  Volume2,
+  Settings,
+  Zap,
+  BarChart3,
+  ChevronDown,
+} from 'lucide-react';
 import { advancedAudioService } from '@/services/advancedAudio';
 import Slider from '@/components/ui/Slider';
 import { useTheme } from '@/contexts/ThemeContext';
@@ -334,14 +342,20 @@ const DualDeckPlayer: React.FC<DualDeckPlayerProps> = ({ className = '' }) => {
               <span className="text-sm">{Math.round(deckA.energy * 100)}%</span>
             </div>
           </div>
-          <WaveformDisplay waveform={deckA.waveform} color="bg-neon-purple" energy={deckA.energy} />
+          <WaveformDisplay
+            waveform={deckA.waveform}
+            color="bg-neon-purple"
+            energy={deckA.energy}
+          />
           <div className="space-y-4">
             <div className="flex items-center gap-4">
               <motion.button
                 onClick={() => togglePlay('A')}
                 className="btn-primary"
                 animate={{
-                  boxShadow: deckA.isPlaying ? '0 0 20px rgba(0, 212, 255, 0.7)' : 'none',
+                  boxShadow: deckA.isPlaying
+                    ? '0 0 20px rgba(0, 212, 255, 0.7)'
+                    : 'none',
                 }}
                 transition={{
                   duration: 0.8,
@@ -357,13 +371,39 @@ const DualDeckPlayer: React.FC<DualDeckPlayerProps> = ({ className = '' }) => {
               </span>
             </div>
             <div className="space-y-2">
-              <label htmlFor="deck-a-volume" className="text-xs font-semibold uppercase tracking-wider">Volume</label>
-              <Slider id="deck-a-volume" min="0" max="1" step="0.01" value={deckA.volume} onChange={(e) => setVolume('A', parseFloat(e.target.value))} />
+              <label
+                htmlFor="deck-a-volume"
+                className="text-xs font-semibold uppercase tracking-wider"
+              >
+                Volume
+              </label>
+              <Slider
+                id="deck-a-volume"
+                min="0"
+                max="1"
+                step="0.01"
+                value={deckA.volume}
+                onChange={(e) => setVolume('A', parseFloat(e.target.value))}
+              />
             </div>
             <div className="space-y-2">
-              <label htmlFor="deck-a-pitch" className="text-xs font-semibold uppercase tracking-wider">Pitch</label>
-              <Slider id="deck-a-pitch" min="0.5" max="2.0" step="0.01" value={deckA.pitch} onChange={(e) => setPitch('A', parseFloat(e.target.value))} />
-              <span className="text-xs text-gray-400">{deckA.pitch.toFixed(2)}x</span>
+              <label
+                htmlFor="deck-a-pitch"
+                className="text-xs font-semibold uppercase tracking-wider"
+              >
+                Pitch
+              </label>
+              <Slider
+                id="deck-a-pitch"
+                min="0.5"
+                max="2.0"
+                step="0.01"
+                value={deckA.pitch}
+                onChange={(e) => setPitch('A', parseFloat(e.target.value))}
+              />
+              <span className="text-xs text-gray-400">
+                {deckA.pitch.toFixed(2)}x
+              </span>
             </div>
           </div>
         </div>
@@ -377,27 +417,90 @@ const DualDeckPlayer: React.FC<DualDeckPlayerProps> = ({ className = '' }) => {
           </div>
 
           <div className="space-y-2">
-            <label htmlFor="master-volume" className="text-xs font-semibold uppercase tracking-wider text-center block">Master</label>
-            <Slider id="master-volume" min="0" max="1" step="0.01" value={mixingState.masterVolume} onChange={(e) => setMasterVolume(parseFloat(e.target.value))} />
+            <label
+              htmlFor="master-volume"
+              className="text-xs font-semibold uppercase tracking-wider text-center block"
+            >
+              Master
+            </label>
+            <Slider
+              id="master-volume"
+              min="0"
+              max="1"
+              step="0.01"
+              value={mixingState.masterVolume}
+              onChange={(e) => setMasterVolume(parseFloat(e.target.value))}
+            />
           </div>
 
           <div className="space-y-2">
-            <label htmlFor="crossfader" className="text-xs font-semibold uppercase tracking-wider text-center block">Crossfader</label>
-            <Slider id="crossfader" min="0" max="1" step="0.01" value={mixingState.crossfader} onChange={(e) => setCrossfader(parseFloat(e.target.value))} />
+            <label
+              htmlFor="crossfader"
+              className="text-xs font-semibold uppercase tracking-wider text-center block"
+            >
+              Crossfader
+            </label>
+            <Slider
+              id="crossfader"
+              min="0"
+              max="1"
+              step="0.01"
+              value={mixingState.crossfader}
+              onChange={(e) => setCrossfader(parseFloat(e.target.value))}
+            />
           </div>
 
           <div className="flex justify-around items-end h-full">
             <div className="flex flex-col items-center space-y-2">
-              <Slider id="eq-low" min="-12" max="12" step="1" value={mixingState.eq.low} onChange={(e) => setEQ('low', parseInt(e.target.value))} orientation="vertical" />
-              <label htmlFor="eq-low" className="text-xs font-semibold uppercase">Low</label>
+              <Slider
+                id="eq-low"
+                min="-12"
+                max="12"
+                step="1"
+                value={mixingState.eq.low}
+                onChange={(e) => setEQ('low', parseInt(e.target.value))}
+                orientation="vertical"
+              />
+              <label
+                htmlFor="eq-low"
+                className="text-xs font-semibold uppercase"
+              >
+                Low
+              </label>
             </div>
             <div className="flex flex-col items-center space-y-2">
-              <Slider id="eq-mid" min="-12" max="12" step="1" value={mixingState.eq.mid} onChange={(e) => setEQ('mid', parseInt(e.target.value))} orientation="vertical" />
-              <label htmlFor="eq-mid" className="text-xs font-semibold uppercase">Mid</label>
+              <Slider
+                id="eq-mid"
+                min="-12"
+                max="12"
+                step="1"
+                value={mixingState.eq.mid}
+                onChange={(e) => setEQ('mid', parseInt(e.target.value))}
+                orientation="vertical"
+              />
+              <label
+                htmlFor="eq-mid"
+                className="text-xs font-semibold uppercase"
+              >
+                Mid
+              </label>
             </div>
             <div className="flex flex-col items-center space-y-2">
-              <Slider id="eq-high" min="-12" max="12" step="1" value={mixingState.eq.high} onChange={(e) => setEQ('high', parseInt(e.target.value))} orientation="vertical" />
-              <label htmlFor="eq-high" className="text-xs font-semibold uppercase">High</label>
+              <Slider
+                id="eq-high"
+                min="-12"
+                max="12"
+                step="1"
+                value={mixingState.eq.high}
+                onChange={(e) => setEQ('high', parseInt(e.target.value))}
+                orientation="vertical"
+              />
+              <label
+                htmlFor="eq-high"
+                className="text-xs font-semibold uppercase"
+              >
+                High
+              </label>
             </div>
           </div>
         </div>
@@ -406,19 +509,27 @@ const DualDeckPlayer: React.FC<DualDeckPlayerProps> = ({ className = '' }) => {
         <div className="glass-card p-4">
           <div className="flex items-center justify-between mb-4">
             <h3 className="text-lg font-semibold text-neon-green">Deck B</h3>
-            <div className={`flex items-center gap-1 ${getEnergyColor(deckB.energy)}`}>
+            <div
+              className={`flex items-center gap-1 ${getEnergyColor(deckB.energy)}`}
+            >
               <Zap className="w-4 h-4" />
               <span className="text-sm">{Math.round(deckB.energy * 100)}%</span>
             </div>
           </div>
-          <WaveformDisplay waveform={deckB.waveform} color="bg-neon-green" energy={deckB.energy} />
+          <WaveformDisplay
+            waveform={deckB.waveform}
+            color="bg-neon-green"
+            energy={deckB.energy}
+          />
           <div className="space-y-4">
             <div className="flex items-center gap-4">
-               <motion.button
+              <motion.button
                 onClick={() => togglePlay('B')}
                 className="btn-accent"
                 animate={{
-                  boxShadow: deckB.isPlaying ? '0 0 20px rgba(0, 255, 204, 0.7)' : 'none',
+                  boxShadow: deckB.isPlaying
+                    ? '0 0 20px rgba(0, 255, 204, 0.7)'
+                    : 'none',
                 }}
                 transition={{
                   duration: 0.8,
@@ -434,13 +545,39 @@ const DualDeckPlayer: React.FC<DualDeckPlayerProps> = ({ className = '' }) => {
               </span>
             </div>
             <div className="space-y-2">
-              <label htmlFor="deck-b-volume" className="text-xs font-semibold uppercase tracking-wider">Volume</label>
-              <Slider id="deck-b-volume" min="0" max="1" step="0.01" value={deckB.volume} onChange={(e) => setVolume('B', parseFloat(e.target.value))} />
+              <label
+                htmlFor="deck-b-volume"
+                className="text-xs font-semibold uppercase tracking-wider"
+              >
+                Volume
+              </label>
+              <Slider
+                id="deck-b-volume"
+                min="0"
+                max="1"
+                step="0.01"
+                value={deckB.volume}
+                onChange={(e) => setVolume('B', parseFloat(e.target.value))}
+              />
             </div>
             <div className="space-y-2">
-              <label htmlFor="deck-b-pitch" className="text-xs font-semibold uppercase tracking-wider">Pitch</label>
-              <Slider id="deck-b-pitch" min="0.5" max="2.0" step="0.01" value={deckB.pitch} onChange={(e) => setPitch('B', parseFloat(e.target.value))} />
-              <span className="text-xs text-gray-400">{deckB.pitch.toFixed(2)}x</span>
+              <label
+                htmlFor="deck-b-pitch"
+                className="text-xs font-semibold uppercase tracking-wider"
+              >
+                Pitch
+              </label>
+              <Slider
+                id="deck-b-pitch"
+                min="0.5"
+                max="2.0"
+                step="0.01"
+                value={deckB.pitch}
+                onChange={(e) => setPitch('B', parseFloat(e.target.value))}
+              />
+              <span className="text-xs text-gray-400">
+                {deckB.pitch.toFixed(2)}x
+              </span>
             </div>
           </div>
         </div>
@@ -451,16 +588,52 @@ const DualDeckPlayer: React.FC<DualDeckPlayerProps> = ({ className = '' }) => {
         <h3 className="text-lg font-semibold mb-4">Effects</h3>
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
           <div className="space-y-2">
-            <label htmlFor="effect-reverb" className="text-xs font-semibold uppercase">Reverb</label>
-            <Slider id="effect-reverb" min="0" max="1" step="0.01" value={mixingState.effects.reverb} onChange={(e) => setEffect('reverb', parseFloat(e.target.value))} />
+            <label
+              htmlFor="effect-reverb"
+              className="text-xs font-semibold uppercase"
+            >
+              Reverb
+            </label>
+            <Slider
+              id="effect-reverb"
+              min="0"
+              max="1"
+              step="0.01"
+              value={mixingState.effects.reverb}
+              onChange={(e) => setEffect('reverb', parseFloat(e.target.value))}
+            />
           </div>
           <div className="space-y-2">
-            <label htmlFor="effect-delay" className="text-xs font-semibold uppercase">Delay</label>
-            <Slider id="effect-delay" min="0" max="1" step="0.01" value={mixingState.effects.delay} onChange={(e) => setEffect('delay', parseFloat(e.target.value))} />
+            <label
+              htmlFor="effect-delay"
+              className="text-xs font-semibold uppercase"
+            >
+              Delay
+            </label>
+            <Slider
+              id="effect-delay"
+              min="0"
+              max="1"
+              step="0.01"
+              value={mixingState.effects.delay}
+              onChange={(e) => setEffect('delay', parseFloat(e.target.value))}
+            />
           </div>
           <div className="space-y-2">
-            <label htmlFor="effect-filter" className="text-xs font-semibold uppercase">Filter</label>
-            <Slider id="effect-filter" min="0" max="1" step="0.01" value={mixingState.effects.filter} onChange={(e) => setEffect('filter', parseFloat(e.target.value))} />
+            <label
+              htmlFor="effect-filter"
+              className="text-xs font-semibold uppercase"
+            >
+              Filter
+            </label>
+            <Slider
+              id="effect-filter"
+              min="0"
+              max="1"
+              step="0.01"
+              value={mixingState.effects.filter}
+              onChange={(e) => setEffect('filter', parseFloat(e.target.value))}
+            />
           </div>
         </div>
       </div>

@@ -175,7 +175,11 @@ export const validateApiConfig = () => {
   return validations;
 };
 
-import { testSpotifyConnection, testSupabaseConnection, testOpenAIConnection } from '@/utils/apiHealth';
+import {
+  testSpotifyConnection,
+  testSupabaseConnection,
+  testOpenAIConnection,
+} from '@/utils/apiHealth';
 
 // Connection Testing
 export const testConnections = {
@@ -202,8 +206,15 @@ export const testConnections = {
 
   async youtube(): Promise<boolean> {
     // Skip API testing in production - assume unavailable unless properly configured
-    if (!API_CONFIG.youtube.apiKey || API_CONFIG.youtube.apiKey.includes('AIzaSyBBD44Gy31o8al3_MoJFksfhVJGI9a7SA')) {
-      console.info('🎥 YouTube API not configured or using invalid demo key - using fallback mode');
+    if (
+      !API_CONFIG.youtube.apiKey ||
+      API_CONFIG.youtube.apiKey.includes(
+        'AIzaSyBBD44Gy31o8al3_MoJFksfhVJGI9a7SA'
+      )
+    ) {
+      console.info(
+        '🎥 YouTube API not configured or using invalid demo key - using fallback mode'
+      );
       serviceStatus.setServiceStatus('youtube', false);
       return false;
     }
@@ -218,7 +229,10 @@ export const testConnections = {
       serviceStatus.setServiceStatus('youtube', success);
       return success;
     } catch (error) {
-      console.info('YouTube connection test failed - using fallback mode:', error);
+      console.info(
+        'YouTube connection test failed - using fallback mode:',
+        error
+      );
       serviceStatus.setServiceStatus('youtube', false);
       return false;
     }
@@ -226,8 +240,13 @@ export const testConnections = {
 
   async lastfm(): Promise<boolean> {
     // Skip API testing with known invalid keys
-    if (!API_CONFIG.lastfm.apiKey || API_CONFIG.lastfm.apiKey.includes('8d3f0ac6611b0146296c5375c9634ef6')) {
-      console.info('🎵 Last.fm API not configured or using invalid demo key - using fallback mode');
+    if (
+      !API_CONFIG.lastfm.apiKey ||
+      API_CONFIG.lastfm.apiKey.includes('8d3f0ac6611b0146296c5375c9634ef6')
+    ) {
+      console.info(
+        '🎵 Last.fm API not configured or using invalid demo key - using fallback mode'
+      );
       serviceStatus.setServiceStatus('lastfm', false);
       return false;
     }
@@ -242,7 +261,10 @@ export const testConnections = {
       serviceStatus.setServiceStatus('lastfm', success);
       return success;
     } catch (error) {
-      console.info('Last.fm connection test failed - using fallback mode:', error);
+      console.info(
+        'Last.fm connection test failed - using fallback mode:',
+        error
+      );
       serviceStatus.setServiceStatus('lastfm', false);
       return false;
     }

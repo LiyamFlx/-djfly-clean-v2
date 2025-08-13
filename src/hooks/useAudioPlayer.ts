@@ -105,7 +105,6 @@ export function useAudioPlayer(
         setIsLoading(true);
         setError(null);
         currentTrackRef.current = track;
-
       }
     }
   }, [src, createTrackFromUrl, options]);
@@ -115,7 +114,7 @@ export function useAudioPlayer(
     if (isPlaying && magicPlayerRef.current) {
       progressIntervalRef.current = window.setInterval(() => {
         // Update progress tracking - simplified for now
-        setCurrentTime(prev => prev + 0.1);
+        setCurrentTime((prev) => prev + 0.1);
       }, 100);
     }
 

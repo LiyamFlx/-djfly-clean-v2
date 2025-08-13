@@ -39,7 +39,7 @@ export interface SpotifyApiConfig {
   scopes: string[];
 }
 
-// OpenAI API types  
+// OpenAI API types
 export interface OpenAIApiConfig {
   apiKey: string;
   baseUrl: string;

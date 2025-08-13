@@ -14,7 +14,10 @@ interface ErrorBoundaryProps {
   onError?: (error: Error, errorInfo: ErrorInfo) => void;
 }
 
-export class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundaryState> {
+export class ErrorBoundary extends Component<
+  ErrorBoundaryProps,
+  ErrorBoundaryState
+> {
   constructor(props: ErrorBoundaryProps) {
     super(props);
     this.state = {
@@ -35,7 +38,7 @@ export class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundarySt
 
   componentDidCatch(error: Error, errorInfo: ErrorInfo) {
     console.error('🚨 ErrorBoundary caught an error:', error, errorInfo);
-    
+
     if (this.props.onError) {
       this.props.onError(error, errorInfo);
     }
@@ -52,7 +55,7 @@ export class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundarySt
   render() {
     if (this.state.hasError) {
       const { error, errorId } = this.state;
-      
+
       if (this.props.fallback) {
         const FallbackComponent = this.props.fallback;
         return <FallbackComponent error={error!} retry={this.handleRetry} />;
@@ -78,7 +81,7 @@ export class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundarySt
               <p className="body-large text-gray-300 mb-4">
                 We encountered an unexpected error. Don't worry, we're on it!
               </p>
-              
+
               {process.env.NODE_ENV === 'development' && error && (
                 <details className="mt-6 p-4 bg-red-900/20 border border-red-500/30 rounded-xl text-left">
                   <summary className="cursor-pointer text-red-400 font-semibold mb-2">
@@ -107,7 +110,7 @@ export class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundarySt
               </button>
 
               <button
-                onClick={() => window.location.href = '/'}
+                onClick={() => (window.location.href = '/')}
                 className="btn-secondary px-8 py-4 text-lg font-semibold hover-lift"
               >
                 <Home className="inline w-5 h-5 mr-2" />
@@ -115,9 +118,7 @@ export class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundarySt
               </button>
             </div>
 
-            <p className="text-sm text-gray-400 mt-8">
-              Error ID: {errorId}
-            </p>
+            <p className="text-sm text-gray-400 mt-8">Error ID: {errorId}</p>
           </motion.div>
         </div>
       );
@@ -136,31 +137,33 @@ export const ErrorFallback: React.FC<ErrorFallbackProps> = ({
   error,
   resetError,
 }) => (
-  <ErrorBoundary fallback={({ error, retry }) => (
-    <div className="min-h-64 bg-rich-black rounded-xl flex items-center justify-center p-8">
-      <div className="text-center">
-        <AlertTriangle className="w-16 h-16 text-neon-purple mx-auto mb-4" />
-        <h3 className="text-lg font-semibold text-pure-white mb-2">Error Occurred</h3>
-        <p className="text-gray-400 mb-4">
-          {error instanceof Error ? error.message : 'An unknown error occurred'}
-        </p>
-        <button onClick={retry} className="btn-primary px-4 py-2">
-          <RefreshCw className="inline w-4 h-4 mr-2" />
-          Try Again
-        </button>
+  <ErrorBoundary
+    fallback={({ error, retry }) => (
+      <div className="min-h-64 bg-rich-black rounded-xl flex items-center justify-center p-8">
+        <div className="text-center">
+          <AlertTriangle className="w-16 h-16 text-neon-purple mx-auto mb-4" />
+          <h3 className="text-lg font-semibold text-pure-white mb-2">
+            Error Occurred
+          </h3>
+          <p className="text-gray-400 mb-4">
+            {error instanceof Error
+              ? error.message
+              : 'An unknown error occurred'}
+          </p>
+          <button onClick={retry} className="btn-primary px-4 py-2">
+            <RefreshCw className="inline w-4 h-4 mr-2" />
+            Try Again
+          </button>
+        </div>
       </div>
-    </div>
-  )}>
+    )}
+  >
     <></>
   </ErrorBoundary>
 );
 
 export const AppErrorBoundary: React.FC<{ children: React.ReactNode }> = ({
   children,
-}) => (
-  <ErrorBoundary>
-    {children}
-  </ErrorBoundary>
-);
+}) => <ErrorBoundary>{children}</ErrorBoundary>;
 
 export default ErrorBoundary;

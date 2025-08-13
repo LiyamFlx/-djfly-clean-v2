@@ -1,7 +1,18 @@
 import React, { useState } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Home, Sparkles, Play, BarChart, User, X, Music, Mic, Zap, Star } from 'lucide-react';
+import {
+  Home,
+  Sparkles,
+  Play,
+  BarChart,
+  User,
+  X,
+  Music,
+  Mic,
+  Zap,
+  Star,
+} from 'lucide-react';
 import { ROUTES } from '@/constants/routes';
 
 interface MobileNavProps {
@@ -14,12 +25,12 @@ const MobileNav: React.FC<MobileNavProps> = () => {
   const navigate = useNavigate();
 
   const navItems = [
-    { 
-      path: ROUTES.HOME, 
-      icon: Home, 
-      label: 'Home', 
+    {
+      path: ROUTES.HOME,
+      icon: Home,
+      label: 'Home',
       color: 'text-blue-400',
-      description: 'Welcome & Overview'
+      description: 'Welcome & Overview',
     },
     {
       path: ROUTES.STUDIO,
@@ -27,28 +38,28 @@ const MobileNav: React.FC<MobileNavProps> = () => {
       label: 'Studio',
       color: 'text-purple-400',
       description: 'Create AI Playlists',
-      badge: 'Start Here'
+      badge: 'Start Here',
     },
     {
       path: ROUTES.PLAYER,
       icon: Play,
       label: 'Player',
       color: 'text-green-400',
-      description: 'Play & Mix Tracks'
+      description: 'Play & Mix Tracks',
     },
     {
       path: ROUTES.PRODUCER,
       icon: BarChart,
       label: 'Analytics',
       color: 'text-orange-400',
-      description: 'Track Performance'
+      description: 'Track Performance',
     },
     {
       path: ROUTES.PROFILE,
       icon: User,
       label: 'Profile',
       color: 'text-pink-400',
-      description: 'Settings & Stats'
+      description: 'Settings & Stats',
     },
   ];
 
@@ -61,17 +72,17 @@ const MobileNav: React.FC<MobileNavProps> = () => {
         setIsOpen(false);
         navigate('/studio/match');
       },
-      gradient: 'from-electric-blue to-bright-turquoise'
+      gradient: 'from-electric-blue to-bright-turquoise',
     },
     {
-      label: 'Magic Set', 
+      label: 'Magic Set',
       description: 'Describe vibe & create mix',
       icon: Sparkles,
       action: () => {
         setIsOpen(false);
         navigate('/studio/set');
       },
-      gradient: 'from-bright-turquoise to-laser-pink'
+      gradient: 'from-bright-turquoise to-laser-pink',
     },
     {
       label: 'Quick Play',
@@ -81,8 +92,8 @@ const MobileNav: React.FC<MobileNavProps> = () => {
         setIsOpen(false);
         navigate('/player');
       },
-      gradient: 'from-laser-pink to-purple-600'
-    }
+      gradient: 'from-laser-pink to-purple-600',
+    },
   ];
 
   const currentItem = navItems.find(
@@ -192,7 +203,9 @@ const MobileNav: React.FC<MobileNavProps> = () => {
                       className={`group w-full p-4 rounded-2xl bg-gradient-to-r ${action.gradient} bg-opacity-20 border border-white/20 hover:bg-opacity-30 transition-all duration-300 text-left`}
                     >
                       <div className="flex items-center gap-4">
-                        <div className={`w-12 h-12 rounded-xl bg-gradient-to-r ${action.gradient} flex items-center justify-center`}>
+                        <div
+                          className={`w-12 h-12 rounded-xl bg-gradient-to-r ${action.gradient} flex items-center justify-center`}
+                        >
                           <action.icon className="w-6 h-6 text-white" />
                         </div>
                         <div className="flex-1">
@@ -282,10 +295,17 @@ const MobileNav: React.FC<MobileNavProps> = () => {
                 className="mt-6 pt-4 border-t border-white/10 text-center"
               >
                 <p className="text-xs text-gray-400 mb-2">
-                  New to DJfly? Start with <span className="text-bright-turquoise font-semibold">Magic Match</span> or <span className="text-laser-pink font-semibold">Magic Set</span>
+                  New to DJfly? Start with{' '}
+                  <span className="text-bright-turquoise font-semibold">
+                    Magic Match
+                  </span>{' '}
+                  or{' '}
+                  <span className="text-laser-pink font-semibold">
+                    Magic Set
+                  </span>
                 </p>
-                <Link 
-                  to="/support/help" 
+                <Link
+                  to="/support/help"
                   onClick={() => setIsOpen(false)}
                   className="text-xs text-gray-500 hover:text-gray-300 transition-colors"
                 >

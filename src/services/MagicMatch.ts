@@ -57,7 +57,7 @@ export class MagicMatch {
     energyWeight: 0.25,
     bpmWeight: 0.25,
     genreWeight: 0.15,
-    popularityWeight: 0.10,
+    popularityWeight: 0.1,
     keyCompatibility: true,
     maxBpmDifference: 15,
     maxEnergyDifference: 0.3,
@@ -72,30 +72,30 @@ export class MagicMatch {
    */
   private initializeKeyCompatibility(): void {
     const compatibleKeys = {
-      'C': ['C', 'F', 'G', 'Am', 'Dm', 'Em'],
+      C: ['C', 'F', 'G', 'Am', 'Dm', 'Em'],
       'C#': ['C#', 'F#', 'G#', 'A#m', 'D#m', 'Fm'],
-      'D': ['D', 'G', 'A', 'Bm', 'Em', 'F#m'],
+      D: ['D', 'G', 'A', 'Bm', 'Em', 'F#m'],
       'D#': ['D#', 'G#', 'A#', 'Cm', 'Fm', 'Gm'],
-      'E': ['E', 'A', 'B', 'C#m', 'F#m', 'G#m'],
-      'F': ['F', 'Bb', 'C', 'Dm', 'Gm', 'Am'],
+      E: ['E', 'A', 'B', 'C#m', 'F#m', 'G#m'],
+      F: ['F', 'Bb', 'C', 'Dm', 'Gm', 'Am'],
       'F#': ['F#', 'B', 'C#', 'D#m', 'G#m', 'A#m'],
-      'G': ['G', 'C', 'D', 'Em', 'Am', 'Bm'],
+      G: ['G', 'C', 'D', 'Em', 'Am', 'Bm'],
       'G#': ['G#', 'C#', 'D#', 'Fm', 'A#m', 'Cm'],
-      'A': ['A', 'D', 'E', 'F#m', 'Bm', 'C#m'],
+      A: ['A', 'D', 'E', 'F#m', 'Bm', 'C#m'],
       'A#': ['A#', 'D#', 'F', 'Gm', 'Cm', 'Dm'],
-      'B': ['B', 'E', 'F#', 'G#m', 'C#m', 'D#m'],
+      B: ['B', 'E', 'F#', 'G#m', 'C#m', 'D#m'],
       // Minor keys
-      'Am': ['Am', 'C', 'F', 'G', 'Dm', 'Em'],
+      Am: ['Am', 'C', 'F', 'G', 'Dm', 'Em'],
       'A#m': ['A#m', 'C#', 'F#', 'G#', 'D#m', 'Fm'],
-      'Bm': ['Bm', 'D', 'G', 'A', 'Em', 'F#m'],
-      'Cm': ['Cm', 'D#', 'G#', 'A#', 'Fm', 'Gm'],
+      Bm: ['Bm', 'D', 'G', 'A', 'Em', 'F#m'],
+      Cm: ['Cm', 'D#', 'G#', 'A#', 'Fm', 'Gm'],
       'C#m': ['C#m', 'E', 'A', 'B', 'F#m', 'G#m'],
-      'Dm': ['Dm', 'F', 'Bb', 'C', 'Gm', 'Am'],
+      Dm: ['Dm', 'F', 'Bb', 'C', 'Gm', 'Am'],
       'D#m': ['D#m', 'F#', 'B', 'C#', 'G#m', 'A#m'],
-      'Em': ['Em', 'G', 'C', 'D', 'Am', 'Bm'],
-      'Fm': ['Fm', 'G#', 'C#', 'D#', 'A#m', 'Cm'],
+      Em: ['Em', 'G', 'C', 'D', 'Am', 'Bm'],
+      Fm: ['Fm', 'G#', 'C#', 'D#', 'A#m', 'Cm'],
       'F#m': ['F#m', 'A', 'D', 'E', 'Bm', 'C#m'],
-      'Gm': ['Gm', 'A#', 'D#', 'F', 'Cm', 'Dm'],
+      Gm: ['Gm', 'A#', 'D#', 'F', 'Cm', 'Dm'],
       'G#m': ['G#m', 'B', 'E', 'F#', 'C#m', 'D#m'],
     };
 
@@ -130,10 +130,12 @@ export class MagicMatch {
           query || 'electronic music',
           limit - tracks.length
         );
-        
+
         // Merge with existing tracks, avoiding duplicates
-        const existingIds = new Set(tracks.map(t => t.id));
-        const uniqueLastfmTracks = lastfmTracks.filter(t => !existingIds.has(t.id));
+        const existingIds = new Set(tracks.map((t) => t.id));
+        const uniqueLastfmTracks = lastfmTracks.filter(
+          (t) => !existingIds.has(t.id)
+        );
         tracks.push(...uniqueLastfmTracks);
       } catch (error) {
         console.warn('Failed to load tracks from Last.fm:', error);
@@ -156,7 +158,7 @@ export class MagicMatch {
     const matches: TrackMatch[] = [];
 
     // Filter out the current track and excluded artists
-    const candidateTracks = this.availableTracks.filter(track => {
+    const candidateTracks = this.availableTracks.filter((track) => {
       if (track.id === request.currentTrack.id) return false;
       if (request.excludeArtists?.includes(track.artist)) return false;
       return true;
@@ -164,8 +166,13 @@ export class MagicMatch {
 
     // Calculate matches for each candidate
     for (const candidate of candidateTracks) {
-      const match = this.calculateMatch(request.currentTrack, candidate, criteria);
-      if (match.score > 0.3) { // Only include decent matches
+      const match = this.calculateMatch(
+        request.currentTrack,
+        candidate,
+        criteria
+      );
+      if (match.score > 0.3) {
+        // Only include decent matches
         matches.push(match);
       }
     }
@@ -185,23 +192,38 @@ export class MagicMatch {
   ): TrackMatch {
     const compatibility = {
       harmonic: this.calculateHarmonicCompatibility(currentTrack, candidate),
-      energy: this.calculateEnergyCompatibility(currentTrack, candidate, criteria),
+      energy: this.calculateEnergyCompatibility(
+        currentTrack,
+        candidate,
+        criteria
+      ),
       bpm: this.calculateBpmCompatibility(currentTrack, candidate, criteria),
       genre: this.calculateGenreCompatibility(currentTrack, candidate),
       popularity: this.calculatePopularityScore(candidate),
     };
 
     // Calculate weighted score
-    const score = 
-      (compatibility.harmonic * criteria.harmonicWeight) +
-      (compatibility.energy * criteria.energyWeight) +
-      (compatibility.bpm * criteria.bpmWeight) +
-      (compatibility.genre * criteria.genreWeight) +
-      (compatibility.popularity * criteria.popularityWeight);
+    const score =
+      compatibility.harmonic * criteria.harmonicWeight +
+      compatibility.energy * criteria.energyWeight +
+      compatibility.bpm * criteria.bpmWeight +
+      compatibility.genre * criteria.genreWeight +
+      compatibility.popularity * criteria.popularityWeight;
 
-    const reasons = this.generateMatchReasons(compatibility, currentTrack, candidate);
-    const confidence = this.calculateConfidence(currentTrack, candidate, compatibility);
-    const transitionSuggestion = this.generateTransitionSuggestion(currentTrack, candidate);
+    const reasons = this.generateMatchReasons(
+      compatibility,
+      currentTrack,
+      candidate
+    );
+    const confidence = this.calculateConfidence(
+      currentTrack,
+      candidate,
+      compatibility
+    );
+    const transitionSuggestion = this.generateTransitionSuggestion(
+      currentTrack,
+      candidate
+    );
 
     return {
       track: candidate,
@@ -220,7 +242,7 @@ export class MagicMatch {
     if (!track1.key || !track2.key) return 0.5; // Neutral if keys unknown
 
     const compatibleKeys = this.keyCompatibilityMap.get(track1.key) || [];
-    
+
     if (compatibleKeys.includes(track2.key)) {
       // Perfect key match or relative major/minor
       if (track1.key === track2.key) return 1.0;
@@ -230,7 +252,7 @@ export class MagicMatch {
 
     // Check if they're in related keys (circle of fifths)
     const keyDistance = this.calculateKeyDistance(track1.key, track2.key);
-    return Math.max(0, 1 - (keyDistance / 6)); // Scale based on key distance
+    return Math.max(0, 1 - keyDistance / 6); // Scale based on key distance
   }
 
   /**
@@ -250,7 +272,7 @@ export class MagicMatch {
     }
 
     // Prefer gradual energy changes
-    return Math.max(0, 1 - (energyDiff / criteria.maxEnergyDifference));
+    return Math.max(0, 1 - energyDiff / criteria.maxEnergyDifference);
   }
 
   /**
@@ -271,9 +293,9 @@ export class MagicMatch {
 
     // Perfect score for very close BPMs
     if (bpmDiff <= 2) return 1.0;
-    
+
     // Scale score based on BPM difference
-    return Math.max(0, 1 - (bpmDiff / criteria.maxBpmDifference));
+    return Math.max(0, 1 - bpmDiff / criteria.maxBpmDifference);
   }
 
   /**
@@ -289,16 +311,21 @@ export class MagicMatch {
 
     // Check for related genres
     const relatedGenres = this.getRelatedGenres(genre1);
-    if (relatedGenres.some(g => genre2.includes(g))) {
+    if (relatedGenres.some((g) => genre2.includes(g))) {
       return 0.7;
     }
 
     // Check if they share common elements
     const genre1Words = genre1.split(/[\s-]/);
     const genre2Words = genre2.split(/[\s-]/);
-    const commonWords = genre1Words.filter(word => genre2Words.includes(word));
-    
-    return Math.max(0.3, commonWords.length / Math.max(genre1Words.length, genre2Words.length));
+    const commonWords = genre1Words.filter((word) =>
+      genre2Words.includes(word)
+    );
+
+    return Math.max(
+      0.3,
+      commonWords.length / Math.max(genre1Words.length, genre2Words.length)
+    );
   }
 
   /**
@@ -314,18 +341,29 @@ export class MagicMatch {
    */
   private calculateKeyDistance(key1: string, key2: string): number {
     const circleOfFifths = [
-      'C', 'G', 'D', 'A', 'E', 'B', 'F#', 'C#', 'G#', 'D#', 'A#', 'F'
+      'C',
+      'G',
+      'D',
+      'A',
+      'E',
+      'B',
+      'F#',
+      'C#',
+      'G#',
+      'D#',
+      'A#',
+      'F',
     ];
-    
+
     // Normalize keys (remove 'm' for minor)
     const normalizedKey1 = key1.replace('m', '');
     const normalizedKey2 = key2.replace('m', '');
-    
+
     const index1 = circleOfFifths.indexOf(normalizedKey1);
     const index2 = circleOfFifths.indexOf(normalizedKey2);
-    
+
     if (index1 === -1 || index2 === -1) return 6; // Max distance if key not found
-    
+
     const distance = Math.abs(index1 - index2);
     return Math.min(distance, 12 - distance); // Shortest distance around circle
   }
@@ -335,11 +373,11 @@ export class MagicMatch {
    */
   private getRelatedGenres(genre: string): string[] {
     const genreRelations: { [key: string]: string[] } = {
-      'house': ['deep house', 'tech house', 'progressive house', 'tribal house'],
-      'techno': ['minimal techno', 'detroit techno', 'progressive techno'],
-      'electronic': ['electro', 'electronica', 'edm', 'dance'],
-      'trance': ['progressive trance', 'uplifting trance', 'psy trance'],
-      'ambient': ['chillout', 'downtempo', 'new age'],
+      house: ['deep house', 'tech house', 'progressive house', 'tribal house'],
+      techno: ['minimal techno', 'detroit techno', 'progressive techno'],
+      electronic: ['electro', 'electronica', 'edm', 'dance'],
+      trance: ['progressive trance', 'uplifting trance', 'psy trance'],
+      ambient: ['chillout', 'downtempo', 'new age'],
       'drum and bass': ['dnb', 'liquid dnb', 'neurofunk'],
     };
 
@@ -357,13 +395,17 @@ export class MagicMatch {
     const reasons: string[] = [];
 
     if (compatibility.harmonic > 0.8) {
-      reasons.push(`Perfect harmonic match (${currentTrack.key} → ${candidate.key})`);
+      reasons.push(
+        `Perfect harmonic match (${currentTrack.key} → ${candidate.key})`
+      );
     } else if (compatibility.harmonic > 0.6) {
       reasons.push(`Compatible keys (${currentTrack.key} → ${candidate.key})`);
     }
 
     if (compatibility.bpm > 0.9) {
-      reasons.push(`BPM perfectly matched (${currentTrack.bpm} → ${candidate.bpm})`);
+      reasons.push(
+        `BPM perfectly matched (${currentTrack.bpm} → ${candidate.bpm})`
+      );
     } else if (compatibility.bpm > 0.7) {
       reasons.push(`Smooth BPM transition possible`);
     }
@@ -407,8 +449,9 @@ export class MagicMatch {
     }
 
     // Factor in overall compatibility
-    const avgCompatibility = Object.values(compatibility).reduce((a, b) => a + b) / 5;
-    confidence = (confidence * 0.6) + (avgCompatibility * 0.4);
+    const avgCompatibility =
+      Object.values(compatibility).reduce((a, b) => a + b) / 5;
+    confidence = confidence * 0.6 + avgCompatibility * 0.4;
 
     return Math.min(1, confidence);
   }
@@ -423,7 +466,7 @@ export class MagicMatch {
     const currentBpm = currentTrack.bpm || 120;
     const candidateBpm = candidate.bpm || 120;
     const bpmDiff = Math.abs(candidateBpm - currentBpm);
-    
+
     const suggestion: TrackMatch['transitionSuggestion'] = {
       crossfadePoint: 30, // Default crossfade point
       effectsRecommended: [],
@@ -435,7 +478,10 @@ export class MagicMatch {
       if (currentTrack.genre?.toLowerCase().includes('ambient')) {
         suggestion.crossfadePoint = Math.max(45, currentTrack.duration * 0.2);
       } else {
-        suggestion.crossfadePoint = Math.max(16, Math.min(32, currentTrack.duration * 0.15));
+        suggestion.crossfadePoint = Math.max(
+          16,
+          Math.min(32, currentTrack.duration * 0.15)
+        );
       }
     }
 
@@ -449,7 +495,9 @@ export class MagicMatch {
       suggestion.effectsRecommended.push('harmonic filter', 'reverb');
     }
 
-    if (Math.abs((currentTrack.energy || 0.5) - (candidate.energy || 0.5)) > 0.3) {
+    if (
+      Math.abs((currentTrack.energy || 0.5) - (candidate.energy || 0.5)) > 0.3
+    ) {
       suggestion.effectsRecommended.push('volume fade', 'EQ adjustment');
     }
 

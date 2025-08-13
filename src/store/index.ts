@@ -179,7 +179,9 @@ export const useDJflyStore = create<DJflyStore>()(
         const tracks: Track[] = [];
 
         set((state) => {
-          state.ai.recommendations = [{ tracks, energy: 85, mood: 'energetic' }];
+          state.ai.recommendations = [
+            { tracks, energy: 85, mood: 'energetic' },
+          ];
           state.ai.isAnalyzing = false;
           state.ai.confidence = 0.9;
         });

@@ -14,28 +14,43 @@ vi.mock('@/config/apiConfig', () => ({
 
 // Mock the music library to have predictable data
 vi.mock('@/services/musicLibrary', () => ({
-    MUSIC_LIBRARY: [
-        { id: 'track1', title: 'Mock Track 1', artist: 'Mock Artist 1', genre: 'Electronic', bpm: 128, key: 'A minor', energy: 0.8 },
-        { id: 'track2', title: 'Mock Track 2', artist: 'Mock Artist 2', genre: 'House', bpm: 125, key: 'C major', energy: 0.7 },
-    ]
+  MUSIC_LIBRARY: [
+    {
+      id: 'track1',
+      title: 'Mock Track 1',
+      artist: 'Mock Artist 1',
+      genre: 'Electronic',
+      bpm: 128,
+      key: 'A minor',
+      energy: 0.8,
+    },
+    {
+      id: 'track2',
+      title: 'Mock Track 2',
+      artist: 'Mock Artist 2',
+      genre: 'House',
+      bpm: 125,
+      key: 'C major',
+      energy: 0.7,
+    },
+  ],
 }));
 
-
 describe('AIMusicEngine', () => {
-    let fetchSpy: any;
+  let fetchSpy: any;
 
-    beforeEach(() => {
-        // Suppress console logs
-        vi.spyOn(console, 'warn').mockImplementation(() => {});
-    });
+  beforeEach(() => {
+    // Suppress console logs
+    vi.spyOn(console, 'warn').mockImplementation(() => {});
+  });
 
-    afterEach(() => {
-        vi.restoreAllMocks();
-    });
+  afterEach(() => {
+    vi.restoreAllMocks();
+  });
 
   it('should generate a fallback playlist when the OpenAI API call fails', async () => {
     fetchSpy = vi.spyOn(global, 'fetch').mockImplementation(() => {
-        return Promise.reject(new Error('API is down'));
+      return Promise.reject(new Error('API is down'));
     });
 
     const engine = new AIMusicEngine();
@@ -50,24 +65,35 @@ describe('AIMusicEngine', () => {
 
   it('should successfully call OpenAI API and return a mapped playlist', async () => {
     const mockApiResponse = {
-        ok: true,
-        json: () => Promise.resolve({
-            choices: [{
-                message: {
-                    function_call: {
-                        arguments: JSON.stringify({
-                            tracks: [{ title: 'Mock Track 1', artist: 'Mock Artist 1', genre: 'Electronic' }],
-                            reasoning: 'This is a test reason.',
-                            energyCurve: [50, 75],
-                            mixingTips: ['Test tip']
-                        })
-                    }
-                }
-            }]
-        })
+      ok: true,
+      json: () =>
+        Promise.resolve({
+          choices: [
+            {
+              message: {
+                function_call: {
+                  arguments: JSON.stringify({
+                    tracks: [
+                      {
+                        title: 'Mock Track 1',
+                        artist: 'Mock Artist 1',
+                        genre: 'Electronic',
+                      },
+                    ],
+                    reasoning: 'This is a test reason.',
+                    energyCurve: [50, 75],
+                    mixingTips: ['Test tip'],
+                  }),
+                },
+              },
+            },
+          ],
+        }),
     };
 
-    fetchSpy = vi.spyOn(global, 'fetch').mockResolvedValue(mockApiResponse as Response);
+    fetchSpy = vi
+      .spyOn(global, 'fetch')
+      .mockResolvedValue(mockApiResponse as Response);
 
     const engine = new AIMusicEngine();
     const request: AIPlaylistRequest = { prompt: 'Test prompt' };

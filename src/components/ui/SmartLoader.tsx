@@ -15,7 +15,7 @@ const SmartLoader: React.FC<SmartLoaderProps> = ({
   stage = 'analyzing',
   progress = 0,
   message,
-  className = ''
+  className = '',
 }) => {
   const [currentMessage, setCurrentMessage] = useState(message || '');
 
@@ -24,26 +24,42 @@ const SmartLoader: React.FC<SmartLoaderProps> = ({
       icon: Loader2,
       color: 'text-electric-blue',
       bgColor: 'bg-electric-blue',
-      messages: ['Analyzing your request...', 'Reading the vibe...', 'Understanding preferences...']
+      messages: [
+        'Analyzing your request...',
+        'Reading the vibe...',
+        'Understanding preferences...',
+      ],
     },
     generating: {
       icon: Sparkles,
-      color: 'text-bright-turquoise', 
+      color: 'text-bright-turquoise',
       bgColor: 'bg-bright-turquoise',
-      messages: ['Generating playlist...', 'Selecting perfect tracks...', 'AI is working magic...']
+      messages: [
+        'Generating playlist...',
+        'Selecting perfect tracks...',
+        'AI is working magic...',
+      ],
     },
     matching: {
       icon: Music,
       color: 'text-laser-pink',
-      bgColor: 'bg-laser-pink', 
-      messages: ['Matching energy levels...', 'Finding perfect flow...', 'Optimizing transitions...']
+      bgColor: 'bg-laser-pink',
+      messages: [
+        'Matching energy levels...',
+        'Finding perfect flow...',
+        'Optimizing transitions...',
+      ],
     },
     finalizing: {
       icon: Zap,
       color: 'text-green-400',
       bgColor: 'bg-green-400',
-      messages: ['Finalizing your set...', 'Adding mixing tips...', 'Almost ready!']
-    }
+      messages: [
+        'Finalizing your set...',
+        'Adding mixing tips...',
+        'Almost ready!',
+      ],
+    },
   };
 
   const config = stageConfig[stage];
@@ -53,7 +69,7 @@ const SmartLoader: React.FC<SmartLoaderProps> = ({
     if (!message && isLoading) {
       const messages = config.messages;
       let index = 0;
-      
+
       const interval = setInterval(() => {
         setCurrentMessage(messages[index % messages.length]);
         index++;
@@ -80,9 +96,11 @@ const SmartLoader: React.FC<SmartLoaderProps> = ({
         >
           {/* Animated Icon */}
           <div className={`w-16 h-16 mx-auto mb-6 ${config.color}`}>
-            <Icon 
-              className="w-full h-full animate-spin" 
-              style={{ animationDuration: stage === 'analyzing' ? '2s' : '1.5s' }}
+            <Icon
+              className="w-full h-full animate-spin"
+              style={{
+                animationDuration: stage === 'analyzing' ? '2s' : '1.5s',
+              }}
             />
           </div>
 

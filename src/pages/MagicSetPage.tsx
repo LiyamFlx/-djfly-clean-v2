@@ -11,7 +11,8 @@ const MagicSetPage: React.FC = () => {
   const [prompt, setPrompt] = useState('');
 
   const { generateSet } = useAIActions();
-  const { setQueue, setCurrentTrack, setIsPlaying, playTrack } = useAudioActions();
+  const { setQueue, setCurrentTrack, setIsPlaying, playTrack } =
+    useAudioActions();
   const aiState = useAIState();
 
   React.useEffect(() => {
@@ -20,7 +21,13 @@ const MagicSetPage: React.FC = () => {
       setCurrentTrack(aiState.generatedTracks[0]);
       setIsPlaying(true);
     }
-  }, [aiState.generatedTracks, aiState.isGenerating, setQueue, setCurrentTrack, setIsPlaying]);
+  }, [
+    aiState.generatedTracks,
+    aiState.isGenerating,
+    setQueue,
+    setCurrentTrack,
+    setIsPlaying,
+  ]);
 
   const handleGenerateSet = async () => {
     if (!prompt.trim()) return;
@@ -233,13 +240,15 @@ const MagicSetPage: React.FC = () => {
         )}
 
         {/* Manual Track Addition */}
-        <motion.div 
+        <motion.div
           className="card p-8 rounded-2xl"
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.4 }}
         >
-          <h3 className="text-2xl font-bold text-gradient mb-4">Manual Curation</h3>
+          <h3 className="text-2xl font-bold text-gradient mb-4">
+            Manual Curation
+          </h3>
           <p className="text-neutral-300 text-lg mb-6 leading-relaxed">
             Search and add tracks manually, or upload your own music files
           </p>
@@ -251,7 +260,7 @@ const MagicSetPage: React.FC = () => {
               className="flex-1 px-6 py-4 bg-neutral-800/50 border border-white/20 rounded-xl text-white placeholder-neutral-400 focus:border-primary-400 focus:ring-2 focus:ring-primary-400/20 focus:outline-none text-lg transition-all duration-300"
               whileFocus={{ scale: 1.02 }}
             />
-            <motion.button 
+            <motion.button
               className="control-button px-6 py-4"
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
@@ -268,7 +277,9 @@ const MagicSetPage: React.FC = () => {
             animate={{ opacity: 1, y: 0 }}
             className="card p-6 rounded-xl border border-red-500/50 bg-red-500/5"
           >
-            <p className="text-red-400 text-lg font-medium">Error: {aiState.error}</p>
+            <p className="text-red-400 text-lg font-medium">
+              Error: {aiState.error}
+            </p>
           </motion.div>
         )}
       </motion.div>

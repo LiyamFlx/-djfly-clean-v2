@@ -1,13 +1,13 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
-import { 
-  Sparkles, 
-  Mic, 
-  Play, 
-  BarChart, 
-  ArrowRight, 
-  CheckCircle, 
+import {
+  Sparkles,
+  Mic,
+  Play,
+  BarChart,
+  ArrowRight,
+  CheckCircle,
   Zap,
   Music,
   Users,
@@ -18,7 +18,7 @@ import {
   Radio,
   Star,
   Shield,
-  Cpu
+  Cpu,
 } from 'lucide-react';
 import { ROUTES } from '@/constants/routes';
 import Button from '@/components/ui/button';
@@ -43,56 +43,61 @@ const HomePage: React.FC = () => {
     {
       icon: Sparkles,
       title: 'AI Magic Match',
-      description: 'Instantly analyze crowd energy and get perfect track recommendations',
+      description:
+        'Instantly analyze crowd energy and get perfect track recommendations',
       color: 'neon-purple',
-      action: () => handleQuickStart('match')
+      action: () => handleQuickStart('match'),
     },
     {
       icon: Radio,
       title: 'AI Set Generator',
       description: 'Generate complete DJ sets tailored to your venue and crowd',
       color: 'neon-green',
-      action: () => handleQuickStart('set')
+      action: () => handleQuickStart('set'),
     },
     {
       icon: BarChart,
       title: 'Real-time Analytics',
-      description: 'Track performance metrics and optimize your sets in real-time',
+      description:
+        'Track performance metrics and optimize your sets in real-time',
       color: 'neon-purple',
-      action: () => navigate('/producer')
+      action: () => navigate('/producer'),
     },
     {
       icon: Volume2,
       title: 'Professional Player',
       description: 'Advanced DJ controls with seamless mixing capabilities',
       color: 'neon-green',
-      action: () => navigate('/player')
-    }
+      action: () => navigate('/player'),
+    },
   ];
 
   const stats = [
     { icon: Users, value: '50K+', label: 'DJs Worldwide' },
     { icon: Music, value: '1M+', label: 'Tracks Analyzed' },
     { icon: Clock, value: '99.9%', label: 'Uptime' },
-    { icon: TrendingUp, value: '4.9/5', label: 'User Rating' }
+    { icon: TrendingUp, value: '4.9/5', label: 'User Rating' },
   ];
 
   const benefits = [
     {
       icon: Cpu,
       title: 'AI-Powered Intelligence',
-      description: 'Advanced machine learning algorithms analyze crowd responses and musical patterns to deliver perfect recommendations every time.'
+      description:
+        'Advanced machine learning algorithms analyze crowd responses and musical patterns to deliver perfect recommendations every time.',
     },
     {
       icon: Shield,
       title: 'Professional Grade',
-      description: 'Built for professional DJs with enterprise-level reliability, security, and performance standards.'
+      description:
+        'Built for professional DJs with enterprise-level reliability, security, and performance standards.',
     },
     {
       icon: Star,
       title: 'Instant Results',
-      description: 'Get immediate insights and recommendations without complex setup or learning curves.'
-    }
+      description:
+        'Get immediate insights and recommendations without complex setup or learning curves.',
+    },
   ];
 
   return (
@@ -101,21 +106,21 @@ const HomePage: React.FC = () => {
       <section className="relative min-h-screen flex-center section-padding">
         {/* Animated Background */}
         <div className="absolute inset-0 overflow-hidden">
-          <motion.div 
+          <motion.div
             className="absolute -top-1/4 -left-1/4 w-96 h-96 bg-neon-purple/20 rounded-full blur-3xl"
-            animate={{ 
+            animate={{
               scale: [1, 1.2, 1],
-              opacity: [0.3, 0.5, 0.3] 
+              opacity: [0.3, 0.5, 0.3],
             }}
-            transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
+            transition={{ duration: 4, repeat: Infinity, ease: 'easeInOut' }}
           />
-          <motion.div 
+          <motion.div
             className="absolute -bottom-1/4 -right-1/4 w-96 h-96 bg-neon-green/15 rounded-full blur-3xl"
-            animate={{ 
+            animate={{
               scale: [1.2, 1, 1.2],
-              opacity: [0.2, 0.4, 0.2] 
+              opacity: [0.2, 0.4, 0.2],
             }}
-            transition={{ duration: 6, repeat: Infinity, ease: "easeInOut" }}
+            transition={{ duration: 6, repeat: Infinity, ease: 'easeInOut' }}
           />
         </div>
 
@@ -128,9 +133,7 @@ const HomePage: React.FC = () => {
             transition={{ duration: 1, type: 'spring', bounce: 0.3 }}
           >
             <div className="text-8xl mb-6">🎧</div>
-            <h1 className="heading-hero gradient-text mb-6">
-              DJfly
-            </h1>
+            <h1 className="heading-hero gradient-text mb-6">DJfly</h1>
             <div className="heading-secondary text-gray-300 mb-8 max-w-3xl mx-auto">
               The AI-powered DJ platform that reads any room instantly
             </div>
@@ -177,7 +180,9 @@ const HomePage: React.FC = () => {
                 transition={{ duration: 0.2 }}
               >
                 <stat.icon className="w-8 h-8 mx-auto mb-3 text-neon-purple" />
-                <div className="heading-tertiary gradient-text">{stat.value}</div>
+                <div className="heading-tertiary gradient-text">
+                  {stat.value}
+                </div>
                 <div className="body-small text-gray-400">{stat.label}</div>
               </motion.div>
             ))}
@@ -198,7 +203,8 @@ const HomePage: React.FC = () => {
               Everything you need to DJ like a pro
             </h2>
             <p className="body-large text-gray-300 max-w-2xl mx-auto">
-              Professional-grade AI tools designed for modern DJs who demand excellence
+              Professional-grade AI tools designed for modern DJs who demand
+              excellence
             </p>
           </motion.div>
 
@@ -216,7 +222,9 @@ const HomePage: React.FC = () => {
                 onHoverEnd={() => setActiveFeature(null)}
               >
                 <div className="flex items-start gap-6">
-                  <div className={`p-4 rounded-2xl bg-${feature.color}/10 border border-${feature.color}/30`}>
+                  <div
+                    className={`p-4 rounded-2xl bg-${feature.color}/10 border border-${feature.color}/30`}
+                  >
                     <feature.icon className={`w-8 h-8 text-${feature.color}`} />
                   </div>
                   <div className="flex-1">
@@ -226,11 +234,15 @@ const HomePage: React.FC = () => {
                     <p className="body-medium text-gray-300 mb-4">
                       {feature.description}
                     </p>
-                    <div className={`inline-flex items-center gap-2 text-${feature.color} font-medium`}>
+                    <div
+                      className={`inline-flex items-center gap-2 text-${feature.color} font-medium`}
+                    >
                       Try Now
-                      <ArrowRight className={`w-4 h-4 transition-transform ${
-                        activeFeature === index ? 'translate-x-1' : ''
-                      }`} />
+                      <ArrowRight
+                        className={`w-4 h-4 transition-transform ${
+                          activeFeature === index ? 'translate-x-1' : ''
+                        }`}
+                      />
                     </div>
                   </div>
                 </div>
@@ -268,7 +280,9 @@ const HomePage: React.FC = () => {
                   <benefit.icon className="w-8 h-8 text-neon-purple" />
                 </div>
                 <h3 className="heading-tertiary mb-4">{benefit.title}</h3>
-                <p className="body-medium text-gray-300">{benefit.description}</p>
+                <p className="body-medium text-gray-300">
+                  {benefit.description}
+                </p>
               </motion.div>
             ))}
           </div>
@@ -287,7 +301,8 @@ const HomePage: React.FC = () => {
               Ready to revolutionize your DJ sets?
             </h2>
             <p className="body-large text-gray-300 mb-8 max-w-2xl mx-auto">
-              Join thousands of DJs worldwide who trust DJfly to deliver unforgettable experiences.
+              Join thousands of DJs worldwide who trust DJfly to deliver
+              unforgettable experiences.
             </p>
             <div className="flex-responsive justify-center">
               <Button
@@ -323,7 +338,10 @@ const HomePage: React.FC = () => {
           >
             <div className="flex gap-1">
               {[...Array(5)].map((_, i) => (
-                <Star key={i} className="w-4 h-4 fill-neon-purple text-neon-purple" />
+                <Star
+                  key={i}
+                  className="w-4 h-4 fill-neon-purple text-neon-purple"
+                />
               ))}
             </div>
             <span className="body-small">

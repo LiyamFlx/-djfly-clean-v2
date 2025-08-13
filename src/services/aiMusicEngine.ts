@@ -317,7 +317,10 @@ class AIMusicEngine {
 
     if (recommendation.tracks.length > 0) {
       // Ensure the replacement is not the same as the track being replaced
-      if (recommendation.tracks[0].id === trackToReplace.id && recommendation.tracks.length > 1) {
+      if (
+        recommendation.tracks[0].id === trackToReplace.id &&
+        recommendation.tracks.length > 1
+      ) {
         return recommendation.tracks[1];
       }
       return recommendation.tracks[0];

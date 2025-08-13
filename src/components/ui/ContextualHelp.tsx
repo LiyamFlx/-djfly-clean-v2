@@ -21,16 +21,18 @@ const ContextualHelp: React.FC<ContextualHelpProps> = ({
   steps,
   isVisible,
   onComplete,
-  onDismiss
+  onDismiss,
 }) => {
   const [currentStep, setCurrentStep] = useState(0);
-  const [highlightedElement, setHighlightedElement] = useState<Element | null>(null);
+  const [highlightedElement, setHighlightedElement] = useState<Element | null>(
+    null
+  );
 
   useEffect(() => {
     if (isVisible && steps[currentStep]?.element) {
       const element = document.querySelector(steps[currentStep].element);
       setHighlightedElement(element);
-      
+
       // Scroll element into view smoothly
       if (element) {
         element.scrollIntoView({ behavior: 'smooth', block: 'center' });
@@ -68,7 +70,7 @@ const ContextualHelp: React.FC<ContextualHelpProps> = ({
               left: highlightedElement.getBoundingClientRect().left - 8,
               width: highlightedElement.getBoundingClientRect().width + 16,
               height: highlightedElement.getBoundingClientRect().height + 16,
-              zIndex: 51
+              zIndex: 51,
             }}
           />
         )}
@@ -103,7 +105,9 @@ const ContextualHelp: React.FC<ContextualHelpProps> = ({
             <motion.div
               className="bg-electric-blue h-2 rounded-full"
               initial={{ width: 0 }}
-              animate={{ width: `${((currentStep + 1) / steps.length) * 100}%` }}
+              animate={{
+                width: `${((currentStep + 1) / steps.length) * 100}%`,
+              }}
               transition={{ duration: 0.3 }}
             />
           </div>
@@ -176,38 +180,44 @@ export const HELP_FLOWS = {
     {
       id: 'welcome',
       title: 'Welcome to Magic Studio!',
-      description: 'This is where AI creates perfect playlists. Choose your path below.',
+      description:
+        'This is where AI creates perfect playlists. Choose your path below.',
     },
     {
       id: 'magic-match',
       title: 'Magic Match - For Live Events',
-      description: 'Record crowd noise to instantly get a playlist that matches the energy and vibe.',
-      element: '[data-help="magic-match"]'
+      description:
+        'Record crowd noise to instantly get a playlist that matches the energy and vibe.',
+      element: '[data-help="magic-match"]',
     },
     {
       id: 'magic-set',
       title: 'Magic Set - Describe Your Vision',
-      description: 'Tell AI what you want in words and get a curated playlist with perfect flow.',
-      element: '[data-help="magic-set"]'
-    }
+      description:
+        'Tell AI what you want in words and get a curated playlist with perfect flow.',
+      element: '[data-help="magic-set"]',
+    },
   ],
   magicMatch: [
     {
       id: 'record-intro',
       title: 'Record the Room',
-      description: 'Click to record 5 seconds of crowd noise. AI will analyze energy, mood, and preferences.',
+      description:
+        'Click to record 5 seconds of crowd noise. AI will analyze energy, mood, and preferences.',
     },
     {
       id: 'ai-analysis',
       title: 'AI Analysis',
-      description: 'Our AI reads the crowd energy and generates the perfect playlist automatically.',
+      description:
+        'Our AI reads the crowd energy and generates the perfect playlist automatically.',
     },
     {
       id: 'results',
       title: 'Your Perfect Playlist',
-      description: 'Review your AI-generated tracks and click "Go to Player" to start mixing!',
-    }
-  ]
+      description:
+        'Review your AI-generated tracks and click "Go to Player" to start mixing!',
+    },
+  ],
 };
 
 export default ContextualHelp;

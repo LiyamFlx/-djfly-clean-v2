@@ -37,7 +37,9 @@ const ApiStatusIndicator: React.FC = () => {
       await testConnections.all();
       updateServiceStatus();
     } catch (error) {
-      console.info('Connection test completed with some services unavailable (demo mode)');
+      console.info(
+        'Connection test completed with some services unavailable (demo mode)'
+      );
       updateServiceStatus(); // Still update the status even if some tests fail
     } finally {
       setIsTesting(false);

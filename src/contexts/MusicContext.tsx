@@ -7,7 +7,7 @@ interface MusicContextValue {
   queue: Track[];
   isPlaying: boolean;
   currentIndex: number;
-  
+
   // Actions
   setQueue: (tracks: Track[]) => void;
   setCurrentTrack: (track: Track | null) => void;
@@ -17,7 +17,7 @@ interface MusicContextValue {
   previousTrack: () => void;
   addToQueue: (track: Track) => void;
   clearQueue: () => void;
-  
+
   // Playlist management
   savePlaylist: (name: string, tracks: Track[]) => void;
   loadPlaylist: (tracks: Track[]) => void;
@@ -54,20 +54,23 @@ export const MusicProvider: React.FC<MusicProviderProps> = ({ children }) => {
     localStorage.setItem('djfly-current-playlist', JSON.stringify(tracks));
   }, []);
 
-  const playTrack = useCallback((track: Track) => {
-    console.log('▶️ Playing track:', track.title);
-    setCurrentTrack(track);
-    setIsPlaying(true);
-    
-    const trackIndex = queue.findIndex(t => t.id === track.id);
-    if (trackIndex !== -1) {
-      setCurrentIndex(trackIndex);
-    }
-  }, [queue]);
+  const playTrack = useCallback(
+    (track: Track) => {
+      console.log('▶️ Playing track:', track.title);
+      setCurrentTrack(track);
+      setIsPlaying(true);
+
+      const trackIndex = queue.findIndex((t) => t.id === track.id);
+      if (trackIndex !== -1) {
+        setCurrentIndex(trackIndex);
+      }
+    },
+    [queue]
+  );
 
   const nextTrack = useCallback(() => {
     if (queue.length === 0) return;
-    
+
     const nextIndex = (currentIndex + 1) % queue.length;
     setCurrentIndex(nextIndex);
     setCurrentTrack(queue[nextIndex]);
@@ -76,7 +79,7 @@ export const MusicProvider: React.FC<MusicProviderProps> = ({ children }) => {
 
   const previousTrack = useCallback(() => {
     if (queue.length === 0) return;
-    
+
     const prevIndex = currentIndex === 0 ? queue.length - 1 : currentIndex - 1;
     setCurrentIndex(prevIndex);
     setCurrentTrack(queue[prevIndex]);
@@ -84,7 +87,7 @@ export const MusicProvider: React.FC<MusicProviderProps> = ({ children }) => {
   }, [queue, currentIndex]);
 
   const addToQueue = useCallback((track: Track) => {
-    setQueue(prev => [...prev, track]);
+    setQueue((prev) => [...prev, track]);
     console.log('➕ Added to queue:', track.title);
   }, []);
 
@@ -98,11 +101,13 @@ export const MusicProvider: React.FC<MusicProviderProps> = ({ children }) => {
   }, []);
 
   const savePlaylist = useCallback((name: string, tracks: Track[]) => {
-    const playlists = JSON.parse(localStorage.getItem('djfly-saved-playlists') || '{}');
+    const playlists = JSON.parse(
+      localStorage.getItem('djfly-saved-playlists') || '{}'
+    );
     playlists[name] = {
       tracks,
       createdAt: new Date().toISOString(),
-      name
+      name,
     };
     localStorage.setItem('djfly-saved-playlists', JSON.stringify(playlists));
     console.log('💾 Saved playlist:', name, 'with', tracks.length, 'tracks');
@@ -115,7 +120,11 @@ export const MusicProvider: React.FC<MusicProviderProps> = ({ children }) => {
       try {
         const tracks = JSON.parse(savedPlaylist);
         if (Array.isArray(tracks) && tracks.length > 0) {
-          console.log('🔄 Restoring saved playlist with', tracks.length, 'tracks');
+          console.log(
+            '🔄 Restoring saved playlist with',
+            tracks.length,
+            'tracks'
+          );
           setQueue(tracks);
           setCurrentTrack(tracks[0]);
         }
@@ -131,7 +140,7 @@ export const MusicProvider: React.FC<MusicProviderProps> = ({ children }) => {
     queue,
     isPlaying,
     currentIndex,
-    
+
     // Actions
     setQueue,
     setCurrentTrack,
@@ -141,16 +150,14 @@ export const MusicProvider: React.FC<MusicProviderProps> = ({ children }) => {
     previousTrack,
     addToQueue,
     clearQueue,
-    
+
     // Playlist management
     savePlaylist,
     loadPlaylist,
   };
 
   return (
-    <MusicContext.Provider value={value}>
-      {children}
-    </MusicContext.Provider>
+    <MusicContext.Provider value={value}>{children}</MusicContext.Provider>
   );
 };
 

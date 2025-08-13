@@ -8,11 +8,14 @@ import type { Track } from '@/types';
 
 const MagicMatchPage: React.FC = () => {
   const navigate = useNavigate();
-  const [status, setStatus] = useState<'ready' | 'recording' | 'analyzing' | 'complete'>('ready');
+  const [status, setStatus] = useState<
+    'ready' | 'recording' | 'analyzing' | 'complete'
+  >('ready');
   const [recordingProgress, setRecordingProgress] = useState(0);
 
   const { generateMatch } = useAIActions();
-  const { setQueue, setCurrentTrack, setIsPlaying, playTrack } = useAudioActions();
+  const { setQueue, setCurrentTrack, setIsPlaying, playTrack } =
+    useAudioActions();
   const aiState = useAIState();
 
   const handleStartRecording = async () => {
@@ -23,12 +26,12 @@ const MagicMatchPage: React.FC = () => {
       // Request microphone access
       const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
       const recorder = new MediaRecorder(stream);
-      
+
       recorder.start();
 
       // Simulate recording progress
       const progressInterval = setInterval(() => {
-        setRecordingProgress(prev => {
+        setRecordingProgress((prev) => {
           if (prev >= 100) {
             clearInterval(progressInterval);
             return 100;
@@ -40,32 +43,33 @@ const MagicMatchPage: React.FC = () => {
       // After 5 seconds, stop recording and analyze
       setTimeout(async () => {
         recorder.stop();
-        stream.getTracks().forEach(track => track.stop());
+        stream.getTracks().forEach((track) => track.stop());
         clearInterval(progressInterval);
-        
+
         setStatus('analyzing');
-        
+
         try {
           // Generate AI-powered crowd analysis
           await generateMatch('Crowd energy analysis from audio recording');
-          
+
           if (aiState.generatedTracks.length > 0) {
             setQueue(aiState.generatedTracks);
             const firstTrack = aiState.generatedTracks[0];
             setCurrentTrack(firstTrack);
             setIsPlaying(true);
           }
-          
+
           setStatus('complete');
         } catch (error) {
           console.error('Failed to analyze crowd:', error);
           setStatus('ready');
         }
       }, 5000);
-
     } catch (error) {
       console.error('Microphone access denied:', error);
-      alert('Microphone access is required for Magic Match. Please allow access and try again.');
+      alert(
+        'Microphone access is required for Magic Match. Please allow access and try again.'
+      );
       setStatus('ready');
     }
   };
@@ -89,13 +93,13 @@ const MagicMatchPage: React.FC = () => {
         className="max-w-4xl mx-auto space-y-8"
       >
         {/* Header */}
-        <motion.div 
+        <motion.div
           className="text-center"
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.1 }}
         >
-          <motion.h2 
+          <motion.h2
             className="text-4xl lg:text-5xl font-bold text-gradient mb-6 leading-tight"
             animate={{ backgroundPosition: ['0% 50%', '100% 50%', '0% 50%'] }}
             transition={{ duration: 6, repeat: Infinity }}
@@ -103,7 +107,8 @@ const MagicMatchPage: React.FC = () => {
             Magic Match
           </motion.h2>
           <p className="text-xl text-neutral-300 max-w-3xl mx-auto leading-relaxed">
-            Record crowd noise and let AI analyze the energy to generate the perfect playlist instantly.
+            Record crowd noise and let AI analyze the energy to generate the
+            perfect playlist instantly.
           </p>
         </motion.div>
 
@@ -129,7 +134,8 @@ const MagicMatchPage: React.FC = () => {
 
             <h3 className="text-2xl font-bold mb-4">Ready to Analyze</h3>
             <p className="text-neutral-300 text-lg mb-8 max-w-md mx-auto">
-              Point your device toward the crowd and tap the microphone to start recording for 5 seconds.
+              Point your device toward the crowd and tap the microphone to start
+              recording for 5 seconds.
             </p>
 
             <motion.button
@@ -165,8 +171,10 @@ const MagicMatchPage: React.FC = () => {
               <Mic className="w-16 h-16 text-white" />
             </motion.div>
 
-            <h3 className="text-2xl font-bold mb-6">Recording Crowd Audio...</h3>
-            
+            <h3 className="text-2xl font-bold mb-6">
+              Recording Crowd Audio...
+            </h3>
+
             <div className="max-w-md mx-auto mb-6">
               <div className="w-full bg-neutral-800 rounded-full h-3">
                 <motion.div
@@ -177,10 +185,14 @@ const MagicMatchPage: React.FC = () => {
                   transition={{ duration: 0.5 }}
                 />
               </div>
-              <p className="text-neutral-400 mt-2">{recordingProgress}% complete</p>
+              <p className="text-neutral-400 mt-2">
+                {recordingProgress}% complete
+              </p>
             </div>
 
-            <p className="text-neutral-300">Keep your device pointed at the crowd...</p>
+            <p className="text-neutral-300">
+              Keep your device pointed at the crowd...
+            </p>
           </motion.div>
         )}
 
@@ -194,13 +206,17 @@ const MagicMatchPage: React.FC = () => {
             <motion.div
               className="w-32 h-32 mx-auto mb-8 bg-button-gradient rounded-full flex items-center justify-center"
               animate={{ rotate: 360 }}
-              transition={{ duration: 2, repeat: Infinity, ease: "linear" }}
+              transition={{ duration: 2, repeat: Infinity, ease: 'linear' }}
             >
               <BarChart3 className="w-16 h-16 text-white" />
             </motion.div>
 
-            <h3 className="text-2xl font-bold mb-4">AI Analyzing Crowd Energy...</h3>
-            <p className="text-neutral-300">Processing audio patterns and generating perfect matches...</p>
+            <h3 className="text-2xl font-bold mb-4">
+              AI Analyzing Crowd Energy...
+            </h3>
+            <p className="text-neutral-300">
+              Processing audio patterns and generating perfect matches...
+            </p>
           </motion.div>
         )}
 
@@ -213,10 +229,12 @@ const MagicMatchPage: React.FC = () => {
           >
             {/* Analysis Results */}
             <div className="card p-8 rounded-2xl">
-              <h3 className="text-2xl font-bold text-gradient mb-6">Analysis Complete!</h3>
-              
+              <h3 className="text-2xl font-bold text-gradient mb-6">
+                Analysis Complete!
+              </h3>
+
               <div className="grid md:grid-cols-3 gap-6 mb-8">
-                <motion.div 
+                <motion.div
                   className="text-center p-6 bg-primary-500/10 rounded-xl"
                   whileHover={{ scale: 1.02 }}
                 >
@@ -225,8 +243,8 @@ const MagicMatchPage: React.FC = () => {
                   </div>
                   <div className="text-sm text-neutral-400">Crowd Energy</div>
                 </motion.div>
-                
-                <motion.div 
+
+                <motion.div
                   className="text-center p-6 bg-secondary-500/10 rounded-xl"
                   whileHover={{ scale: 1.02 }}
                 >
@@ -235,15 +253,17 @@ const MagicMatchPage: React.FC = () => {
                   </div>
                   <div className="text-sm text-neutral-400">Time Context</div>
                 </motion.div>
-                
-                <motion.div 
+
+                <motion.div
                   className="text-center p-6 bg-accent-500/10 rounded-xl"
                   whileHover={{ scale: 1.02 }}
                 >
                   <div className="text-3xl font-bold text-accent-400 mb-2">
                     {aiState.generatedTracks.length}
                   </div>
-                  <div className="text-sm text-neutral-400">Tracks Generated</div>
+                  <div className="text-sm text-neutral-400">
+                    Tracks Generated
+                  </div>
                 </motion.div>
               </div>
 
@@ -271,14 +291,18 @@ const MagicMatchPage: React.FC = () => {
                     transition={{ delay: index * 0.1 }}
                     className="flex items-center gap-4 p-4 bg-neutral-800/30 rounded-xl hover:bg-neutral-800/50 transition-all duration-300 group"
                   >
-                    <div className="text-sm text-neutral-400 w-8">{index + 1}.</div>
+                    <div className="text-sm text-neutral-400 w-8">
+                      {index + 1}.
+                    </div>
                     <img
                       src={track.image}
                       alt={track.title}
                       className="w-12 h-12 rounded-lg object-cover"
                     />
                     <div className="flex-1">
-                      <h5 className="font-semibold text-white">{track.title}</h5>
+                      <h5 className="font-semibold text-white">
+                        {track.title}
+                      </h5>
                       <p className="text-sm text-neutral-400">{track.artist}</p>
                     </div>
                     {track.bpm && (

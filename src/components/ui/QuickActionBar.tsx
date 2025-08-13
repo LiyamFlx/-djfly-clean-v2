@@ -17,16 +17,16 @@ const QuickActionBar: React.FC = () => {
       description: 'Record crowd & get playlist',
       shortcut: '⌘M',
       action: () => navigate('/studio/match'),
-      color: 'electric-blue'
+      color: 'electric-blue',
     },
     {
-      id: 'magic-set', 
+      id: 'magic-set',
       icon: Sparkles,
       label: 'Magic Set',
       description: 'Describe & create playlist',
       shortcut: '⌘S',
       action: () => navigate('/studio/set'),
-      color: 'bright-turquoise'
+      color: 'bright-turquoise',
     },
     {
       id: 'player',
@@ -36,8 +36,8 @@ const QuickActionBar: React.FC = () => {
       shortcut: '⌘P',
       action: () => navigate('/player'),
       color: 'laser-pink',
-      badge: queue.length > 0 ? queue.length : undefined
-    }
+      badge: queue.length > 0 ? queue.length : undefined,
+    },
   ];
 
   // Keyboard shortcuts
@@ -103,8 +103,12 @@ const QuickActionBar: React.FC = () => {
               className="fixed bottom-24 left-6 z-50 glass-card p-6 w-80"
             >
               <div className="mb-4">
-                <h3 className="text-lg font-semibold text-white mb-1">Quick Actions</h3>
-                <p className="text-sm text-gray-400">Jump to any feature instantly</p>
+                <h3 className="text-lg font-semibold text-white mb-1">
+                  Quick Actions
+                </h3>
+                <p className="text-sm text-gray-400">
+                  Jump to any feature instantly
+                </p>
               </div>
 
               <div className="space-y-3">
@@ -120,7 +124,9 @@ const QuickActionBar: React.FC = () => {
                     }}
                     className="w-full flex items-center gap-4 p-3 rounded-lg bg-white/5 hover:bg-white/10 transition-colors group"
                   >
-                    <div className={`relative w-10 h-10 bg-${action.color}/20 rounded-lg flex items-center justify-center group-hover:bg-${action.color}/30 transition-colors`}>
+                    <div
+                      className={`relative w-10 h-10 bg-${action.color}/20 rounded-lg flex items-center justify-center group-hover:bg-${action.color}/30 transition-colors`}
+                    >
                       <action.icon className={`w-5 h-5 text-${action.color}`} />
                       {action.badge && (
                         <div className="absolute -top-2 -right-2 w-5 h-5 bg-red-500 rounded-full flex items-center justify-center text-xs font-bold text-white">
@@ -131,10 +137,16 @@ const QuickActionBar: React.FC = () => {
 
                     <div className="flex-1 text-left">
                       <div className="flex items-center justify-between">
-                        <span className="font-medium text-white">{action.label}</span>
-                        <span className="text-xs text-gray-400 font-mono">{action.shortcut}</span>
+                        <span className="font-medium text-white">
+                          {action.label}
+                        </span>
+                        <span className="text-xs text-gray-400 font-mono">
+                          {action.shortcut}
+                        </span>
                       </div>
-                      <p className="text-sm text-gray-400">{action.description}</p>
+                      <p className="text-sm text-gray-400">
+                        {action.description}
+                      </p>
                     </div>
                   </motion.button>
                 ))}

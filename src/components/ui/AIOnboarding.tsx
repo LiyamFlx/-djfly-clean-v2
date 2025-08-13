@@ -16,47 +16,50 @@ const AIOnboarding: React.FC = () => {
   const [userPreferences, setUserPreferences] = useState({
     experience: '',
     genres: [] as string[],
-    useCase: ''
+    useCase: '',
   });
 
   const steps: OnboardingStep[] = [
     {
       id: 'welcome',
       title: 'Welcome to the Future of DJing',
-      description: 'AI that reads any room and creates perfect playlists in seconds. Let me show you how it works.',
-      icon: Brain
+      description:
+        'AI that reads any room and creates perfect playlists in seconds. Let me show you how it works.',
+      icon: Brain,
     },
     {
       id: 'experience',
       title: 'Tell Me About Yourself',
-      description: 'Are you a professional DJ, hobbyist, or just love great music?',
+      description:
+        'Are you a professional DJ, hobbyist, or just love great music?',
       icon: Users,
-      interactive: true
+      interactive: true,
     },
     {
       id: 'demo-magic-match',
       title: 'Magic Match Demo',
-      description: 'Watch me analyze a crowd and generate the perfect playlist.',
+      description:
+        'Watch me analyze a crowd and generate the perfect playlist.',
       icon: Zap,
       demoAction: () => {
         // Trigger demo Magic Match flow
-      }
+      },
     },
     {
       id: 'demo-magic-set',
-      title: 'Magic Set Demo', 
+      title: 'Magic Set Demo',
       description: 'See how I create playlists from text descriptions.',
       icon: Sparkles,
       demoAction: () => {
         // Trigger demo Magic Set flow
-      }
+      },
     },
     {
       id: 'ready',
-      title: 'You\'re Ready to Rock!',
+      title: "You're Ready to Rock!",
       description: 'Choose your first adventure and let the AI magic begin.',
-      icon: Music
-    }
+      icon: Music,
+    },
   ];
 
   const handleNext = () => {
@@ -105,12 +108,14 @@ const AIOnboarding: React.FC = () => {
                 Skip intro
               </button>
             </div>
-            
+
             <div className="w-full bg-gray-700 rounded-full h-2">
               <motion.div
                 className="bg-gradient-to-r from-electric-blue to-bright-turquoise h-2 rounded-full"
                 initial={{ width: 0 }}
-                animate={{ width: `${((currentStep + 1) / steps.length) * 100}%` }}
+                animate={{
+                  width: `${((currentStep + 1) / steps.length) * 100}%`,
+                }}
                 transition={{ duration: 0.5 }}
               />
             </div>
@@ -130,7 +135,7 @@ const AIOnboarding: React.FC = () => {
                 whileHover={{ scale: 1.05 }}
               >
                 {React.createElement(steps[currentStep].icon, {
-                  className: "w-10 h-10 text-white"
+                  className: 'w-10 h-10 text-white',
                 })}
               </motion.div>
 
@@ -138,7 +143,7 @@ const AIOnboarding: React.FC = () => {
               <h2 className="text-3xl font-bold text-white mb-4">
                 {steps[currentStep].title}
               </h2>
-              
+
               <p className="text-xl text-gray-300 mb-8 leading-relaxed">
                 {steps[currentStep].description}
               </p>
@@ -147,19 +152,28 @@ const AIOnboarding: React.FC = () => {
               {steps[currentStep].interactive && currentStep === 1 && (
                 <div className="space-y-4 mb-8">
                   <div className="grid grid-cols-3 gap-4">
-                    {['Professional DJ', 'Hobbyist', 'Music Lover'].map((option) => (
-                      <button
-                        key={option}
-                        onClick={() => setUserPreferences({...userPreferences, experience: option})}
-                        className={`p-4 rounded-lg border-2 transition-all ${
-                          userPreferences.experience === option
-                            ? 'border-electric-blue bg-electric-blue/20'
-                            : 'border-gray-600 hover:border-gray-500'
-                        }`}
-                      >
-                        <div className="text-sm font-medium text-white">{option}</div>
-                      </button>
-                    ))}
+                    {['Professional DJ', 'Hobbyist', 'Music Lover'].map(
+                      (option) => (
+                        <button
+                          key={option}
+                          onClick={() =>
+                            setUserPreferences({
+                              ...userPreferences,
+                              experience: option,
+                            })
+                          }
+                          className={`p-4 rounded-lg border-2 transition-all ${
+                            userPreferences.experience === option
+                              ? 'border-electric-blue bg-electric-blue/20'
+                              : 'border-gray-600 hover:border-gray-500'
+                          }`}
+                        >
+                          <div className="text-sm font-medium text-white">
+                            {option}
+                          </div>
+                        </button>
+                      )
+                    )}
                   </div>
                 </div>
               )}
@@ -180,7 +194,10 @@ const AIOnboarding: React.FC = () => {
                   <button
                     onClick={handleNext}
                     className="btn-hero flex items-center gap-3"
-                    disabled={steps[currentStep].interactive && !userPreferences.experience}
+                    disabled={
+                      steps[currentStep].interactive &&
+                      !userPreferences.experience
+                    }
                   >
                     Continue
                     <ArrowRight className="w-5 h-5" />

@@ -9,43 +9,43 @@ const ValuePropSection: React.FC = () => {
       title: '5 Second Results',
       description: 'Perfect playlists generated faster than you can think',
       stat: '5s',
-      color: 'electric-blue'
+      color: 'electric-blue',
     },
     {
-      icon: Target, 
+      icon: Target,
       title: '99% Match Rate',
       description: 'AI understands your vibe better than you do',
       stat: '99%',
-      color: 'bright-turquoise'
+      color: 'bright-turquoise',
     },
     {
       icon: Users,
       title: '10K+ Happy DJs',
       description: 'Trusted by professionals worldwide',
       stat: '10K+',
-      color: 'laser-pink'
-    }
+      color: 'laser-pink',
+    },
   ];
 
   const features = [
-    { 
-      icon: Zap, 
+    {
+      icon: Zap,
       title: 'Instant Magic',
       subtitle: 'Record crowd → Get playlist → Start mixing',
-      benefit: 'Zero learning curve'
+      benefit: 'Zero learning curve',
     },
     {
       icon: TrendingUp,
-      title: 'Smart Transitions', 
+      title: 'Smart Transitions',
       subtitle: 'BPM matching, key compatibility, energy flow',
-      benefit: 'Professional results'
+      benefit: 'Professional results',
     },
     {
       icon: Star,
       title: 'Always Learning',
       subtitle: 'AI improves with every session',
-      benefit: 'Gets better over time'
-    }
+      benefit: 'Gets better over time',
+    },
   ];
 
   return (
@@ -67,18 +67,20 @@ const ValuePropSection: React.FC = () => {
               transition={{ delay: index * 0.2 }}
               className="text-center group"
             >
-              <div className={`w-20 h-20 mx-auto mb-4 bg-${benefit.color}/20 rounded-full flex items-center justify-center group-hover:bg-${benefit.color}/30 transition-colors duration-300`}>
+              <div
+                className={`w-20 h-20 mx-auto mb-4 bg-${benefit.color}/20 rounded-full flex items-center justify-center group-hover:bg-${benefit.color}/30 transition-colors duration-300`}
+              >
                 <benefit.icon className={`w-10 h-10 text-${benefit.color}`} />
               </div>
-              
+
               <div className={`text-5xl font-black text-${benefit.color} mb-2`}>
                 {benefit.stat}
               </div>
-              
+
               <h3 className="text-xl font-bold text-white mb-2">
                 {benefit.title}
               </h3>
-              
+
               <p className="text-gray-300 leading-relaxed">
                 {benefit.description}
               </p>
@@ -101,16 +103,16 @@ const ValuePropSection: React.FC = () => {
                 <div className="w-12 h-12 bg-gradient-to-r from-electric-blue to-bright-turquoise rounded-lg flex items-center justify-center flex-shrink-0">
                   <feature.icon className="w-6 h-6 text-white" />
                 </div>
-                
+
                 <div className="flex-1">
                   <h3 className="text-xl font-bold text-white mb-2">
                     {feature.title}
                   </h3>
-                  
+
                   <p className="text-gray-300 mb-3 leading-relaxed">
                     {feature.subtitle}
                   </p>
-                  
+
                   <div className="inline-flex items-center gap-2 px-3 py-1 bg-green-500/20 rounded-full">
                     <div className="w-2 h-2 bg-green-400 rounded-full"></div>
                     <span className="text-green-400 text-sm font-medium">

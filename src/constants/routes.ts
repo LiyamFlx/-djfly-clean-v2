@@ -7,7 +7,7 @@ export const ROUTES = {
   PLAYER: '/player',
   PRODUCER: '/producer',
   PLANNER: '/planner', // Added per QA checklist
-  DANCER: '/dancer',   // Added per QA checklist
+  DANCER: '/dancer', // Added per QA checklist
   PROFILE: '/profile',
   LIBRARY: '/library',
   DOCS: '/docs',

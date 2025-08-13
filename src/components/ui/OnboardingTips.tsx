@@ -18,16 +18,22 @@ interface OnboardingTipsProps {
   onComplete?: () => void;
 }
 
-const OnboardingTips: React.FC<OnboardingTipsProps> = ({ tips, page, onComplete }) => {
+const OnboardingTips: React.FC<OnboardingTipsProps> = ({
+  tips,
+  page,
+  onComplete,
+}) => {
   const [isVisible, setIsVisible] = useState(false);
   const [currentTipIndex, setCurrentTipIndex] = useState(0);
   const [completedPages, setCompletedPages] = useState<string[]>([]);
 
   useEffect(() => {
     // Check if user has seen tips for this page
-    const seenPages = JSON.parse(localStorage.getItem('djfly-onboarding-seen') || '[]');
+    const seenPages = JSON.parse(
+      localStorage.getItem('djfly-onboarding-seen') || '[]'
+    );
     setCompletedPages(seenPages);
-    
+
     if (!seenPages.includes(page) && tips.length > 0) {
       // Show tips after a short delay
       const timer = setTimeout(() => setIsVisible(true), 1000);
@@ -81,7 +87,9 @@ const OnboardingTips: React.FC<OnboardingTipsProps> = ({ tips, page, onComplete 
                 <Lightbulb className="w-5 h-5 text-bright-turquoise" />
               </div>
               <div>
-                <h3 className="text-lg font-semibold text-white">{currentTip.title}</h3>
+                <h3 className="text-lg font-semibold text-white">
+                  {currentTip.title}
+                </h3>
                 <p className="text-sm text-gray-400">
                   Tip {currentTipIndex + 1} of {tips.length}
                 </p>
@@ -99,7 +107,9 @@ const OnboardingTips: React.FC<OnboardingTipsProps> = ({ tips, page, onComplete 
           <div className="w-full bg-gray-700 rounded-full h-2 mb-6">
             <motion.div
               initial={{ width: 0 }}
-              animate={{ width: `${((currentTipIndex + 1) / tips.length) * 100}%` }}
+              animate={{
+                width: `${((currentTipIndex + 1) / tips.length) * 100}%`,
+              }}
               className="bg-gradient-to-r from-bright-turquoise to-electric-blue h-2 rounded-full"
               transition={{ duration: 0.3 }}
             />
@@ -130,7 +140,7 @@ const OnboardingTips: React.FC<OnboardingTipsProps> = ({ tips, page, onComplete 
             >
               Skip tips
             </button>
-            
+
             <div className="flex items-center gap-2">
               {currentTipIndex > 0 && (
                 <button

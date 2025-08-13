@@ -1,7 +1,13 @@
 import React from 'react';
 import { motion } from 'framer-motion';
 import { BarChart, TrendingUp, Users, Clock, Award } from 'lucide-react';
-import { useSessionState, useCrowdState, useAIActions, useAIState, useAudioState } from '@/store';
+import {
+  useSessionState,
+  useCrowdState,
+  useAIActions,
+  useAIState,
+  useAudioState,
+} from '@/store';
 import { useMusicContext } from '@/contexts/MusicContext';
 import Button from '@/components/ui/button';
 import { Lightbulb } from 'lucide-react';
@@ -46,7 +52,9 @@ const ProducerPage: React.FC = () => {
         const newPlaylistName = `My Set v${Math.floor(Math.random() * 100)}`;
         savePlaylist(newPlaylistName, newQueue);
 
-        alert(`New playlist "${newPlaylistName}" created with the suggested track!`);
+        alert(
+          `New playlist "${newPlaylistName}" created with the suggested track!`
+        );
       }
     }
   };
@@ -334,7 +342,9 @@ const ProducerPage: React.FC = () => {
           {weakTrack ? (
             <div className="space-y-4">
               <p className="text-gray-300">
-                AI has identified a potential weak spot in your set: <strong className="text-white">{weakTrack.title}</strong> by <strong className="text-white">{weakTrack.artist}</strong>.
+                AI has identified a potential weak spot in your set:{' '}
+                <strong className="text-white">{weakTrack.title}</strong> by{' '}
+                <strong className="text-white">{weakTrack.artist}</strong>.
               </p>
               <Button onClick={handleGetSuggestion} disabled={isAnalyzing}>
                 {isAnalyzing ? 'Analyzing...' : 'Get AI Suggestion'}
@@ -347,7 +357,15 @@ const ProducerPage: React.FC = () => {
                   className="mt-4 p-4 bg-rich-black/50 rounded-lg"
                 >
                   <p className="text-gray-300 mb-2">
-                    Suggestion: Replace with <strong className="text-white">{replacementSuggestion.title}</strong> by <strong className="text-white">{replacementSuggestion.artist}</strong>.
+                    Suggestion: Replace with{' '}
+                    <strong className="text-white">
+                      {replacementSuggestion.title}
+                    </strong>{' '}
+                    by{' '}
+                    <strong className="text-white">
+                      {replacementSuggestion.artist}
+                    </strong>
+                    .
                   </p>
                   <Button variant="accent" onClick={handleApplySuggestion}>
                     Apply & Create New Version
@@ -356,7 +374,9 @@ const ProducerPage: React.FC = () => {
               )}
             </div>
           ) : (
-            <p className="text-gray-400">Play a set to get AI improvement suggestions.</p>
+            <p className="text-gray-400">
+              Play a set to get AI improvement suggestions.
+            </p>
           )}
         </motion.div>
       </div>

@@ -17,9 +17,13 @@ const ProducerPage = lazy(() => import('@/pages/ProducerPage'));
 const DocsPage = lazy(() => import('@/pages/DocsPage'));
 const LoginPage = lazy(() => import('@/pages/auth/LoginPage'));
 const SignupPage = lazy(() => import('@/pages/auth/SignupPage'));
-const ForgotPasswordPage = lazy(() => import('@/pages/auth/ForgotPasswordPage'));
+const ForgotPasswordPage = lazy(
+  () => import('@/pages/auth/ForgotPasswordPage')
+);
 const ResetPasswordPage = lazy(() => import('@/pages/auth/ResetPasswordPage'));
-const SpotifyCallbackPage = lazy(() => import('@/pages/auth/SpotifyCallbackPage'));
+const SpotifyCallbackPage = lazy(
+  () => import('@/pages/auth/SpotifyCallbackPage')
+);
 const TermsPage = lazy(() => import('@/pages/legal/TermsPage'));
 const PrivacyPage = lazy(() => import('@/pages/legal/PrivacyPage'));
 const HelpPage = lazy(() => import('@/pages/support/HelpPage'));
@@ -41,7 +45,9 @@ const AppRoutes = () => {
 
   return (
     <>
-      <div className="min-h-screen bg-pure-black pb-24"> {/* Add padding for mini-player */}
+      <div className="min-h-screen bg-pure-black pb-24">
+        {' '}
+        {/* Add padding for mini-player */}
         <ApiStatusIndicator />
         <Suspense fallback={<LoadingSpinner />}>
           <Routes>
@@ -55,9 +61,18 @@ const AppRoutes = () => {
             <Route path="/docs" element={<DocsPage />} />
             <Route path="/auth/login" element={<LoginPage />} />
             <Route path="/auth/signup" element={<SignupPage />} />
-            <Route path="/auth/forgot-password" element={<ForgotPasswordPage />} />
-            <Route path="/auth/reset-password" element={<ResetPasswordPage />} />
-            <Route path="/auth/spotify/callback" element={<SpotifyCallbackPage />} />
+            <Route
+              path="/auth/forgot-password"
+              element={<ForgotPasswordPage />}
+            />
+            <Route
+              path="/auth/reset-password"
+              element={<ResetPasswordPage />}
+            />
+            <Route
+              path="/auth/spotify/callback"
+              element={<SpotifyCallbackPage />}
+            />
             <Route path="/legal/terms" element={<TermsPage />} />
             <Route path="/legal/privacy" element={<PrivacyPage />} />
             <Route path="/support/help" element={<HelpPage />} />

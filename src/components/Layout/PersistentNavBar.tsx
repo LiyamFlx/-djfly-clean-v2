@@ -15,7 +15,12 @@ const PersistentNavBar: React.FC = () => {
   const getCurrentStep = () => {
     const path = location.pathname;
     if (path === '/') return 1;
-    if (path.startsWith('/studio') && !path.includes('/match') && !path.includes('/set')) return 2;
+    if (
+      path.startsWith('/studio') &&
+      !path.includes('/match') &&
+      !path.includes('/set')
+    )
+      return 2;
     if (path.includes('/match') || path.includes('/set')) return 3;
     if (path === '/player') return 4;
     return 1;
@@ -24,10 +29,38 @@ const PersistentNavBar: React.FC = () => {
   const currentStep = getCurrentStep();
 
   const steps = [
-    { id: 1, label: 'Discover', icon: Home, path: '/', active: currentStep >= 1 },
-    { id: 2, label: 'Choose', icon: Sparkles, path: '/studio', active: currentStep >= 2 },
-    { id: 3, label: 'Create', icon: currentStep === 3 && location.pathname.includes('/match') ? Mic : Zap, path: location.pathname.includes('/match') ? '/studio/match' : '/studio/set', active: currentStep >= 3 },
-    { id: 4, label: 'Play', icon: Play, path: '/player', active: currentStep >= 4, badge: queue.length }
+    {
+      id: 1,
+      label: 'Discover',
+      icon: Home,
+      path: '/',
+      active: currentStep >= 1,
+    },
+    {
+      id: 2,
+      label: 'Choose',
+      icon: Sparkles,
+      path: '/studio',
+      active: currentStep >= 2,
+    },
+    {
+      id: 3,
+      label: 'Create',
+      icon:
+        currentStep === 3 && location.pathname.includes('/match') ? Mic : Zap,
+      path: location.pathname.includes('/match')
+        ? '/studio/match'
+        : '/studio/set',
+      active: currentStep >= 3,
+    },
+    {
+      id: 4,
+      label: 'Play',
+      icon: Play,
+      path: '/player',
+      active: currentStep >= 4,
+      badge: queue.length,
+    },
   ];
 
   return (
@@ -53,7 +86,7 @@ const PersistentNavBar: React.FC = () => {
                 <button
                   onClick={() => navigate(step.path)}
                   className={`relative flex items-center gap-2 px-4 py-2 rounded-lg transition-all duration-200 ${
-                    step.active 
+                    step.active
                       ? 'bg-electric-blue/20 text-electric-blue'
                       : 'text-gray-400 hover:text-white hover:bg-white/5'
                   }`}
@@ -67,7 +100,9 @@ const PersistentNavBar: React.FC = () => {
                   )}
                 </button>
                 {index < steps.length - 1 && (
-                  <div className={`w-8 h-px ${step.active ? 'bg-electric-blue' : 'bg-gray-600'} transition-colors`} />
+                  <div
+                    className={`w-8 h-px ${step.active ? 'bg-electric-blue' : 'bg-gray-600'} transition-colors`}
+                  />
                 )}
               </React.Fragment>
             ))}
@@ -77,13 +112,15 @@ const PersistentNavBar: React.FC = () => {
           <div className="flex items-center gap-3">
             {currentTrack && (
               <div className="hidden sm:flex items-center gap-2 text-sm">
-                <div className={`w-2 h-2 rounded-full ${isPlaying ? 'bg-green-400' : 'bg-gray-400'}`} />
+                <div
+                  className={`w-2 h-2 rounded-full ${isPlaying ? 'bg-green-400' : 'bg-gray-400'}`}
+                />
                 <span className="text-gray-300 max-w-32 truncate">
                   {currentTrack.title}
                 </span>
               </div>
             )}
-            
+
             {queue.length > 0 && (
               <button
                 onClick={() => navigate('/player')}
@@ -100,8 +137,12 @@ const PersistentNavBar: React.FC = () => {
         {/* Mobile Progress Bar */}
         <div className="md:hidden mt-2">
           <div className="flex items-center justify-between mb-2">
-            <span className="text-sm text-gray-400">Step {currentStep} of 4</span>
-            <span className="text-sm text-gray-400">{Math.round((currentStep / 4) * 100)}% Complete</span>
+            <span className="text-sm text-gray-400">
+              Step {currentStep} of 4
+            </span>
+            <span className="text-sm text-gray-400">
+              {Math.round((currentStep / 4) * 100)}% Complete
+            </span>
           </div>
           <div className="w-full bg-gray-700 rounded-full h-2">
             <motion.div

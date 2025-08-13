@@ -15,7 +15,7 @@ interface ProgressState {
 
 export const useProgressTracking = () => {
   const location = useLocation();
-  
+
   const [progress, setProgress] = useState<ProgressState>(() => {
     const saved = localStorage.getItem('djfly-progress');
     if (saved) {
@@ -25,7 +25,7 @@ export const useProgressTracking = () => {
         // Fall through to default
       }
     }
-    
+
     return {
       currentStep: 1,
       completedSteps: [],
@@ -34,8 +34,8 @@ export const useProgressTracking = () => {
         startTime: Date.now(),
         lastActivity: Date.now(),
         featuresUsed: [],
-        playlistsCreated: 0
-      }
+        playlistsCreated: 0,
+      },
     };
   });
 
@@ -51,16 +51,18 @@ export const useProgressTracking = () => {
   // Update progress when location changes
   useEffect(() => {
     const currentStep = getStepFromPath(location.pathname);
-    
-    setProgress(prev => {
+
+    setProgress((prev) => {
       const updated = {
         ...prev,
         currentStep,
-        completedSteps: Array.from(new Set([...prev.completedSteps, currentStep])),
+        completedSteps: Array.from(
+          new Set([...prev.completedSteps, currentStep])
+        ),
         sessionData: {
           ...prev.sessionData,
-          lastActivity: Date.now()
-        }
+          lastActivity: Date.now(),
+        },
       };
 
       // Persist to localStorage
@@ -71,28 +73,31 @@ export const useProgressTracking = () => {
 
   // Track feature usage
   const trackFeatureUsage = useCallback((feature: string, metadata?: any) => {
-    setProgress(prev => {
+    setProgress((prev) => {
       const updated = {
         ...prev,
         sessionData: {
           ...prev.sessionData,
           lastActivity: Date.now(),
-          featuresUsed: Array.from(new Set([...prev.sessionData.featuresUsed, feature])),
-          playlistsCreated: feature === 'playlist_created' 
-            ? prev.sessionData.playlistsCreated + 1 
-            : prev.sessionData.playlistsCreated
-        }
+          featuresUsed: Array.from(
+            new Set([...prev.sessionData.featuresUsed, feature])
+          ),
+          playlistsCreated:
+            feature === 'playlist_created'
+              ? prev.sessionData.playlistsCreated + 1
+              : prev.sessionData.playlistsCreated,
+        },
       };
 
       localStorage.setItem('djfly-progress', JSON.stringify(updated));
-      
+
       // Analytics tracking (if needed)
       if (typeof window !== 'undefined' && (window as any).gtag) {
         (window as any).gtag('event', 'feature_used', {
           feature_name: feature,
           step: prev.currentStep,
           session_duration: Date.now() - prev.sessionData.startTime,
-          ...metadata
+          ...metadata,
         });
       }
 
@@ -102,13 +107,13 @@ export const useProgressTracking = () => {
 
   // Update step progress (for within-step progress)
   const updateStepProgress = useCallback((step: string, progress: number) => {
-    setProgress(prev => {
+    setProgress((prev) => {
       const updated = {
         ...prev,
         stepProgress: {
           ...prev.stepProgress,
-          [step]: Math.max(0, Math.min(100, progress))
-        }
+          [step]: Math.max(0, Math.min(100, progress)),
+        },
       };
 
       localStorage.setItem('djfly-progress', JSON.stringify(updated));
@@ -119,36 +124,40 @@ export const useProgressTracking = () => {
   // Get suggestions for next actions
   const getNextActionSuggestion = useCallback(() => {
     const { currentStep, completedSteps, sessionData } = progress;
-    
+
     if (currentStep === 1 && !completedSteps.includes(2)) {
       return {
         action: 'Try Magic Studio',
         path: '/studio',
-        reason: 'Start creating your first AI playlist'
+        reason: 'Start creating your first AI playlist',
       };
     }
-    
-    if (currentStep === 2 && !sessionData.featuresUsed.includes('magic-match') && !sessionData.featuresUsed.includes('magic-set')) {
+
+    if (
+      currentStep === 2 &&
+      !sessionData.featuresUsed.includes('magic-match') &&
+      !sessionData.featuresUsed.includes('magic-set')
+    ) {
       return {
         action: 'Choose Your Path',
         path: '/studio',
-        reason: 'Select Magic Match or Magic Set to begin'
+        reason: 'Select Magic Match or Magic Set to begin',
       };
     }
-    
+
     if (sessionData.playlistsCreated > 0 && !completedSteps.includes(4)) {
       return {
         action: 'Go to Player',
-        path: '/player', 
-        reason: 'Your playlist is ready to play!'
+        path: '/player',
+        reason: 'Your playlist is ready to play!',
       };
     }
-    
+
     if (sessionData.playlistsCreated === 0) {
       return {
         action: 'Create Your First Playlist',
         path: '/studio/set',
-        reason: 'Experience the AI magic'
+        reason: 'Experience the AI magic',
       };
     }
 
@@ -158,10 +167,19 @@ export const useProgressTracking = () => {
   // Calculate overall completion percentage
   const getCompletionPercentage = useCallback(() => {
     const stepWeight = 25; // Each step worth 25%
-    const featureBonus = Math.min(20, progress.sessionData.featuresUsed.length * 5);
-    const playlistBonus = Math.min(10, progress.sessionData.playlistsCreated * 5);
-    
-    return Math.min(100, (progress.completedSteps.length * stepWeight) + featureBonus + playlistBonus);
+    const featureBonus = Math.min(
+      20,
+      progress.sessionData.featuresUsed.length * 5
+    );
+    const playlistBonus = Math.min(
+      10,
+      progress.sessionData.playlistsCreated * 5
+    );
+
+    return Math.min(
+      100,
+      progress.completedSteps.length * stepWeight + featureBonus + playlistBonus
+    );
   }, [progress]);
 
   // Reset progress (for testing or user request)
@@ -174,10 +192,10 @@ export const useProgressTracking = () => {
         startTime: Date.now(),
         lastActivity: Date.now(),
         featuresUsed: [],
-        playlistsCreated: 0
-      }
+        playlistsCreated: 0,
+      },
     };
-    
+
     setProgress(defaultProgress);
     localStorage.setItem('djfly-progress', JSON.stringify(defaultProgress));
   }, []);
@@ -190,7 +208,7 @@ export const useProgressTracking = () => {
     getCompletionPercentage,
     resetProgress,
     isFirstTime: progress.sessionData.featuresUsed.length === 0,
-    sessionDuration: Date.now() - progress.sessionData.startTime
+    sessionDuration: Date.now() - progress.sessionData.startTime,
   };
 };
 

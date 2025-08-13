@@ -66,7 +66,7 @@ const NavItem: React.FC<NavItemProps> = React.memo(
           <motion.div
             layoutId="activeTab"
             className="absolute inset-0 bg-neon-purple/10 border border-neon-purple/30 rounded-lg -z-10"
-            transition={{ type: "spring", bounce: 0.2, duration: 0.6 }}
+            transition={{ type: 'spring', bounce: 0.2, duration: 0.6 }}
           />
         )}
       </motion.button>
@@ -202,7 +202,9 @@ const MainNav: React.FC = () => {
                 <div className="flex-between p-6 border-b border-white/10">
                   <div className="flex items-center gap-3">
                     <div className="text-2xl">🎧</div>
-                    <span className="heading-tertiary gradient-text">DJfly</span>
+                    <span className="heading-tertiary gradient-text">
+                      DJfly
+                    </span>
                   </div>
                   <button
                     onClick={() => setIsMobileMenuOpen(false)}

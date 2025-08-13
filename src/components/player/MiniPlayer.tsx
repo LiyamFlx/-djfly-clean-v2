@@ -6,13 +6,8 @@ import { Link } from 'react-router-dom';
 import { ROUTES } from '@/constants/routes';
 
 const MiniPlayer: React.FC = () => {
-  const {
-    currentTrack,
-    isPlaying,
-    setIsPlaying,
-    nextTrack,
-    clearQueue,
-  } = useMusicContext();
+  const { currentTrack, isPlaying, setIsPlaying, nextTrack, clearQueue } =
+    useMusicContext();
 
   if (!currentTrack) {
     return null;
@@ -36,7 +31,11 @@ const MiniPlayer: React.FC = () => {
             <Link to={ROUTES.PLAYER} className="flex items-center gap-3 group">
               <div className="w-12 h-12 bg-gray-700 rounded-md overflow-hidden relative">
                 {currentTrack.image ? (
-                  <img src={currentTrack.image} alt={currentTrack.title} className="w-full h-full object-cover" />
+                  <img
+                    src={currentTrack.image}
+                    alt={currentTrack.title}
+                    className="w-full h-full object-cover"
+                  />
                 ) : (
                   <div className="w-full h-full flex items-center justify-center bg-gray-600">
                     <Music className="w-6 h-6 text-gray-400" />
@@ -44,19 +43,34 @@ const MiniPlayer: React.FC = () => {
                 )}
               </div>
               <div>
-                <h4 className="font-semibold group-hover:text-neon-purple transition-colors">{currentTrack.title}</h4>
+                <h4 className="font-semibold group-hover:text-neon-purple transition-colors">
+                  {currentTrack.title}
+                </h4>
                 <p className="text-sm text-gray-400">{currentTrack.artist}</p>
               </div>
             </Link>
 
             <div className="flex items-center gap-4">
-              <button onClick={togglePlay} className="p-2 rounded-full hover:bg-white/10 transition-colors">
-                {isPlaying ? <Pause className="w-6 h-6" /> : <Play className="w-6 h-6" />}
+              <button
+                onClick={togglePlay}
+                className="p-2 rounded-full hover:bg-white/10 transition-colors"
+              >
+                {isPlaying ? (
+                  <Pause className="w-6 h-6" />
+                ) : (
+                  <Play className="w-6 h-6" />
+                )}
               </button>
-              <button onClick={nextTrack} className="p-2 rounded-full hover:bg-white/10 transition-colors text-gray-400 hover:text-white">
+              <button
+                onClick={nextTrack}
+                className="p-2 rounded-full hover:bg-white/10 transition-colors text-gray-400 hover:text-white"
+              >
                 <SkipForward className="w-6 h-6" />
               </button>
-              <button onClick={clearQueue} className="p-2 rounded-full hover:bg-white/10 transition-colors text-gray-400 hover:text-white">
+              <button
+                onClick={clearQueue}
+                className="p-2 rounded-full hover:bg-white/10 transition-colors text-gray-400 hover:text-white"
+              >
                 <X className="w-6 h-6" />
               </button>
             </div>

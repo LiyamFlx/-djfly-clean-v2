@@ -8,9 +8,9 @@ interface TrackListProps {
   showPlayButton?: boolean;
 }
 
-const TrackList: React.FC<TrackListProps> = ({ 
-  title = "Recommended Tracks",
-  showPlayButton = true 
+const TrackList: React.FC<TrackListProps> = ({
+  title = 'Recommended Tracks',
+  showPlayButton = true,
 }) => {
   const { queue, currentTrack, isPlaying, playTrack } = useMusicContext();
 
@@ -32,7 +32,7 @@ const TrackList: React.FC<TrackListProps> = ({
         {queue.map((track, index) => {
           const isCurrentTrack = currentTrack?.id === track.id;
           const isTrackPlaying = isCurrentTrack && isPlaying;
-          
+
           return (
             <motion.div
               key={track.id}
@@ -40,7 +40,9 @@ const TrackList: React.FC<TrackListProps> = ({
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: index * 0.1 }}
               className={`bg-gray-800 p-4 rounded-lg flex items-center justify-between transition-all duration-200 ${
-                isCurrentTrack ? 'ring-2 ring-electric-blue/50 bg-electric-blue/10' : 'hover:bg-gray-700'
+                isCurrentTrack
+                  ? 'ring-2 ring-electric-blue/50 bg-electric-blue/10'
+                  : 'hover:bg-gray-700'
               }`}
             >
               <div className="flex items-center gap-4">
@@ -48,8 +50,8 @@ const TrackList: React.FC<TrackListProps> = ({
                   <button
                     onClick={() => playTrack(track)}
                     className={`w-10 h-10 rounded-full flex items-center justify-center transition-all duration-200 ${
-                      isCurrentTrack 
-                        ? 'bg-electric-blue text-white' 
+                      isCurrentTrack
+                        ? 'bg-electric-blue text-white'
                         : 'bg-gray-700 text-gray-300 hover:bg-gray-600'
                     }`}
                   >
@@ -60,9 +62,11 @@ const TrackList: React.FC<TrackListProps> = ({
                     )}
                   </button>
                 )}
-                
+
                 <div className="flex-1">
-                  <p className={`font-medium ${isCurrentTrack ? 'text-electric-blue' : 'text-white'}`}>
+                  <p
+                    className={`font-medium ${isCurrentTrack ? 'text-electric-blue' : 'text-white'}`}
+                  >
                     {track.title}
                   </p>
                   <p className="text-gray-400 text-sm">{track.artist}</p>
@@ -73,7 +77,7 @@ const TrackList: React.FC<TrackListProps> = ({
                   )}
                 </div>
               </div>
-              
+
               <div className="text-right text-sm text-gray-400">
                 <div className="flex items-center gap-4">
                   {track.bpm && <span>{track.bpm} BPM</span>}
@@ -81,7 +85,8 @@ const TrackList: React.FC<TrackListProps> = ({
                 </div>
                 {track.duration && (
                   <div className="mt-1 text-xs">
-                    {Math.floor(track.duration / 60)}:{String(track.duration % 60).padStart(2, '0')}
+                    {Math.floor(track.duration / 60)}:
+                    {String(track.duration % 60).padStart(2, '0')}
                   </div>
                 )}
               </div>
@@ -89,10 +94,15 @@ const TrackList: React.FC<TrackListProps> = ({
           );
         })}
       </div>
-      
+
       {queue.length > 0 && (
         <div className="mt-4 p-3 bg-gray-800/50 rounded-lg text-sm text-gray-400 text-center">
-          {queue.length} tracks • {Math.round(queue.reduce((total, track) => total + (track.duration || 240), 0) / 60)} min total
+          {queue.length} tracks •{' '}
+          {Math.round(
+            queue.reduce((total, track) => total + (track.duration || 240), 0) /
+              60
+          )}{' '}
+          min total
         </div>
       )}
     </div>

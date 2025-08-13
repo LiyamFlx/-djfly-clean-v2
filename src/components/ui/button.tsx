@@ -2,7 +2,12 @@ import React from 'react';
 import { motion } from 'framer-motion';
 import { LucideIcon } from 'lucide-react';
 
-export type ButtonVariant = 'primary' | 'secondary' | 'accent' | 'ghost' | 'danger';
+export type ButtonVariant =
+  | 'primary'
+  | 'secondary'
+  | 'accent'
+  | 'ghost'
+  | 'danger';
 export type ButtonSize = 'sm' | 'md' | 'lg' | 'xl';
 
 interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
@@ -57,7 +62,9 @@ export const Button: React.FC<ButtonProps> = ({
     sizeClasses[size],
     fullWidth ? 'w-full' : '',
     className,
-  ].filter(Boolean).join(' ');
+  ]
+    .filter(Boolean)
+    .join(' ');
 
   const isDisabled = disabled || loading;
 
@@ -74,13 +81,12 @@ export const Button: React.FC<ButtonProps> = ({
         {loading ? (
           <LoadingSpinner />
         ) : (
-          Icon &&
-          iconPosition === 'left' && <Icon className="w-4 h-4" />
+          Icon && iconPosition === 'left' && <Icon className="w-4 h-4" />
         )}
         <span className="font-medium">{children}</span>
-        {!loading &&
-          Icon &&
-          iconPosition === 'right' && <Icon className="w-4 h-4" />}
+        {!loading && Icon && iconPosition === 'right' && (
+          <Icon className="w-4 h-4" />
+        )}
       </span>
     </motion.button>
   );
