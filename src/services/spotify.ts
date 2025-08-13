@@ -161,6 +161,8 @@ export class SpotifyService {
     }
 
     return this.accessToken;
+  }
+
   private getDemoTracks(query: string, limit: number = 20): Track[] {
     const cacheKey = `demo_tracks_${query}_${limit}`;
     const cachedTracks = cache.get<Track[]>(cacheKey);

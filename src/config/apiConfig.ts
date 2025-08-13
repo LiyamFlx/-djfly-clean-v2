@@ -270,13 +270,6 @@ export const testConnections = {
     }
   },
 
-  async openai(): Promise<boolean> {
-    const result = await testOpenAIConnection();
-    const isConnected = result.status === 'connected';
-    serviceStatus.setServiceStatus('openai', isConnected);
-    return isConnected;
-  },
-
   async all(): Promise<Record<string, boolean>> {
     const results = await Promise.allSettled([
       this.spotify(),

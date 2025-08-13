@@ -4,7 +4,6 @@
  */
 
 import React, { useState, useEffect, useCallback } from 'react';
-import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
   runAllHealthChecks,
@@ -20,26 +19,7 @@ const ApiStatusIndicator: React.FC = () => {
   const [isExpanded, setIsExpanded] = useState(false);
   const [isTesting, setIsTesting] = useState(false);
 
-  const updateServiceStatus = () => {
-    setServices({
-      spotify: serviceStatus.getServiceStatus('spotify'),
-      supabase: serviceStatus.getServiceStatus('supabase'),
-      openai: serviceStatus.getServiceStatus('openai'),
-    });
-  };
-
   const testAllConnections = useCallback(async () => {
-    setIsTesting(true);
-    try {
-      // Test connections but don't throw errors for demo mode
-      await testConnections.all();
-      updateServiceStatus();
-  useEffect(() => {
-    // Initial status check on mount
-    testAllConnections();
-  }, []);
-
-  const testAllConnections = async () => {
     setIsTesting(true);
     try {
       const results = await runAllHealthChecks();
@@ -52,32 +32,23 @@ const ApiStatusIndicator: React.FC = () => {
       console.info(
         'Connection test completed with some services unavailable (demo mode)'
       );
-      updateServiceStatus(); // Still update the status even if some tests fail
     } finally {
       setIsTesting(false);
     }
   }, []);
 
   useEffect(() => {
-    // Initial status check
-    updateServiceStatus();
-
-    // Skip automatic connection testing to avoid console errors in demo mode
-    // testAllConnections();
+    // Initial status check on mount
+    testAllConnections();
 
     // Set up periodic checks
-    const interval = setInterval(updateServiceStatus, 30000); // Check every 30s
+    const interval = setInterval(() => {
+      testAllConnections();
+    }, 30000); // Check every 30s
 
     return () => clearInterval(interval);
   }, [testAllConnections]);
 
-  const getOverallStatus = () => {
-    const connectedServices = Object.values(services).filter(Boolean).length;
-    const totalServices = Object.keys(services).length;
-
-    if (connectedServices === totalServices) return 'all';
-    if (connectedServices > 0) return 'partial';
-    return 'demo'; // Change from 'none' to 'demo' for better UX
   const getOverallStatus = (): ServiceStatus => {
     const statuses = Object.values(services).map((s) => s?.status);
     if (statuses.every((s) => s === 'connected')) return 'connected';
@@ -94,7 +65,6 @@ const ApiStatusIndicator: React.FC = () => {
         return 'text-yellow-400';
       case 'demo':
         return 'text-blue-400'; // Use blue for demo mode instead of red
-        return 'text-blue-400';
       default:
         return 'text-red-400';
     }
@@ -108,7 +78,6 @@ const ApiStatusIndicator: React.FC = () => {
         return '🟡';
       case 'demo':
         return '🔵'; // Use blue circle for demo mode
-        return '🔵';
       default:
         return '🔴';
     }

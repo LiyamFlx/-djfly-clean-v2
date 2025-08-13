@@ -36,7 +36,6 @@ interface CacheItem {
   timestamp: number;
 }
 
-class AIMusicEngine {
 export class AIMusicEngine {
   private apiKey: string;
   private baseUrl: string;

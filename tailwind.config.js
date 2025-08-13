@@ -118,8 +118,10 @@ export default {
         'neon-gradient': 'linear-gradient(135deg, #9d4edd 0%, #abff4f 100%)',
         'glass-gradient':
           'linear-gradient(135deg, rgba(255,255,255,0.05) 0%, rgba(255,255,255,0.02) 100%)',
-        'purple-glow': 'radial-gradient(circle, rgba(157, 78, 221, 0.3) 0%, transparent 70%)',
-        'green-glow': 'radial-gradient(circle, rgba(171, 255, 79, 0.3) 0%, transparent 70%)',
+        'purple-glow':
+          'radial-gradient(circle, rgba(157, 78, 221, 0.3) 0%, transparent 70%)',
+        'green-glow':
+          'radial-gradient(circle, rgba(171, 255, 79, 0.3) 0%, transparent 70%)',
       },
       backdropBlur: {
         xs: '2px',
@@ -136,12 +138,15 @@ export default {
       boxShadow: {
         // Neon glow effects updated with new brand colors
         'neon-purple': '0 0 20px rgba(157, 78, 221, 0.5)',
-        'neon-purple-lg': '0 0 40px rgba(157, 78, 221, 0.7), 0 0 80px rgba(157, 78, 221, 0.3)',
+        'neon-purple-lg':
+          '0 0 40px rgba(157, 78, 221, 0.7), 0 0 80px rgba(157, 78, 221, 0.3)',
         'neon-green': '0 0 20px rgba(171, 255, 79, 0.5)',
-        'neon-green-lg': '0 0 40px rgba(171, 255, 79, 0.7), 0 0 80px rgba(171, 255, 79, 0.3)',
+        'neon-green-lg':
+          '0 0 40px rgba(171, 255, 79, 0.7), 0 0 80px rgba(171, 255, 79, 0.3)',
         'laser-pink': '0 0 20px rgba(157, 78, 221, 0.5)',
-        'laser-pink-lg': '0 0 40px rgba(157, 78, 221, 0.7), 0 0 80px rgba(157, 78, 221, 0.3)',
-        'glass': '0 8px 32px rgba(0, 0, 0, 0.8)',
+        'laser-pink-lg':
+          '0 0 40px rgba(157, 78, 221, 0.7), 0 0 80px rgba(157, 78, 221, 0.3)',
+        glass: '0 8px 32px rgba(0, 0, 0, 0.8)',
         'glass-lg': '0 16px 48px rgba(0, 0, 0, 0.9)',
         'focus-purple': '0 0 0 2px rgba(157, 78, 221, 0.8)',
         'focus-green': '0 0 0 2px rgba(171, 255, 79, 0.8)',

@@ -30,11 +30,6 @@ const HelpPage = lazy(() => import('@/pages/support/HelpPage'));
 const ContactPage = lazy(() => import('@/pages/support/ContactPage'));
 const NotFoundPage = lazy(() => import('@/pages/errors/NotFoundPage'));
 
-// --- Components ---
-import React, { Suspense } from 'react';
-import AppRouter from './components/AppRouter';
-import ApiStatusIndicator from './components/ApiStatusIndicator';
-
 const LoadingSpinner = ({ message = 'Loading...' }: { message?: string }) => (
   <div className="min-h-screen bg-black-gradient flex items-center justify-center">
     <div className="text-center">
@@ -102,13 +97,4 @@ function App() {
     </ThemeProvider>
   );
 }
-const App: React.FC = () => {
-  return (
-    <Suspense fallback={<LoadingSpinner />}>
-      <ApiStatusIndicator />
-      <AppRouter />
-    </Suspense>
-  );
-};
-
 export default App;
