@@ -6,6 +6,8 @@ export const ROUTES = {
   STUDIO_MATCH: '/studio/match',
   PLAYER: '/player',
   PRODUCER: '/producer',
+  PLANNER: '/planner', // Added per QA checklist
+  DANCER: '/dancer',   // Added per QA checklist
   PROFILE: '/profile',
   LIBRARY: '/library',
   DOCS: '/docs',

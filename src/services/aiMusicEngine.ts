@@ -37,7 +37,7 @@ interface MoodAnalysis {
   description: string;
 }
 
-class AIMusicEngine {
+export class AIMusicEngine {
   private apiKey: string;
   private baseUrl: string;
   private cache = new Map<string, any>();

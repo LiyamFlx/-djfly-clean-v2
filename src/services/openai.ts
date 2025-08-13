@@ -1,5 +1,6 @@
 import { Track } from '@/types';
 import { spotifyService } from './spotify';
+import { API_CONFIG } from '@/config/apiConfig';
 
 interface OpenAIMessage {
   role: 'system' | 'user' | 'assistant';
@@ -19,7 +20,7 @@ class OpenAIService {
   private baseUrl = 'https://api.openai.com/v1';
 
   constructor() {
-    this.apiKey = import.meta.env.VITE_OPENAI_API_KEY || '';
+    this.apiKey = API_CONFIG.openai.apiKey || '';
 
     if (!this.apiKey || this.apiKey === 'demo_openai_key') {
       console.warn(
@@ -362,6 +363,13 @@ class OpenAIService {
     prompt: string,
     onProgress: (progress: number) => void
   ): Promise<Track[]> {
+    const cacheKey = `demo_playlist_${prompt}`;
+    const cachedPlaylist = cache.get<Track[]>(cacheKey);
+    if (cachedPlaylist) {
+      onProgress(100);
+      return cachedPlaylist;
+    }
+
     onProgress(20);
 
     // Simulate API delay
@@ -400,6 +408,7 @@ class OpenAIService {
 
     onProgress(100);
     console.info('🎵 Using demo playlist for prompt:', prompt);
+    cache.set(cacheKey, demoTracks, 300000); // Cache for 5 minutes
     return demoTracks;
   }
 

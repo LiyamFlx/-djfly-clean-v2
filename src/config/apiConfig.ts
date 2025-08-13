@@ -206,81 +206,29 @@ export const validateApiConfig = () => {
   return validations;
 };
 
+import { testSpotifyConnection, testSupabaseConnection, testOpenAIConnection } from '@/utils/apiHealth';
+
 // Connection Testing
 export const testConnections = {
   async spotify(): Promise<boolean> {
-    if (!API_CONFIG.spotify.clientId || !API_CONFIG.spotify.clientSecret) {
-      return false;
-    }
-
-    try {
-      // Test Spotify API with client credentials flow
-      const response = await fetch(`${API_CONFIG.spotify.authUrl}/api/token`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/x-www-form-urlencoded',
-          Authorization: `Basic ${btoa(`${API_CONFIG.spotify.clientId}:${API_CONFIG.spotify.clientSecret}`)}`,
-        },
-        body: 'grant_type=client_credentials',
-      });
-
-      const success = response.ok;
-      serviceStatus.setServiceStatus('spotify', success);
-      return success;
-    } catch (error) {
-      console.error('Spotify connection test failed:', error);
-      serviceStatus.setServiceStatus('spotify', false);
-      return false;
-    }
+    const result = await testSpotifyConnection();
+    const isConnected = result.status === 'connected';
+    serviceStatus.setServiceStatus('spotify', isConnected);
+    return isConnected;
   },
 
   async supabase(): Promise<boolean> {
-    if (!API_CONFIG.supabase.url || !API_CONFIG.supabase.anonKey) {
-      return false;
-    }
-
-    try {
-      // Test Supabase connection
-      const response = await fetch(`${API_CONFIG.supabase.url}/rest/v1/`, {
-        headers: {
-          apikey: API_CONFIG.supabase.anonKey,
-          Authorization: `Bearer ${API_CONFIG.supabase.anonKey}`,
-        },
-      });
-
-      const success = response.status !== 401; // 401 would indicate invalid key
-      serviceStatus.setServiceStatus('supabase', success);
-      return success;
-    } catch (error) {
-      console.error('Supabase connection test failed:', error);
-      serviceStatus.setServiceStatus('supabase', false);
-      return false;
-    }
+    const result = await testSupabaseConnection();
+    const isConnected = result.status === 'connected';
+    serviceStatus.setServiceStatus('supabase', isConnected);
+    return isConnected;
   },
 
   async openai(): Promise<boolean> {
-    if (!API_CONFIG.openai.apiKey) {
-      serviceStatus.setServiceStatus('openai', false);
-      return false;
-    }
-
-    try {
-      // Test OpenAI API (just check if key format is valid)
-      const response = await fetch(`${API_CONFIG.openai.baseUrl}/models`, {
-        headers: {
-          Authorization: `Bearer ${API_CONFIG.openai.apiKey}`,
-          'Content-Type': 'application/json',
-        },
-      });
-
-      const success = response.ok;
-      serviceStatus.setServiceStatus('openai', success);
-      return success;
-    } catch (error) {
-      console.error('OpenAI connection test failed:', error);
-      serviceStatus.setServiceStatus('openai', false);
-      return false;
-    }
+    const result = await testOpenAIConnection();
+    const isConnected = result.status === 'connected';
+    serviceStatus.setServiceStatus('openai', isConnected);
+    return isConnected;
   },
 
   async all(): Promise<Record<string, boolean>> {

@@ -440,6 +440,12 @@ class SpotifyService {
    * Get demo tracks for fallback mode
    */
   private getDemoTracks(query: string, limit: number = 20): Track[] {
+    const cacheKey = `demo_tracks_${query}_${limit}`;
+    const cachedTracks = cache.get<Track[]>(cacheKey);
+    if (cachedTracks) {
+      return cachedTracks;
+    }
+
     const demoTracks: Track[] = [
       {
         id: 'demo_1',
@@ -519,7 +525,9 @@ class SpotifyService {
     }
 
     // Return all demo tracks if no query or no matches found
-    return demoTracks.slice(0, limit);
+    const result = demoTracks.slice(0, limit);
+    cache.set(cacheKey, result, 300000); // Cache for 5 minutes
+    return result;
   }
 
   /**
