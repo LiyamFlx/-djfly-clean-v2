@@ -214,7 +214,10 @@ const ShareSet: React.FC<ShareSetProps> = ({
         {/* Quick Share URL */}
         {shareLink && (
           <div>
-            <label htmlFor="share-link-input" className="block text-sm font-medium text-gray-300 mb-2">
+            <label
+              htmlFor="share-link-input"
+              className="block text-sm font-medium text-gray-300 mb-2"
+            >
               Share Link
             </label>
             <div className="flex items-center gap-2">
@@ -315,7 +318,10 @@ const ShareSet: React.FC<ShareSetProps> = ({
               exit={{ opacity: 0, height: 0 }}
               className="space-y-2"
             >
-              <label htmlFor="embed-code-textarea" className="block text-sm font-medium text-gray-300">
+              <label
+                htmlFor="embed-code-textarea"
+                className="block text-sm font-medium text-gray-300"
+              >
                 Embed Code (Copy & Paste)
               </label>
               <div className="flex items-start gap-2">

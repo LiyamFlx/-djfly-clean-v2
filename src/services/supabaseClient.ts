@@ -10,25 +10,24 @@ import type { SetMetrics, SetInsights } from './analytics';
 interface Database {
   public: {
     Tables: {
-      users: {
+      profiles: {
         Row: {
           id: string;
-          email: string;
           username: string;
+          avatar_url?: string;
           created_at: string;
           updated_at: string;
         };
         Insert: {
-          id?: string;
-          email: string;
+          id: string;
           username: string;
+          avatar_url?: string;
           created_at?: string;
           updated_at?: string;
         };
         Update: {
-          id?: string;
-          email?: string;
           username?: string;
+          avatar_url?: string;
           updated_at?: string;
         };
       };
@@ -63,7 +62,7 @@ interface Database {
           user_id: string;
           favorite_genres: string[];
           preferred_bpm_range: { min: number; max: number };
-          settings: Record<string, any>;
+          settings: Record<string, unknown>;
           created_at: string;
           updated_at: string;
         };
@@ -72,14 +71,14 @@ interface Database {
           user_id: string;
           favorite_genres?: string[];
           preferred_bpm_range?: { min: number; max: number };
-          settings?: Record<string, any>;
+          settings?: Record<string, unknown>;
           created_at?: string;
           updated_at?: string;
         };
         Update: {
           favorite_genres?: string[];
           preferred_bpm_range?: { min: number; max: number };
-          settings?: Record<string, any>;
+          settings?: Record<string, unknown>;
           updated_at?: string;
         };
       };
@@ -139,7 +138,7 @@ class SupabaseService {
 
     try {
       const { error } = await this.client
-        .from('users')
+        .from('profiles')
         .select('count')
         .limit(1);
 
@@ -200,7 +199,10 @@ class SupabaseService {
   /**
    * Get user's DJ session history
    */
-  async getUserSessions(userId: string, limit: number = 20): Promise<any[]> {
+  async getUserSessions(
+    userId: string,
+    limit: number = 20
+  ): Promise<unknown[]> {
     if (!this.client || !this.isConnected) {
       return this.getLocalSessions();
     }
@@ -230,7 +232,7 @@ class SupabaseService {
     preferences: {
       favorite_genres?: string[];
       preferred_bpm_range?: { min: number; max: number };
-      settings?: Record<string, any>;
+      settings?: Record<string, unknown>;
     }
   ): Promise<boolean> {
     if (!this.client || !this.isConnected) {
@@ -265,7 +267,7 @@ class SupabaseService {
   /**
    * Get user preferences
    */
-  async getUserPreferences(userId: string): Promise<any> {
+  async getUserPreferences(userId: string): Promise<unknown> {
     if (!this.client || !this.isConnected) {
       const stored = localStorage.getItem(`djfly_preferences_${userId}`);
       return stored ? JSON.parse(stored) : null;
@@ -331,7 +333,7 @@ class SupabaseService {
   /**
    * Fallback: Get local sessions
    */
-  private getLocalSessions(): any[] {
+  private getLocalSessions(): unknown[] {
     try {
       const sessions = localStorage.getItem('djfly_local_sessions');
       return sessions ? JSON.parse(sessions) : [];

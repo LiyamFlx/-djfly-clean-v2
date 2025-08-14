@@ -680,7 +680,7 @@ class AnalyticsEngine {
   /**
    * Get historical session data
    */
-  async getSessionHistory(): Promise<any[]> {
+  async getSessionHistory(): Promise<unknown[]> {
     try {
       const userId = this.getCurrentUserId();
       const sessions = await supabaseService.getUserSessions(userId);

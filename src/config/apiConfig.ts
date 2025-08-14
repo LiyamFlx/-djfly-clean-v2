@@ -24,12 +24,9 @@ const getEnvVar = (
 export const API_CONFIG = {
   // Spotify Configuration
   spotify: {
-    clientId: getEnvVar('VITE_SPOTIFY_CLIENT_ID') || 'demo_client_id',
-    clientSecret:
-      getEnvVar('VITE_SPOTIFY_CLIENT_SECRET') || 'demo_client_secret',
-    redirectUri:
-      getEnvVar('VITE_SPOTIFY_REDIRECT_URI') ||
-      'http://localhost:5173/auth/spotify/callback',
+    clientId: getEnvVar('VITE_SPOTIFY_CLIENT_ID'),
+    clientSecret: getEnvVar('VITE_SPOTIFY_CLIENT_SECRET'),
+    redirectUri: getEnvVar('VITE_SPOTIFY_REDIRECT_URI'),
     scopes: [
       'user-read-private',
       'user-read-email',
@@ -41,41 +38,43 @@ export const API_CONFIG = {
     ].join(' '),
     baseUrl: 'https://api.spotify.com/v1',
     authUrl: 'https://accounts.spotify.com',
+    tokenUrl: 'https://accounts.spotify.com/api/token',
   },
 
   // Supabase Configuration
   supabase: {
-    url: getEnvVar('VITE_SUPABASE_URL') || 'https://demo.supabase.co',
-    anonKey: getEnvVar('VITE_SUPABASE_ANON_KEY') || 'demo_anon_key',
+    url: getEnvVar('VITE_SUPABASE_URL'),
+    anonKey: getEnvVar('VITE_SUPABASE_ANON_KEY'),
   },
 
   // OpenAI Configuration
   openai: {
-    apiKey: getEnvVar('VITE_OPENAI_API_KEY', false) || 'demo_openai_key',
+    apiKey: getEnvVar('VITE_OPENAI_API_KEY'),
     baseUrl: 'https://api.openai.com/v1',
+    modelsUrl: 'https://api.openai.com/v1/models',
   },
 
   // YouTube Configuration
   youtube: {
-    apiKey: getEnvVar('VITE_YOUTUBE_API_KEY', false),
+    apiKey: getEnvVar('VITE_YOUTUBE_API_KEY'),
     baseUrl: 'https://www.googleapis.com/youtube/v3',
   },
 
   // Last.fm Configuration
   lastfm: {
-    apiKey: getEnvVar('VITE_LASTFM_API_KEY', false),
-    secret: getEnvVar('VITE_LASTFM_SECRET', false),
+    apiKey: getEnvVar('VITE_LASTFM_API_KEY'),
+    secret: getEnvVar('VITE_LASTFM_SECRET'),
     baseUrl: 'https://ws.audioscrobbler.com/2.0',
   },
 
   // Google Studio Configuration
   googleStudio: {
-    apiKey: getEnvVar('VITE_GOOGLE_STUDIO_API_KEY', false),
+    apiKey: getEnvVar('VITE_GOOGLE_STUDIO_API_KEY'),
   },
 
   // App Configuration
   app: {
-    environment: getEnvVar('VITE_APP_ENVIRONMENT') || 'development',
+    environment: getEnvVar('VITE_APP_ENVIRONMENT'),
     magicMatch: getEnvVar('VITE_MAGIC_MATCH_ENABLED') === 'true',
     magicSet: getEnvVar('VITE_MAGIC_SET_ENABLED') === 'true',
   },
@@ -111,78 +110,48 @@ export class ServiceStatus {
   }
 
   getAllServices(): Record<string, boolean> {
-    return Object.fromEntries(this.services);
+    return Object.fromEntries(this.services.entries());
   }
 }
 
 export const serviceStatus = ServiceStatus.getInstance();
 
-// API Key Validation
+// Configuration validation
 export const validateApiConfig = () => {
-  // Check for placeholder/demo credentials
-  const isPlaceholderSpotifyId = API_CONFIG.spotify.clientId?.match(
-    /^(abc123|e5050e55f5a94ca2|demo_client_id)/
-  );
-  const isPlaceholderSpotifySecret = API_CONFIG.spotify.clientSecret?.match(
-    /^(xyz456|7e76b6a7c1434b1a|demo_client_secret)/
-  );
-
-  const isPlaceholderOpenAI =
-    API_CONFIG.openai.apiKey?.match(/^(demo_openai_key)/);
-
-  const validations = {
+  const validations: Record<string, Record<string, boolean>> = {
     spotify: {
-      clientId:
-        !!API_CONFIG.spotify.clientId &&
-        API_CONFIG.spotify.clientId.length > 10 &&
-        !isPlaceholderSpotifyId,
-      clientSecret:
-        !!API_CONFIG.spotify.clientSecret &&
-        API_CONFIG.spotify.clientSecret.length > 10 &&
-        !isPlaceholderSpotifySecret,
+      clientId: !!API_CONFIG.spotify.clientId,
+      clientSecret: !!API_CONFIG.spotify.clientSecret,
       redirectUri: !!API_CONFIG.spotify.redirectUri,
-      isPlaceholder: !!(isPlaceholderSpotifyId || isPlaceholderSpotifySecret),
     },
     supabase: {
-      url:
-        !!API_CONFIG.supabase.url &&
-        API_CONFIG.supabase.url.startsWith('https://'),
-      anonKey:
-        !!API_CONFIG.supabase.anonKey &&
-        API_CONFIG.supabase.anonKey.startsWith('eyJ'),
+      url: !!API_CONFIG.supabase.url,
+      anonKey: !!API_CONFIG.supabase.anonKey,
     },
     openai: {
-      apiKey:
-        !API_CONFIG.openai.apiKey ||
-        (API_CONFIG.openai.apiKey.startsWith('sk-') &&
-          API_CONFIG.openai.apiKey.length > 40) ||
-        isPlaceholderOpenAI,
-      isPlaceholder: !!isPlaceholderOpenAI,
+      apiKey: !!API_CONFIG.openai.apiKey,
     },
     youtube: {
-      apiKey:
-        !!API_CONFIG.youtube.apiKey && API_CONFIG.youtube.apiKey.length > 20,
+      apiKey: !!API_CONFIG.youtube.apiKey,
     },
     lastfm: {
-      apiKey:
-        !!API_CONFIG.lastfm.apiKey && API_CONFIG.lastfm.apiKey.length > 20,
-      secret:
-        !!API_CONFIG.lastfm.secret && API_CONFIG.lastfm.secret.length > 20,
+      apiKey: !!API_CONFIG.lastfm.apiKey,
+      secret: !!API_CONFIG.lastfm.secret,
     },
     googleStudio: {
-      apiKey:
-        !!API_CONFIG.googleStudio.apiKey &&
-        API_CONFIG.googleStudio.apiKey.length > 20,
+      apiKey: !!API_CONFIG.googleStudio.apiKey,
     },
   };
 
   // Log validation results
-  console.log('🔑 API Configuration Validation:');
   Object.entries(validations).forEach(([service, checks]) => {
     const allValid = Object.values(checks).every(Boolean);
     console.log(
-      `${service.charAt(0).toUpperCase() + service.slice(1)}: ${allValid ? '✅' : '❌'}`
+      `${allValid ? '✅' : '⚠️'} ${service.toUpperCase()}: ${
+        allValid ? 'All credentials configured' : 'Some credentials missing'
+      }`
     );
+
     if (!allValid) {
       Object.entries(checks).forEach(([key, valid]) => {
         if (!valid) {
@@ -235,27 +204,90 @@ export const testConnections = {
     return isConnected;
   },
 
-  async all(): Promise<Record<string, boolean>> {
-    console.log('🔍 Testing all API connections...');
+  async youtube(): Promise<boolean> {
+    // Skip API testing in production - assume unavailable unless properly configured
+    if (
+      !API_CONFIG.youtube.apiKey ||
+      API_CONFIG.youtube.apiKey.includes(
+        'AIzaSyBBD44Gy31o8al3_MoJFksfhVJGI9a7SA'
+      )
+    ) {
+      console.info(
+        '🎥 YouTube API not configured or using invalid demo key - using fallback mode'
+      );
+      serviceStatus.setServiceStatus('youtube', false);
+      return false;
+    }
 
+    try {
+      // Only test if we have what looks like a real API key
+      const response = await fetch(
+        `${API_CONFIG.youtube.baseUrl}/search?part=snippet&q=test&key=${API_CONFIG.youtube.apiKey}&maxResults=1`
+      );
+
+      const success = response.ok;
+      serviceStatus.setServiceStatus('youtube', success);
+      return success;
+    } catch (error) {
+      console.info(
+        'YouTube connection test failed - using fallback mode:',
+        error
+      );
+      serviceStatus.setServiceStatus('youtube', false);
+      return false;
+    }
+  },
+
+  async lastfm(): Promise<boolean> {
+    // Skip API testing with known invalid keys
+    if (
+      !API_CONFIG.lastfm.apiKey ||
+      API_CONFIG.lastfm.apiKey.includes('8d3f0ac6611b0146296c5375c9634ef6')
+    ) {
+      console.info(
+        '🎵 Last.fm API not configured or using invalid demo key - using fallback mode'
+      );
+      serviceStatus.setServiceStatus('lastfm', false);
+      return false;
+    }
+
+    try {
+      // Only test if we have what looks like a real API key
+      const response = await fetch(
+        `${API_CONFIG.lastfm.baseUrl}/?method=track.search&track=test&api_key=${API_CONFIG.lastfm.apiKey}&format=json`
+      );
+
+      const success = response.ok;
+      serviceStatus.setServiceStatus('lastfm', success);
+      return success;
+    } catch (error) {
+      console.info(
+        'Last.fm connection test failed - using fallback mode:',
+        error
+      );
+      serviceStatus.setServiceStatus('lastfm', false);
+      return false;
+    }
+  },
+
+  async all(): Promise<Record<string, boolean>> {
     const results = await Promise.allSettled([
       this.spotify(),
       this.supabase(),
       this.openai(),
+      this.youtube(),
+      this.lastfm(),
     ]);
 
-    const connectionResults = {
-      spotify: results[0].status === 'fulfilled' ? results[0].value : false,
-      supabase: results[1].status === 'fulfilled' ? results[1].value : false,
-      openai: results[2].status === 'fulfilled' ? results[2].value : false,
+    return {
+      spotify: results[0].status === 'fulfilled' && results[0].value,
+      supabase: results[1].status === 'fulfilled' && results[1].value,
+      openai: results[2].status === 'fulfilled' && results[2].value,
+      youtube: results[3].status === 'fulfilled' && results[3].value,
+      lastfm: results[4].status === 'fulfilled' && results[4].value,
     };
-
-    console.log('📊 Connection Test Results:', connectionResults);
-    return connectionResults;
   },
 };
 
-// Initialize configuration on import
+// Initialize configuration validation
 validateApiConfig();
-
-export default API_CONFIG;

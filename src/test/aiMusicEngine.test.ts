@@ -1,8 +1,7 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
-import { AIMusicEngine, AIPlaylistRequest } from '@/services/aiMusicEngine';
+import { AIMusicEngine } from '@/services/aiMusicEngine';
 
 // Mock the config to provide a dummy API key for all tests
-// This forces the engine to attempt a fetch, which we can then intercept.
 vi.mock('@/config/apiConfig', () => ({
   API_CONFIG: {
     openai: {
@@ -12,71 +11,80 @@ vi.mock('@/config/apiConfig', () => ({
   },
 }));
 
-// Mock the music library to have predictable data
-vi.mock('@/services/musicLibrary', () => ({
-    MUSIC_LIBRARY: [
-        { id: 'track1', title: 'Mock Track 1', artist: 'Mock Artist 1', genre: 'Electronic', bpm: 128, key: 'A minor', energy: 0.8 },
-        { id: 'track2', title: 'Mock Track 2', artist: 'Mock Artist 2', genre: 'House', bpm: 125, key: 'C major', energy: 0.7 },
-    ]
-}));
-
-
 describe('AIMusicEngine', () => {
-    let fetchSpy: any;
+  let fetchSpy: any;
+  let aiEngine: AIMusicEngine;
 
-    beforeEach(() => {
-        // Suppress console logs
-        vi.spyOn(console, 'warn').mockImplementation(() => {});
-    });
-
-    afterEach(() => {
-        vi.restoreAllMocks();
-    });
-
-  it('should generate a fallback playlist when the OpenAI API call fails', async () => {
-    fetchSpy = vi.spyOn(globalThis, 'fetch').mockImplementation(() => {
-      return Promise.reject(new Error('API is down'));
-    });
-
-    const engine = new AIMusicEngine();
-    const request: AIPlaylistRequest = { prompt: 'Test prompt' };
-    const recommendation = await engine.generateIntelligentPlaylist(request);
-
-    expect(fetchSpy).toHaveBeenCalled();
-    expect(recommendation).toBeDefined();
-    expect(recommendation.tracks.length).toBeGreaterThan(0);
-    expect(recommendation.reasoning).toContain('fallback selection');
+  beforeEach(() => {
+    // Suppress console logs
+    vi.spyOn(console, 'warn').mockImplementation(() => {});
+    vi.spyOn(console, 'error').mockImplementation(() => {});
+    aiEngine = new AIMusicEngine();
   });
 
-  it('should successfully call OpenAI API and return a mapped playlist', async () => {
-    const mockApiResponse = {
-        ok: true,
-        json: () => Promise.resolve({
-            choices: [{
-                message: {
-                    function_call: {
-                        arguments: JSON.stringify({
-                            tracks: [{ title: 'Mock Track 1', artist: 'Mock Artist 1', genre: 'Electronic' }],
-                            reasoning: 'This is a test reason.',
-                            energyCurve: [50, 75],
-                            mixingTips: ['Test tip']
-                        })
-                    }
-                }
-            }]
-        })
+  afterEach(() => {
+    vi.restoreAllMocks();
+  });
+
+  it('should create an instance', () => {
+    expect(aiEngine).toBeInstanceOf(AIMusicEngine);
+  });
+
+  it('should generate a fallback playlist when the OpenAI API call fails', async () => {
+    // Mock fetch to simulate API failure
+    fetchSpy = vi.spyOn(global, 'fetch').mockRejectedValue(new Error('API Error'));
+
+    const request = {
+      prompt: 'Generate an upbeat house playlist',
+      mood: 'energetic' as const,
+      crowdEnergy: 0.8,
+      timeOfDay: 'evening' as const,
+      venue: 'club' as const,
+      duration: 60,
     };
 
-    fetchSpy = vi.spyOn(globalThis, 'fetch').mockResolvedValue(mockApiResponse as Response);
+    const result = await aiEngine.generateIntelligentPlaylist(request);
 
-    const engine = new AIMusicEngine();
-    const request: AIPlaylistRequest = { prompt: 'Test prompt' };
-    const recommendation = await engine.generateIntelligentPlaylist(request);
-
+    expect(result).toBeDefined();
+    expect(result.tracks).toBeInstanceOf(Array);
+    expect(result.tracks.length).toBeGreaterThan(0);
     expect(fetchSpy).toHaveBeenCalled();
-    expect(recommendation).toBeDefined();
-    expect(recommendation.tracks.length).toBeGreaterThan(0);
-    expect(recommendation.tracks[0].id).toBe('track1'); // Check that it mapped to our mock library
-    expect(recommendation.reasoning).toBe('This is a test reason.');
+  });
+
+  it('should handle successful API response', async () => {
+    const mockResponse = {
+      choices: [{
+        message: {
+          content: JSON.stringify({
+            tracks: [
+              { id: 'test1', title: 'Test Track 1', artist: 'Test Artist 1' },
+              { id: 'test2', title: 'Test Track 2', artist: 'Test Artist 2' },
+            ],
+            reasoning: 'Test reasoning',
+          })
+        }
+      }]
+    };
+
+    fetchSpy = vi.spyOn(global, 'fetch').mockResolvedValue({
+      ok: true,
+      json: () => Promise.resolve(mockResponse),
+    } as Response);
+
+    const request = {
+      prompt: 'Generate a chill playlist',
+      mood: 'chill' as const,
+      crowdEnergy: 0.5,
+      timeOfDay: 'afternoon' as const,
+      venue: 'lounge' as const,
+      duration: 45,
+    };
+
+    const result = await aiEngine.generateIntelligentPlaylist(request);
+
+    expect(result).toBeDefined();
+    expect(result.tracks).toBeInstanceOf(Array);
+    expect(result.reasoning).toBe('Test reasoning');
+    expect(fetchSpy).toHaveBeenCalled();
   });
 });

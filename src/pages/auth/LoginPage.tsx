@@ -3,7 +3,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { authService } from '@/services/auth';
 
-const LoginPage = () => {
+const LoginPage: React.FC = () => {
   const [formData, setFormData] = useState({
     email: '',
     password: '',
@@ -14,30 +14,37 @@ const LoginPage = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setError('');
     setIsLoading(true);
+    setError('');
 
     try {
-      await authService.mockLogin(formData.email);
-      navigate('/');
+      const result = await authService.signIn(formData);
+
+      if (result.success) {
+        navigate('/player');
+      } else {
+        setError(result.error || 'Login failed');
+      }
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Login failed');
+      // Fallback to mock login for demo purposes
+      try {
+        await authService.mockLogin(formData.email);
+        navigate('/');
+      } catch {
+        setError(err instanceof Error ? err.message : 'Login failed');
+      }
     } finally {
       setIsLoading(false);
     }
   };
 
-  const handleOAuthLogin = async (provider: 'google' | 'spotify' | 'apple') => {
-    try {
-      if (import.meta.env.VITE_USE_SUPABASE === 'true') {
-        await authService.supabaseOAuthLogin(
-          provider as 'google' | 'github' | 'discord'
-        );
-      } else {
-        await authService.oauthLogin(provider);
-      }
-    } catch (err) {
-      setError(err instanceof Error ? err.message : 'OAuth login failed');
+  const handleOAuthLogin = (provider: string) => {
+    if (provider === 'spotify') {
+      const authUrl = authService.getSpotifyAuthUrl();
+      window.location.href = authUrl;
+    } else {
+      // Mock OAuth for demo
+      navigate('/');
     }
   };
 
@@ -72,8 +79,8 @@ const LoginPage = () => {
                 Email Address
               </label>
               <input
-                type="email"
                 id="email"
+                type="email"
                 value={formData.email}
                 onChange={(e) =>
                   setFormData({ ...formData, email: e.target.value })
@@ -92,8 +99,8 @@ const LoginPage = () => {
                 Password
               </label>
               <input
-                type="password"
                 id="password"
+                type="password"
                 value={formData.password}
                 onChange={(e) =>
                   setFormData({ ...formData, password: e.target.value })
@@ -122,12 +129,12 @@ const LoginPage = () => {
               disabled={isLoading}
               className="w-full py-3 bg-gradient-to-r from-electric-blue to-bright-turquoise text-rich-black rounded-lg font-semibold transition-transform hover:scale-105 disabled:bg-ui-bg-hover disabled:text-ui-text-dim disabled:scale-100"
             >
-              {isLoading ? 'Logging in...' : 'Log In'}
+              {isLoading ? 'Signing in...' : 'Sign In'}
             </button>
           </form>
 
           <div className="mt-6">
-            <div className="relative mb-6">
+            <div className="relative">
               <div className="absolute inset-0 flex items-center">
                 <div className="w-full border-t border-ui-border"></div>
               </div>
@@ -138,28 +145,30 @@ const LoginPage = () => {
               </div>
             </div>
 
-            <div className="grid grid-cols-3 gap-3">
-              <button
-                onClick={() => handleOAuthLogin('google')}
-                className="flex items-center justify-center py-2 px-4 bg-ui-bg-hover hover:bg-ui-border rounded-lg transition-colors"
-                aria-label="Log in with Google"
-              >
-                <span className="text-lg">🎵</span>
-              </button>
-              <button
-                onClick={() => handleOAuthLogin('spotify')}
-                className="flex items-center justify-center py-2 px-4 bg-ui-bg-hover hover:bg-ui-border rounded-lg transition-colors"
-                aria-label="Log in with Spotify"
-              >
-                <span className="text-lg">🎧</span>
-              </button>
-              <button
-                onClick={() => handleOAuthLogin('apple')}
-                className="flex items-center justify-center py-2 px-4 bg-ui-bg-hover hover:bg-ui-border rounded-lg transition-colors"
-                aria-label="Log in with Apple"
-              >
-                <span className="text-lg">🍎</span>
-              </button>
+            <div className="mt-4">
+              <div className="grid grid-cols-3 gap-3">
+                <button
+                  onClick={() => handleOAuthLogin('google')}
+                  className="flex items-center justify-center py-2 px-4 bg-ui-bg-hover hover:bg-ui-border rounded-lg transition-colors"
+                  aria-label="Log in with Google"
+                >
+                  <span className="text-lg">🎵</span>
+                </button>
+                <button
+                  onClick={() => handleOAuthLogin('spotify')}
+                  className="flex items-center justify-center py-2 px-4 bg-ui-bg-hover hover:bg-ui-border rounded-lg transition-colors"
+                  aria-label="Log in with Spotify"
+                >
+                  <span className="text-lg">🎧</span>
+                </button>
+                <button
+                  onClick={() => handleOAuthLogin('apple')}
+                  className="flex items-center justify-center py-2 px-4 bg-ui-bg-hover hover:bg-ui-border rounded-lg transition-colors"
+                  aria-label="Log in with Apple"
+                >
+                  <span className="text-lg">🍎</span>
+                </button>
+              </div>
             </div>
           </div>
 

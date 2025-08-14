@@ -213,14 +213,14 @@ class PerformanceService {
     }
   }
 
-  private handleBackgroundAnalysis(result: any) {
+  private handleBackgroundAnalysis(result: unknown) {
     // Emit event or store result for components to use
     window.dispatchEvent(
       new CustomEvent('audioAnalysisComplete', { detail: result })
     );
   }
 
-  private handleWaveformResult(waveform: number[]) {
+  private handleWaveformResult(waveform: Float32Array) {
     // Emit waveform data for visualization components
     window.dispatchEvent(
       new CustomEvent('waveformGenerated', { detail: waveform })

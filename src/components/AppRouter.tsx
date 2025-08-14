@@ -42,6 +42,10 @@ const AppRouter: React.FC = () => {
           <Route index element={<HomePage />} />
 
           {/* Studio routes */}
+          <Route path={ROUTES.STUDIO} element={<StudioPage />}>
+            <Route path="set" element={<MagicSetPage />} />
+            <Route path="match" element={<MagicMatchPage />} />
+          </Route>
           <Route path={ROUTES.STUDIO} element={<StudioPage />} />
           <Route path={ROUTES.STUDIO_MATCH} element={<MagicMatchPage />} />
           <Route path={ROUTES.STUDIO_SET} element={<MagicSetPage />} />

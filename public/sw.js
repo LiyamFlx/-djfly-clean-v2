@@ -1,9 +1,9 @@
-const CACHE_NAME = 'djfly-v1.3.0';
+const CACHE_NAME = 'djfly-v1.4.0';
 const urlsToCache = [
   '/',
   '/manifest.json',
-  '/icon-192.png',
-  '/icon-512.png',
+  '/icon-192.svg',
+  '/icon-512.svg',
   '/vite.svg',
 ];
 

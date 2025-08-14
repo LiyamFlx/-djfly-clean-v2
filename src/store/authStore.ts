@@ -91,7 +91,7 @@ export const useAuthStore = create<AuthState>()(
           duration: 0,
           maxDuration: GUEST_MAX_DURATION,
           features: [
-            'demo-tracks',
+            'tracks',
             'basic-mixing',
             'effects',
             'sharing',
@@ -99,7 +99,7 @@ export const useAuthStore = create<AuthState>()(
           ],
           limitations: [
             '10-minute session limit',
-            'Demo tracks only (12 tracks)',
+            'Limited tracks',
             'Watermarked sharing',
             'Cannot save sets',
             'No AI recommendations',

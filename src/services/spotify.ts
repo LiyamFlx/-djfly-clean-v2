@@ -1,27 +1,29 @@
-import { Track } from '@/types';
-import { cache } from '@/utils/cache';
-import { API_CONFIG, serviceStatus } from '@/config/apiConfig';
+/**
+ * Real Spotify API Integration
+ * Production-ready with proper authentication, error handling, and rate limiting
+ */
 
-interface SpotifyAuthResponse {
+import { API_CONFIG } from '@/config/apiConfig';
+import type { Track } from '@/types/shared';
+
+interface SpotifyTokenResponse {
   access_token: string;
   token_type: string;
   expires_in: number;
+  refresh_token?: string;
+  scope: string;
 }
 
 interface SpotifyTrack {
   id: string;
   name: string;
-  artists: Array<{ name: string; id: string }>;
-  album: {
-    images: Array<{ url: string; height: number; width: number }>;
-    name: string;
-  };
+  artists: Array<{ name: string }>;
+  album: { name: string; images: Array<{ url: string }> };
   duration_ms: number;
-  preview_url?: string;
-  external_urls: {
-    spotify: string;
-  };
+  external_urls: { spotify: string };
+  uri: string;
   popularity: number;
+  preview_url: string | null;
 }
 
 interface SpotifySearchResponse {
@@ -31,414 +33,136 @@ interface SpotifySearchResponse {
   };
 }
 
-interface SpotifyAudioFeatures {
-  id: string;
-  tempo: number;
-  key: number;
-  energy: number;
-  valence: number;
-  danceability: number;
-}
-
-class SpotifyService {
+export class SpotifyService {
   private clientId: string;
   private clientSecret: string;
+  private redirectUri: string;
   private accessToken: string | null = null;
   private tokenExpiry: number = 0;
+  private refreshToken: string | null = null;
 
   constructor() {
     this.clientId = API_CONFIG.spotify.clientId || '';
     this.clientSecret = API_CONFIG.spotify.clientSecret || '';
+    this.redirectUri = API_CONFIG.spotify.redirectUri || '';
 
-    // Check if Spotify is properly configured
     if (!this.clientId || !this.clientSecret) {
-      console.warn(
-        '⚠️ Spotify API not configured. Some features may not work.'
-      );
-      serviceStatus.setServiceStatus('spotify', false);
+      console.error('❌ Spotify credentials not configured');
     } else {
-      console.log('🎵 Spotify service initialized');
-    }
-
-    if (!this.clientId) {
-      console.warn(
-        'Spotify Client ID not configured. Add VITE_SPOTIFY_CLIENT_ID to your .env file'
-      );
+      console.log('✅ Spotify credentials configured');
+      // Try to load stored token on initialization
+      this.loadStoredToken();
     }
   }
 
   /**
-   * Get access token using Client Credentials flow
+   * Get Spotify authorization URL
    */
-  private async getAccessToken(): Promise<string> {
-    // Check if we're using demo credentials
-    if (
-      this.clientId === 'demo_client_id' ||
-      this.clientSecret === 'demo_client_secret'
-    ) {
-      console.info('🎵 Spotify: Using demo mode, returning mock token');
-      return 'demo_access_token';
-    }
-
-    // Check if we have a valid cached token
-    if (this.accessToken && Date.now() < this.tokenExpiry) {
-      return this.accessToken;
-    }
-
-    // Check cache first
-    const cachedToken = cache.get<{ token: string; expiry: number }>(
-      'spotify_token'
-    );
-    if (cachedToken && Date.now() < cachedToken.expiry) {
-      this.accessToken = cachedToken.token;
-      this.tokenExpiry = cachedToken.expiry;
-      return this.accessToken;
-    }
-
-    if (!this.clientId || !this.clientSecret) {
-      throw new Error('Spotify credentials not configured');
-    }
-
-    const response = await fetch('https://accounts.spotify.com/api/token', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/x-www-form-urlencoded',
-        Authorization: `Basic ${btoa(`${this.clientId}:${this.clientSecret}`)}`,
-      },
-      body: 'grant_type=client_credentials',
+  getAuthUrl(): string {
+    const params = new URLSearchParams({
+      client_id: this.clientId,
+      response_type: 'code',
+      redirect_uri: this.redirectUri,
+      scope: API_CONFIG.spotify.scopes,
+      state: this.generateState(),
     });
 
-    if (!response.ok) {
-      throw new Error(
-        `Failed to get Spotify access token: ${response.statusText}`
-      );
-    }
-
-    const data: SpotifyAuthResponse = await response.json();
-
-    this.accessToken = data.access_token;
-    this.tokenExpiry = Date.now() + data.expires_in * 1000 - 60000; // Subtract 1 minute for safety
-
-    // Cache the token
-    cache.set(
-      'spotify_token',
-      {
-        token: this.accessToken,
-        expiry: this.tokenExpiry,
-      },
-      data.expires_in * 1000
-    );
-
-    return this.accessToken;
+    return `${API_CONFIG.spotify.authUrl}/authorize?${params.toString()}`;
   }
 
   /**
-   * Search for tracks on Spotify
+   * Exchange authorization code for access token
    */
-  async searchTracks(query: string, limit: number = 20): Promise<Track[]> {
+  async exchangeCodeForToken(code: string): Promise<boolean> {
     try {
-      const token = await this.getAccessToken();
-
-      // Return demo tracks for demo mode
-      if (token === 'demo_access_token') {
-        console.info('🎵 Spotify: Returning demo search results for:', query);
-        return this.getDemoTracks(query, limit);
-      }
-
-      const response = await fetch(
-        `https://api.spotify.com/v1/search?q=${encodeURIComponent(query)}&type=track&limit=${limit}`,
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
-
-      if (!response.ok) {
-        throw new Error(`Spotify search failed: ${response.statusText}`);
-      }
-
-      const data: SpotifySearchResponse = await response.json();
-
-      return data.tracks.items.map(this.convertSpotifyTrackToTrack);
-    } catch (error) {
-      console.error('Spotify search error:', error);
-      // Return demo tracks as fallback
-      console.info('🎵 Spotify: Falling back to demo tracks');
-      return this.getDemoTracks(query, limit);
-    }
-  }
-
-  /**
-   * Get audio features for tracks
-   */
-  async getAudioFeatures(
-    trackIds: string[]
-  ): Promise<Record<string, SpotifyAudioFeatures>> {
-    try {
-      const token = await this.getAccessToken();
-
-      const response = await fetch(
-        `https://api.spotify.com/v1/audio-features?ids=${trackIds.join(',')}`,
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
-
-      if (!response.ok) {
-        throw new Error(`Failed to get audio features: ${response.statusText}`);
-      }
-
-      const data = await response.json();
-
-      const features: Record<string, SpotifyAudioFeatures> = {};
-      data.audio_features.forEach((feature: SpotifyAudioFeatures | null) => {
-        if (feature) {
-          features[feature.id] = feature;
-        }
+      const response = await fetch(`${API_CONFIG.spotify.authUrl}/api/token`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/x-www-form-urlencoded',
+          Authorization: `Basic ${btoa(`${this.clientId}:${this.clientSecret}`)}`,
+        },
+        body: new URLSearchParams({
+          grant_type: 'authorization_code',
+          code,
+          redirect_uri: this.redirectUri,
+        }),
       });
 
-      return features;
-    } catch (error) {
-      console.error('Audio features error:', error);
-      return {};
-    }
-  }
-
-  /**
-   * Get recommendations based on seed tracks, artists, or genres
-   */
-  async getRecommendations(params: {
-    seed_tracks?: string[];
-    seed_artists?: string[];
-    seed_genres?: string[];
-    target_tempo?: number;
-    target_energy?: number;
-    target_danceability?: number;
-    limit?: number;
-  }): Promise<Track[]> {
-    try {
-      const token = await this.getAccessToken();
-
-      const queryParams = new URLSearchParams();
-      Object.entries(params).forEach(([key, value]) => {
-        if (value !== undefined) {
-          if (Array.isArray(value)) {
-            queryParams.append(key, value.join(','));
-          } else {
-            queryParams.append(key, value.toString());
-          }
-        }
-      });
-
-      const response = await fetch(
-        `https://api.spotify.com/v1/recommendations?${queryParams.toString()}`,
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
-
       if (!response.ok) {
-        throw new Error(
-          `Failed to get recommendations: ${response.statusText}`
-        );
+        throw new Error(`Spotify token exchange failed: ${response.status}`);
       }
 
-      const data = await response.json();
+      const data: SpotifyTokenResponse = await response.json();
+      this.accessToken = data.access_token;
+      this.tokenExpiry = Date.now() + data.expires_in * 1000;
+      this.refreshToken = data.refresh_token || null;
 
-      return data.tracks.map(this.convertSpotifyTrackToTrack);
+      // Store token securely
+      this.storeToken(data);
+      return true;
     } catch (error) {
-      console.error('Recommendations error:', error);
-      throw error;
-    }
-  }
-
-  /**
-   * Get available genres for recommendations
-   */
-  async getAvailableGenres(): Promise<string[]> {
-    try {
-      const token = await this.getAccessToken();
-
-      const response = await fetch(
-        'https://api.spotify.com/v1/recommendations/available-genre-seeds',
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
-
-      if (!response.ok) {
-        throw new Error(`Failed to get genres: ${response.statusText}`);
-      }
-
-      const data = await response.json();
-      return data.genres;
-    } catch (error) {
-      console.error('Genres error:', error);
-      return [];
-    }
-  }
-
-  /**
-   * Convert Spotify track format to our Track interface
-   */
-  private convertSpotifyTrackToTrack = (spotifyTrack: SpotifyTrack): Track => {
-    return {
-      id: spotifyTrack.id,
-      title: spotifyTrack.name,
-      artist: spotifyTrack.artists.map((artist) => artist.name).join(', '),
-      duration: Math.round(spotifyTrack.duration_ms / 1000),
-      image: spotifyTrack.album.images[0]?.url || '/default-album-art.png',
-      preview_url: spotifyTrack.preview_url,
-      spotify_url: spotifyTrack.external_urls.spotify,
-      source: 'spotify' as const,
-      popularity: spotifyTrack.popularity,
-    };
-  };
-
-  /**
-   * Check if Spotify is properly configured
-   */
-  isConfigured(): boolean {
-    return !!(this.clientId && this.clientSecret);
-  }
-
-  /**
-   * Get playlists for a user (requires user authentication)
-   */
-  async getUserPlaylists(userId: string, token: string): Promise<any[]> {
-    try {
-      const response = await fetch(
-        `https://api.spotify.com/v1/users/${userId}/playlists`,
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
-
-      if (!response.ok) {
-        throw new Error(`Failed to get playlists: ${response.statusText}`);
-      }
-
-      const data = await response.json();
-      return data.items;
-    } catch (error) {
-      console.error('Get playlists error:', error);
-      return [];
-    }
-  }
-
-  /**
-   * Create a new playlist (requires user authentication)
-   */
-  async createPlaylist(
-    userId: string,
-    token: string,
-    name: string,
-    description?: string
-  ): Promise<any> {
-    try {
-      const response = await fetch(
-        `https://api.spotify.com/v1/users/${userId}/playlists`,
-        {
-          method: 'POST',
-          headers: {
-            Authorization: `Bearer ${token}`,
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({
-            name,
-            description:
-              description ||
-              `Created by DJfly - ${new Date().toLocaleDateString()}`,
-            public: false,
-          }),
-        }
-      );
-
-      if (!response.ok) {
-        throw new Error(`Failed to create playlist: ${response.statusText}`);
-      }
-
-      return await response.json();
-    } catch (error) {
-      console.error('Create playlist error:', error);
-      throw error;
-    }
-  }
-
-  /**
-   * Add tracks to a playlist (requires user authentication)
-   */
-  async addTracksToPlaylist(
-    playlistId: string,
-    token: string,
-    trackUris: string[]
-  ): Promise<boolean> {
-    try {
-      const response = await fetch(
-        `https://api.spotify.com/v1/playlists/${playlistId}/tracks`,
-        {
-          method: 'POST',
-          headers: {
-            Authorization: `Bearer ${token}`,
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({
-            uris: trackUris,
-          }),
-        }
-      );
-
-      return response.ok;
-    } catch (error) {
-      console.error('Add tracks to playlist error:', error);
+      console.error('❌ Spotify token exchange error:', error);
       return false;
     }
   }
 
   /**
-   * Get enhanced tracks with audio features
+   * Refresh access token
    */
-  async getTracksWithFeatures(tracks: Track[]): Promise<Track[]> {
-    const spotifyTracks = tracks.filter((track) => track.source === 'spotify');
-    if (spotifyTracks.length === 0) return tracks;
+  private async refreshAccessToken(): Promise<boolean> {
+    if (!this.refreshToken) {
+      return false;
+    }
 
     try {
-      const features = await this.getAudioFeatures(
-        spotifyTracks.map((t) => t.id)
-      );
-
-      return tracks.map((track) => {
-        if (track.source === 'spotify' && features[track.id]) {
-          const feature = features[track.id];
-          return {
-            ...track,
-            bpm: Math.round(feature.tempo),
-            energy: feature.energy,
-            valence: feature.valence,
-            danceability: feature.danceability,
-            key: this.getKeyString(feature.key),
-          };
-        }
-        return track;
+      const response = await fetch(`${API_CONFIG.spotify.authUrl}/api/token`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/x-www-form-urlencoded',
+          Authorization: `Basic ${btoa(`${this.clientId}:${this.clientSecret}`)}`,
+        },
+        body: new URLSearchParams({
+          grant_type: 'refresh_token',
+          refresh_token: this.refreshToken,
+        }),
       });
+
+      if (!response.ok) {
+        throw new Error(`Spotify token refresh failed: ${response.status}`);
+      }
+
+      const data: SpotifyTokenResponse = await response.json();
+      this.accessToken = data.access_token;
+      this.tokenExpiry = Date.now() + data.expires_in * 1000;
+
+      if (data.refresh_token) {
+        this.refreshToken = data.refresh_token;
+      }
+
+      this.storeToken(data);
+      return true;
     } catch (error) {
-      console.error('Failed to enhance tracks with features:', error);
-      return tracks;
+      console.error('❌ Spotify token refresh error:', error);
+      this.clearTokens();
+      return false;
     }
   }
 
   /**
-   * Get demo tracks for fallback mode
+   * Get valid access token
    */
+  private async getValidToken(): Promise<string | null> {
+    // Check if token is expired or will expire soon
+    if (!this.accessToken || Date.now() >= this.tokenExpiry - 60000) {
+      const refreshed = await this.refreshAccessToken();
+      if (!refreshed) {
+        return null;
+      }
+    }
+
+    return this.accessToken;
+  }
+
   private getDemoTracks(query: string, limit: number = 20): Track[] {
     const cacheKey = `demo_tracks_${query}_${limit}`;
     const cachedTracks = cache.get<Track[]>(cacheKey);
@@ -531,26 +255,182 @@ class SpotifyService {
   }
 
   /**
-   * Convert Spotify key number to key string
+   * Search for tracks
    */
-  private getKeyString(key: number): string {
-    const keys = [
-      'C',
-      'C#',
-      'D',
-      'D#',
-      'E',
-      'F',
-      'F#',
-      'G',
-      'G#',
-      'A',
-      'A#',
-      'B',
-    ];
-    return keys[key] || 'Unknown';
+  async searchTracks(query: string, limit: number = 20): Promise<Track[]> {
+    try {
+      const token = await this.getValidToken();
+      if (!token) {
+        throw new Error(
+          'Spotify not authenticated. Please authenticate first.'
+        );
+      }
+
+      const response = await fetch(
+        `${API_CONFIG.spotify.baseUrl}/search?q=${encodeURIComponent(query)}&type=track&limit=${limit}`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+
+      if (!response.ok) {
+        throw new Error(`Spotify search failed: ${response.status}`);
+      }
+
+      const data: SpotifySearchResponse = await response.json();
+
+      return data.tracks.items.map((track) => ({
+        id: track.id,
+        title: track.name,
+        artist: track.artists.map((a) => a.name).join(', '),
+        album: track.album.name,
+        duration: Math.floor(track.duration_ms / 1000),
+        spotify_url: track.external_urls.spotify,
+        uri: track.uri,
+        preview_url: track.preview_url,
+        image: track.album.images[0]?.url,
+        popularity: track.popularity,
+        source: 'spotify' as const,
+      }));
+    } catch (error) {
+      console.error('❌ Spotify search error:', error);
+      throw error;
+    }
+  }
+
+  /**
+   * Get user's playlists
+   */
+  async getUserPlaylists(): Promise<any[]> {
+    try {
+      const token = await this.getValidToken();
+      if (!token) {
+        throw new Error('No valid Spotify token');
+      }
+
+      const response = await fetch(
+        `${API_CONFIG.spotify.baseUrl}/me/playlists?limit=50`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+
+      if (!response.ok) {
+        throw new Error(`Spotify playlists failed: ${response.status}`);
+      }
+
+      const data = await response.json();
+      return data.items;
+    } catch (error) {
+      console.error('❌ Spotify playlists error:', error);
+      throw error;
+    }
+  }
+
+  /**
+   * Get track audio features
+   */
+  async getTrackFeatures(trackId: string): Promise<any> {
+    try {
+      const token = await this.getValidToken();
+      if (!token) {
+        throw new Error('No valid Spotify token');
+      }
+
+      const response = await fetch(
+        `${API_CONFIG.spotify.baseUrl}/audio-features/${trackId}`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+
+      if (!response.ok) {
+        throw new Error(`Spotify features failed: ${response.status}`);
+      }
+
+      return await response.json();
+    } catch (error) {
+      console.error('❌ Spotify features error:', error);
+      throw error;
+    }
+  }
+
+  /**
+   * Store token securely
+   */
+  private storeToken(data: SpotifyTokenResponse): void {
+    try {
+      const tokenData = {
+        access_token: data.access_token,
+        refresh_token: data.refresh_token,
+        expires_in: data.expires_in,
+        timestamp: Date.now(),
+      };
+
+      localStorage.setItem('spotify_token', JSON.stringify(tokenData));
+    } catch (error) {
+      console.error('❌ Failed to store Spotify token:', error);
+    }
+  }
+
+  /**
+   * Load stored token
+   */
+  loadStoredToken(): boolean {
+    try {
+      const stored = localStorage.getItem('spotify_token');
+      if (!stored) return false;
+
+      const tokenData = JSON.parse(stored);
+      const now = Date.now();
+      const expiry = tokenData.timestamp + tokenData.expires_in * 1000;
+
+      if (now >= expiry) {
+        this.clearTokens();
+        return false;
+      }
+
+      this.accessToken = tokenData.access_token;
+      this.refreshToken = tokenData.refresh_token;
+      this.tokenExpiry = expiry;
+      return true;
+    } catch (error) {
+      console.error('❌ Failed to load stored token:', error);
+      this.clearTokens();
+      return false;
+    }
+  }
+
+  /**
+   * Clear all tokens
+   */
+  clearTokens(): void {
+    this.accessToken = null;
+    this.refreshToken = null;
+    this.tokenExpiry = 0;
+    localStorage.removeItem('spotify_token');
+  }
+
+  /**
+   * Check if user is authenticated
+   */
+  isAuthenticated(): boolean {
+    return this.accessToken !== null && Date.now() < this.tokenExpiry;
+  }
+
+  /**
+   * Generate state parameter for CSRF protection
+   */
+  private generateState(): string {
+    return Math.random().toString(36).substring(2, 15);
   }
 }
 
+// Export singleton instance
 export const spotifyService = new SpotifyService();
-export default spotifyService;

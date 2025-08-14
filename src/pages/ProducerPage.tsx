@@ -1,43 +1,122 @@
 import React from 'react';
+import { motion } from 'framer-motion';
+import { BarChart, TrendingUp, Users, Clock, Award } from 'lucide-react';
+import {
+  useSessionState,
+  useCrowdState,
+  useAIActions,
+  useAIState,
+  useAudioState,
+} from '@/store';
+import { useMusicContext } from '@/contexts/MusicContext';
+import Button from '@/components/ui/button';
+import { Lightbulb } from 'lucide-react';
 
-const ProducerAnalyticsPage = () => (
-  <div className="min-h-screen bg-gray-900 text-white p-8">
-    <div className="max-w-6xl mx-auto">
-      <h1 className="text-3xl font-bold mb-8">📊 Producer Analytics</h1>
-      <div className="grid md:grid-cols-3 gap-6 mb-8">
-        <div className="bg-gray-800 p-6 rounded-xl">
-          <h3 className="text-lg font-semibold mb-2">Total Plays</h3>
-          <p className="text-3xl font-bold text-blue-400">1,337</p>
-        </div>
-        <div className="bg-gray-800 p-6 rounded-xl">
-          <h3 className="text-lg font-semibold mb-2">Active Sets</h3>
-          <p className="text-3xl font-bold text-purple-400">42</p>
-        </div>
-        <div className="bg-gray-800 p-6 rounded-xl">
-          <h3 className="text-lg font-semibold mb-2">Followers</h3>
-          <p className="text-3xl font-bold text-green-400">89</p>
-        </div>
-      </div>
-      <div className="bg-gray-800 p-6 rounded-xl">
-        <h3 className="text-xl font-semibold mb-4">Popular Tracks</h3>
-        <div className="space-y-3">
-          {['Electronic Dreams', 'Bass Drop Madness', 'Synth Wave Sunset'].map(
-            (track, i) => (
-              <div
-                key={i}
-                className="flex items-center justify-between p-3 bg-gray-700 rounded-lg"
-              >
-                <span>{track}</span>
-                <span className="text-blue-400">
-                  {Math.floor(Math.random() * 500)} plays
-                </span>
+const ProducerPage: React.FC = () => {
+  const sessionState = useSessionState();
+  const crowdState = useCrowdState();
+  const { queue } = useAudioState();
+  const { getReplacementTrack } = useAIActions();
+  const { replacementSuggestion, isAnalyzing } = useAIState();
+  const { currentTrack } = useMusicContext();
+
+  // Simulate weak track detection for demo
+  const weakTrack = queue.length > 2 ? queue[1] : null;
+
+  const handleGetSuggestion = async () => {
+    if (weakTrack) {
+      await getReplacementTrack(weakTrack);
+    }
+  };
+
+  const handleApplySuggestion = () => {
+    if (replacementSuggestion) {
+      // In a real app, this would update the queue
+      console.log('Applying suggestion:', replacementSuggestion);
+    }
+  };
+
+  return (
+    <div className="min-h-screen bg-black-gradient py-8">
+      <div className="container-responsive">
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="space-y-8"
+        >
+          {/* Header */}
+          <div className="text-center">
+            <motion.h1
+              className="heading-hero gradient-text mb-4"
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.1 }}
+            >
+              Producer Dashboard
+            </motion.h1>
+            <p className="heading-secondary text-gray-300">
+              Real-time analytics and AI insights for your sets
+            </p>
+          </div>
+
+          {/* Stats Grid */}
+          <motion.div
+            className="grid-responsive-4 gap-6"
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.2 }}
+          >
+            <div className="glass-card text-center">
+              <div className="flex items-center justify-center mb-3">
+                <BarChart className="w-6 h-6 text-neon-purple" />
               </div>
-            )
-          )}
-        </div>
+              <div className="text-2xl font-bold text-white mb-1">
+                {Math.round((crowdState.energyLevel || 0.75) * 100)}%
+              </div>
+              <div className="text-sm text-gray-400">Crowd Energy</div>
+            </div>
+
+            <div className="glass-card text-center">
+              <div className="flex items-center justify-center mb-3">
+                <TrendingUp className="w-6 h-6 text-neon-green" />
+              </div>
+              <div className="text-2xl font-bold text-white mb-1">
+                {crowdState.energyTrend === 'rising'
+                  ? '+12%'
+                  : crowdState.energyTrend === 'falling'
+                    ? '-8%'
+                    : '~0%'}
+              </div>
+              <div className="text-sm text-gray-400">Energy Trend</div>
+            </div>
+
+            <div className="glass-card text-center">
+              <div className="flex items-center justify-center mb-3">
+                <Users className="w-6 h-6 text-electric-blue" />
+              </div>
+              <div className="text-2xl font-bold text-white mb-1">
+                {Math.floor(Math.random() * 200) + 50}
+              </div>
+              <div className="text-sm text-gray-400">Active Listeners</div>
+            </div>
+
+            <div className="glass-card text-center">
+              <div className="flex items-center justify-center mb-3">
+                <Clock className="w-6 h-6 text-bright-turquoise" />
+              </div>
+              <div className="text-2xl font-bold text-white mb-1">
+                {sessionState.playTime
+                  ? Math.floor(sessionState.playTime / 60000)
+                  : 0}
+                m
+              </div>
+              <div className="text-sm text-gray-400">Session Time</div>
+            </div>
+          </motion.div>
+        </motion.div>
       </div>
     </div>
-  </div>
-);
+  );
+};
 
-export default ProducerAnalyticsPage;
+export default ProducerPage;
