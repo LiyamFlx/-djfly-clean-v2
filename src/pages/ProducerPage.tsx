@@ -1,15 +1,12 @@
 import React from 'react';
 import { motion } from 'framer-motion';
 import { BarChart, TrendingUp, Users, Clock } from 'lucide-react';
-import { useSessionState } from '@/hooks/useSessionState';
-import { useCrowdState } from '@/hooks/useCrowdState';
-import { useAIState } from '@/hooks/useAIState';
-import { useAIActions } from '@/hooks/useAIActions';
+import { useSessionState, useCrowdState, useAIState, useAIActions } from '@/store';
 
 const ProducerPage: React.FC = () => {
-  const { sessionState } = useSessionState();
-  const { crowdState } = useCrowdState();
-  const { aiState } = useAIState();
+  const sessionState = useSessionState();
+  const crowdState = useCrowdState();
+  const aiState = useAIState();
   const { getReplacementTrack } = useAIActions();
 
   const handleGetSuggestion = async () => {
