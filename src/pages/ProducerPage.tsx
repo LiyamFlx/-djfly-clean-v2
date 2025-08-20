@@ -1,7 +1,12 @@
 import React from 'react';
 import { motion } from 'framer-motion';
 import { BarChart, TrendingUp, Users, Clock } from 'lucide-react';
-import { useSessionState, useCrowdState, useAIState, useAIActions } from '@/store';
+import {
+  useSessionState,
+  useCrowdState,
+  useAIState,
+  useAIActions,
+} from '@/store';
 
 const ProducerPage: React.FC = () => {
   const sessionState = useSessionState();
