@@ -5,7 +5,7 @@
 
 import type { Track } from '@/types/shared';
 import { spotifyService } from './spotify';
-import { lastfmService } from '../-djfly-clean-v2/src/services/lastfm';
+import { lastfmService } from './lastfm';
 import { serviceStatus } from '@/config/apiConfig';
 
 export interface MatchCriteria {

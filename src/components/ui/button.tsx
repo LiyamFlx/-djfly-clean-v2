@@ -1,5 +1,5 @@
 import React from 'react';
-import { motion } from 'framer-motion';
+import { motion, HTMLMotionProps } from 'framer-motion';
 import { LucideIcon } from 'lucide-react';
 
 export type ButtonVariant =
@@ -10,7 +10,7 @@ export type ButtonVariant =
   | 'danger';
 export type ButtonSize = 'sm' | 'md' | 'lg' | 'xl';
 
-interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
+interface ButtonProps extends Omit<HTMLMotionProps<'button'>, 'children'> {
   variant?: ButtonVariant;
   size?: ButtonSize;
   icon?: LucideIcon;

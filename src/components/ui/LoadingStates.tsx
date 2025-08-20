@@ -4,8 +4,8 @@ import { Music, Brain, Sparkles } from 'lucide-react';
 
 interface LoadingSpinnerProps {
   size?: 'sm' | 'md' | 'lg';
-  color?: string;
-  message?: string;
+  _color?: string; // Prefix with underscore to indicate unused
+  className?: string;
 }
 
 export const LoadingSpinner: React.FC<LoadingSpinnerProps> = ({

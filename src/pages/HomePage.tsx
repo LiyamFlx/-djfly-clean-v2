@@ -1,14 +1,11 @@
 import React, { useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
-import { motion, AnimatePresence } from 'framer-motion';
+import { useNavigate } from 'react-router-dom';
+import { motion } from 'framer-motion';
 import {
   Sparkles,
-  Mic,
   Play,
   BarChart,
   ArrowRight,
-  CheckCircle,
-  Zap,
   Music,
   Users,
   Clock,
@@ -20,7 +17,6 @@ import {
   Shield,
   Cpu,
 } from 'lucide-react';
-import { ROUTES } from '@/constants/routes';
 import Button from '@/components/ui/button';
 
 const HomePage: React.FC = () => {
@@ -172,7 +168,7 @@ const HomePage: React.FC = () => {
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.8, delay: 0.5 }}
             >
-              {stats.map((stat, index) => (
+              {stats.map((stat, _index) => (
                 <motion.div
                   key={stat.label}
                   className="glass-card text-center hover-scale"

@@ -1,14 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
-import {
-  Play,
-  Pause,
-  Volume2,
-  Settings,
-  Zap,
-  BarChart3,
-  ChevronDown,
-} from 'lucide-react';
+import { motion } from 'framer-motion';
+import { Play, Pause, Settings, Zap, ChevronDown } from 'lucide-react';
 import { advancedAudioService } from '@/services/advancedAudio';
 import Slider from '@/components/ui/Slider';
 import { useTheme } from '@/contexts/ThemeContext';

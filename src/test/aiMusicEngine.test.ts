@@ -32,7 +32,9 @@ describe('AIMusicEngine', () => {
 
   it('should generate a fallback playlist when the OpenAI API call fails', async () => {
     // Mock fetch to simulate API failure
-    fetchSpy = vi.spyOn(global, 'fetch').mockRejectedValue(new Error('API Error'));
+    fetchSpy = vi
+      .spyOn(global, 'fetch')
+      .mockRejectedValue(new Error('API Error'));
 
     const request = {
       prompt: 'Generate an upbeat house playlist',
@@ -53,17 +55,19 @@ describe('AIMusicEngine', () => {
 
   it('should handle successful API response', async () => {
     const mockResponse = {
-      choices: [{
-        message: {
-          content: JSON.stringify({
-            tracks: [
-              { id: 'test1', title: 'Test Track 1', artist: 'Test Artist 1' },
-              { id: 'test2', title: 'Test Track 2', artist: 'Test Artist 2' },
-            ],
-            reasoning: 'Test reasoning',
-          })
-        }
-      }]
+      choices: [
+        {
+          message: {
+            content: JSON.stringify({
+              tracks: [
+                { id: 'test1', title: 'Test Track 1', artist: 'Test Artist 1' },
+                { id: 'test2', title: 'Test Track 2', artist: 'Test Artist 2' },
+              ],
+              reasoning: 'Test reasoning',
+            }),
+          },
+        },
+      ],
     };
 
     fetchSpy = vi.spyOn(global, 'fetch').mockResolvedValue({

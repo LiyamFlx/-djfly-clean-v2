@@ -2,11 +2,18 @@ export interface SessionContext {
   venue?: string;
   crowdSize?: number;
   vibe?: string;
-  bpmTarget?: number;
+  bpmTarget?: number | [number, number]; // Allow both single value and range
   genres?: string[];
 }
 
-export type SessionStatus = 'idle' | 'active' | 'paused' | 'ended';
+export type SessionStatus =
+  | 'idle'
+  | 'active'
+  | 'paused'
+  | 'ended'
+  | 'live'
+  | 'analytics_ready'
+  | 'setup';
 
 export interface SessionTransition {
   from: SessionStatus;
@@ -25,18 +32,21 @@ export interface SessionRecovery {
   session_id: string;
   recovery_point: Date;
   state_snapshot: any;
+  last_status?: SessionStatus; // Add missing property
 }
 
 export interface EnergyPoint {
   timestamp: Date;
   value: number;
   track_id?: string;
+  t?: number; // Add compatibility property for existing code
 }
 
 export interface CrowdResponse {
   energy: number;
   engagement: number;
   mood: string;
+  energyLevel?: number; // Add missing property
 }
 
 export interface SessionMetrics {
@@ -57,6 +67,7 @@ export interface Session {
   energy_curve?: EnergyPoint[];
   context?: SessionContext;
   realtime_channel?: string;
+  playTime?: number; // Add missing property
 }
 
 export interface SessionAnalytics {
@@ -75,4 +86,14 @@ export interface SessionSummary {
   analytics: SessionAnalytics;
   highlights: string[];
   recommendations: string[];
+}
+
+// Add missing types for AI state
+export interface AIState {
+  isAnalyzing: boolean;
+  confidence: number;
+  lastAnalysis: Date | null;
+  recommendations: any[];
+  replacementSuggestion: any | null;
+  generatedTracks?: any[]; // Add missing property
 }

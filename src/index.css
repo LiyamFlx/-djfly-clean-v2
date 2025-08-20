@@ -5,8 +5,21 @@
 @layer base {
   body {
     @apply bg-pure-black text-pure-white;
-    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', sans-serif;
-    font-feature-settings: 'rlig' 1, 'calt' 1, 'ss01' 1, 'ss02' 1;
+    font-family:
+      'Inter',
+      -apple-system,
+      BlinkMacSystemFont,
+      'Segoe UI',
+      'Roboto',
+      'Oxygen',
+      'Ubuntu',
+      'Cantarell',
+      sans-serif;
+    font-feature-settings:
+      'rlig' 1,
+      'calt' 1,
+      'ss01' 1,
+      'ss02' 1;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
     text-rendering: optimizeLegibility;
@@ -163,7 +176,9 @@
 
   .glass-card {
     @apply bg-pure-white/5 backdrop-blur-xl border border-pure-white/10 rounded-2xl p-6 transition-all duration-200 ease-in-out hover:bg-pure-white/10 hover:border-pure-white/20;
-    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.8), inset 0 1px 0 rgba(255, 255, 255, 0.1);
+    box-shadow:
+      0 8px 32px rgba(0, 0, 0, 0.8),
+      inset 0 1px 0 rgba(255, 255, 255, 0.1);
     @apply bg-ui-bg/50 backdrop-blur-sm border border-ui-border rounded-xl;
   }
 
@@ -359,7 +374,9 @@
   .gradient-border::before {
     @apply absolute inset-0 p-[1px] bg-gradient-to-r from-neon-purple to-neon-green rounded-2xl;
     content: '';
-    mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+    mask:
+      linear-gradient(#fff 0 0) content-box,
+      linear-gradient(#fff 0 0);
     mask-composite: exclude;
   }
 
@@ -385,7 +402,9 @@
   /* === DARK THEME VARIANTS === */
   .light .glass-card {
     @apply bg-pure-white/90 backdrop-blur-xl border border-gray-200/50 text-gray-900;
-    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1), inset 0 1px 0 rgba(255, 255, 255, 0.2);
+    box-shadow:
+      0 8px 32px rgba(0, 0, 0, 0.1),
+      inset 0 1px 0 rgba(255, 255, 255, 0.2);
   }
 
   .light .btn-primary {
@@ -415,7 +434,9 @@
   }
 
   .border-glow {
-    box-shadow: inset 0 0 0 1px rgba(139, 92, 246, 0.3), 0 0 10px rgba(139, 92, 246, 0.2);
+    box-shadow:
+      inset 0 0 0 1px rgba(139, 92, 246, 0.3),
+      0 0 10px rgba(139, 92, 246, 0.2);
   }
 
   /* === SKIN SYSTEM === */
@@ -424,29 +445,65 @@
   [data-skin='minimalist'] .glass-card {
     @apply bg-gray-100 border-gray-200 text-gray-800 shadow-lg;
   }
-  [data-skin='minimalist'] .text-neon-purple { @apply text-blue-600; }
-  [data-skin='minimalist'] .text-neon-green { @apply text-emerald-600; }
-  [data-skin='minimalist'] .bg-neon-purple { @apply bg-blue-600; }
-  [data-skin='minimalist'] .bg-neon-green { @apply bg-emerald-600; }
-  [data-skin='minimalist'] .btn-primary { @apply bg-blue-600 text-white; }
-  [data-skin='minimalist'] .btn-accent { @apply bg-emerald-600 text-white; }
-  [data-skin='minimalist'] .slider::-webkit-slider-thumb { @apply bg-blue-600; }
-  [data-skin='minimalist'] .slider { @apply bg-gray-300; }
+  [data-skin='minimalist'] .text-neon-purple {
+    @apply text-blue-600;
+  }
+  [data-skin='minimalist'] .text-neon-green {
+    @apply text-emerald-600;
+  }
+  [data-skin='minimalist'] .bg-neon-purple {
+    @apply bg-blue-600;
+  }
+  [data-skin='minimalist'] .bg-neon-green {
+    @apply bg-emerald-600;
+  }
+  [data-skin='minimalist'] .btn-primary {
+    @apply bg-blue-600 text-white;
+  }
+  [data-skin='minimalist'] .btn-accent {
+    @apply bg-emerald-600 text-white;
+  }
+  [data-skin='minimalist'] .slider::-webkit-slider-thumb {
+    @apply bg-blue-600;
+  }
+  [data-skin='minimalist'] .slider {
+    @apply bg-gray-300;
+  }
 
   /* Retro Skin */
   [data-skin='retro'] {
     font-family: 'Press Start 2P', cursive;
   }
-  [data-skin='retro'] .glass-card { @apply bg-gray-800 border-gray-700 rounded-none; }
-  [data-skin='retro'] .text-neon-purple { @apply text-red-500; }
-  [data-skin='retro'] .text-neon-green { @apply text-lime-400; }
-  [data-skin='retro'] .bg-neon-purple { @apply bg-red-500; }
-  [data-skin='retro'] .bg-neon-green { @apply bg-lime-400; }
-  [data-skin='retro'] .btn { @apply rounded-none; }
-  [data-skin='retro'] .btn-primary { @apply bg-red-500 text-white; }
-  [data-skin='retro'] .btn-accent { @apply bg-lime-400 text-black; }
-  [data-skin='retro'] .slider { @apply rounded-none; }
-  [data-skin='retro'] .slider::-webkit-slider-thumb { @apply bg-red-500 rounded-none; }
+  [data-skin='retro'] .glass-card {
+    @apply bg-gray-800 border-gray-700 rounded-none;
+  }
+  [data-skin='retro'] .text-neon-purple {
+    @apply text-red-500;
+  }
+  [data-skin='retro'] .text-neon-green {
+    @apply text-lime-400;
+  }
+  [data-skin='retro'] .bg-neon-purple {
+    @apply bg-red-500;
+  }
+  [data-skin='retro'] .bg-neon-green {
+    @apply bg-lime-400;
+  }
+  [data-skin='retro'] .btn {
+    @apply rounded-none;
+  }
+  [data-skin='retro'] .btn-primary {
+    @apply bg-red-500 text-white;
+  }
+  [data-skin='retro'] .btn-accent {
+    @apply bg-lime-400 text-black;
+  }
+  [data-skin='retro'] .slider {
+    @apply rounded-none;
+  }
+  [data-skin='retro'] .slider::-webkit-slider-thumb {
+    @apply bg-red-500 rounded-none;
+  }
 }
 
 @layer utilities {
