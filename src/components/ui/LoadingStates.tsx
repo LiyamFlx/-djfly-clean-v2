@@ -10,7 +10,7 @@ interface LoadingSpinnerProps {
 
 export const LoadingSpinner: React.FC<LoadingSpinnerProps> = ({
   size = 'md',
-  color = 'neon-purple',
+  _color = 'neon-purple',
   message = 'Loading...',
 }) => {
   const sizeClasses = {

@@ -11,7 +11,6 @@ import {
 const ProducerPage: React.FC = () => {
   const sessionState = useSessionState();
   const crowdState = useCrowdState();
-  const aiState = useAIState();
   const { getReplacementTrack } = useAIActions();
 
   const handleGetSuggestion = async () => {

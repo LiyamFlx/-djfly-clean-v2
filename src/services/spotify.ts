@@ -3,8 +3,9 @@
  * Production-ready with proper authentication, error handling, and rate limiting
  */
 
-import { API_CONFIG } from '@/config/apiConfig';
-import type { Track } from '@/types/shared';
+import { spotifyConfig } from '@/config/spotifyConfig';
+import { cache } from '@/utils/cache';
+import type { Track, Playlist, UserProfile } from '@/types';
 
 interface SpotifyTokenResponse {
   access_token: string;
@@ -42,9 +43,9 @@ export class SpotifyService {
   private refreshToken: string | null = null;
 
   constructor() {
-    this.clientId = API_CONFIG.spotify.clientId || '';
-    this.clientSecret = API_CONFIG.spotify.clientSecret || '';
-    this.redirectUri = API_CONFIG.spotify.redirectUri || '';
+    this.clientId = spotifyConfig.clientId || '';
+    this.clientSecret = spotifyConfig.clientSecret || '';
+    this.redirectUri = spotifyConfig.redirectUri || '';
 
     if (!this.clientId || !this.clientSecret) {
       console.error('❌ Spotify credentials not configured');
@@ -63,11 +64,11 @@ export class SpotifyService {
       client_id: this.clientId,
       response_type: 'code',
       redirect_uri: this.redirectUri,
-      scope: API_CONFIG.spotify.scopes,
+      scope: spotifyConfig.scopes,
       state: this.generateState(),
     });
 
-    return `${API_CONFIG.spotify.authUrl}/authorize?${params.toString()}`;
+    return `${spotifyConfig.authUrl}/authorize?${params.toString()}`;
   }
 
   /**
@@ -75,7 +76,7 @@ export class SpotifyService {
    */
   async exchangeCodeForToken(code: string): Promise<boolean> {
     try {
-      const response = await fetch(`${API_CONFIG.spotify.authUrl}/api/token`, {
+      const response = await fetch(`${spotifyConfig.authUrl}/api/token`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/x-www-form-urlencoded',
@@ -115,7 +116,7 @@ export class SpotifyService {
     }
 
     try {
-      const response = await fetch(`${API_CONFIG.spotify.authUrl}/api/token`, {
+      const response = await fetch(`${spotifyConfig.authUrl}/api/token`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/x-www-form-urlencoded',
@@ -267,7 +268,7 @@ export class SpotifyService {
       }
 
       const response = await fetch(
-        `${API_CONFIG.spotify.baseUrl}/search?q=${encodeURIComponent(query)}&type=track&limit=${limit}`,
+        `${spotifyConfig.baseUrl}/search?q=${encodeURIComponent(query)}&type=track&limit=${limit}`,
         {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -311,7 +312,7 @@ export class SpotifyService {
       }
 
       const response = await fetch(
-        `${API_CONFIG.spotify.baseUrl}/me/playlists?limit=50`,
+        `${spotifyConfig.baseUrl}/me/playlists?limit=50`,
         {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -342,7 +343,7 @@ export class SpotifyService {
       }
 
       const response = await fetch(
-        `${API_CONFIG.spotify.baseUrl}/audio-features/${trackId}`,
+        `${spotifyConfig.baseUrl}/audio-features/${trackId}`,
         {
           headers: {
             Authorization: `Bearer ${token}`,

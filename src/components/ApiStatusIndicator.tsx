@@ -28,7 +28,7 @@ const ApiStatusIndicator: React.FC = () => {
         newState[result.service] = result;
       });
       setServices(newState);
-    } catch (error) {
+    } catch (_error) {
       console.info(
         'Connection test completed with some services unavailable (demo mode)'
       );
@@ -167,7 +167,7 @@ const ServiceStatusRow: React.FC<{
   description: string;
 }> = ({ result, name, description }) => {
   const status = result?.status || 'disconnected';
-  const _message = result?.message || 'Not tested';
+  // const _message = result?.message || 'Not tested';
 
   const statusStyles: Record<ServiceStatus, string> = {
     connected: 'bg-green-900 text-green-300',

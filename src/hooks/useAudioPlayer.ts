@@ -1,6 +1,5 @@
-import { useEffect, useRef, useState, useCallback } from 'react';
-import MagicPlayer, { type AudioSource } from '@/services/MagicPlayer';
-import type { Track } from '@/types/shared';
+import { useState, useRef, useCallback, useEffect } from 'react';
+import type { Track, AudioState } from '@/types';
 
 export interface UseAudioPlayerOptions {
   volume?: number;
@@ -61,36 +60,6 @@ export function useAudioPlayer(
   // Setup MagicPlayer event listeners
   useEffect(() => {
     if (!magicPlayerRef.current) return;
-
-    const player = magicPlayerRef.current;
-
-    const handlePlay = () => {
-      setIsPlaying(true);
-      setIsLoading(false);
-      setError(null);
-    };
-
-    const handlePause = () => {
-      setIsPlaying(false);
-    };
-
-    const handleLoaded = (data: { duration?: number }) => {
-      setDuration(data.duration || 0);
-      setIsLoading(false);
-      setError(null);
-    };
-
-    const handleError = (data: { message?: string }) => {
-      setError(data.message || 'Playback error occurred');
-      setIsLoading(false);
-      setIsPlaying(false);
-      console.error('🚨 Audio playback error:', data.message);
-    };
-
-    const handleEnded = () => {
-      setIsPlaying(false);
-      setCurrentTime(0);
-    };
 
     // Add event listeners - placeholder for now
   }, []);

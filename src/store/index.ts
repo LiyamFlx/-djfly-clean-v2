@@ -167,7 +167,7 @@ export const useDJflyStore = create<DJflyStore>()(
       }),
 
     // AI actions
-    generateSet: async (prompt) => {
+    generateSet: async (_prompt) => {
       set((state) => {
         state.ai.isAnalyzing = true;
         state.ai.confidence = 0;

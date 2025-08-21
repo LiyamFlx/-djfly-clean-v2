@@ -1,7 +1,15 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { useLocation, useNavigate } from 'react-router-dom';
-import { Home, Sparkles, Mic, Play, BarChart, Zap } from 'lucide-react';
+import {
+  Home,
+  Sparkles,
+  Play,
+  User,
+  Menu,
+  X,
+  FileText,
+} from 'lucide-react';
 import { useMusicContext } from '@/contexts/MusicContext';
 
 const PersistentNavBar: React.FC = () => {
@@ -47,7 +55,7 @@ const PersistentNavBar: React.FC = () => {
       id: 3,
       label: 'Create',
       icon:
-        currentStep === 3 && location.pathname.includes('/match') ? Mic : Zap,
+        currentStep === 3 && location.pathname.includes('/match') ? User : FileText,
       path: location.pathname.includes('/match')
         ? '/studio/match'
         : '/studio/set',

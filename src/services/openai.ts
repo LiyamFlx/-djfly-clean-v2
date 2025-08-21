@@ -44,7 +44,7 @@ class OpenAIService {
    */
   async generatePlaylist(
     prompt: string,
-    context?: any
+    _context?: any
   ): Promise<AIRecommendation> {
     try {
       await this.rateLimit();
@@ -71,25 +71,24 @@ class OpenAIService {
         ]
       }`;
 
-      const response = await fetch(`${this.baseUrl}/chat/completions`, {
+      const response = await fetch('/api/openai/chat', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          Authorization: `Bearer ${this.apiKey}`,
+          Authorization: `Bearer ${process.env.REACT_APP_OPENAI_API_KEY}`,
         },
         body: JSON.stringify({
-          model: 'gpt-3.5-turbo',
+          model: 'gpt-4',
           messages: [
             {
               role: 'system',
-              content: systemPrompt,
+              content: 'You are a helpful AI assistant.',
             },
             {
               role: 'user',
               content: prompt,
             },
           ],
-          temperature: 0.7,
           max_tokens: 1000,
         }),
       });
@@ -113,8 +112,14 @@ class OpenAIService {
         return this.getMockRecommendation(prompt);
       }
     } catch (error) {
-      console.warn('OpenAI API failed, using mock data:', error);
-      return this.getMockRecommendation(prompt);
+      console.error('Error generating playlist:', error);
+      // const parseError = (error: any) => {
+      //   if (error?.response?.data?.error?.message) {
+      //     return error.response.data.error.message;
+      //   }
+      //   return error?.message || 'Unknown error occurred';
+      // };
+      throw new Error('Failed to generate playlist');
     }
   }
 
@@ -167,8 +172,14 @@ class OpenAIService {
         return this.getMockMoodAnalysis(crowdData);
       }
     } catch (error) {
-      console.warn('OpenAI mood analysis failed, using mock data:', error);
-      return this.getMockMoodAnalysis(crowdData);
+      console.error('Error analyzing audio:', error);
+      // const parseError = (error: any) => {
+      //   if (error?.response?.data?.error?.message) {
+      //     return error.response.data.error.message;
+      //   }
+      //   return error?.message || 'Unknown error occurred';
+      // };
+      throw new Error('Failed to analyze audio');
     }
   }
 

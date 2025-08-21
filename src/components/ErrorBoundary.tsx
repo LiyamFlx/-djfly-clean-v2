@@ -37,7 +37,10 @@ export class ErrorBoundary extends Component<
   }
 
   componentDidCatch(error: Error, errorInfo: ErrorInfo) {
-    console.error('🚨 ErrorBoundary caught an error:', error, errorInfo);
+    // Log error to console in development
+    if (import.meta.env.MODE === 'development') {
+      console.error('Error caught by boundary:', error, errorInfo);
+    }
 
     if (this.props.onError) {
       this.props.onError(error, errorInfo);
@@ -82,7 +85,7 @@ export class ErrorBoundary extends Component<
                 We encountered an unexpected error. Don't worry, we're on it!
               </p>
 
-              {process.env.NODE_ENV === 'development' && error && (
+              {import.meta.env.MODE === 'development' && error && (
                 <details className="mt-6 p-4 bg-red-900/20 border border-red-500/30 rounded-xl text-left">
                   <summary className="cursor-pointer text-red-400 font-semibold mb-2">
                     <Bug className="inline w-4 h-4 mr-2" />
@@ -134,8 +137,8 @@ interface ErrorFallbackProps {
 }
 
 export const ErrorFallback: React.FC<ErrorFallbackProps> = ({
-  error,
-  resetError,
+  _error,
+  _resetError,
 }) => (
   <ErrorBoundary
     fallback={({ error, retry }) => (
