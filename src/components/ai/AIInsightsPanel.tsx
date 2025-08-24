@@ -11,8 +11,14 @@ import {
   BarChart3,
   Camera,
   Activity,
+  Sparkles,
+  Music,
+  Heart,
+  Clock,
 } from 'lucide-react';
 import { aiPersonalizationService } from '@/services/aiPersonalization';
+import { EnhancedCard, GlassCard, NeonCard } from '@/components/ui/EnhancedCard';
+import { AIAnalysisLoading } from '@/components/ui/LoadingStates';
 
 interface AIInsightsPanelProps {
   userId: string;
@@ -27,6 +33,8 @@ interface InsightCard {
   trend?: 'up' | 'down' | 'stable';
   confidence: number;
   category: 'crowd' | 'personal' | 'prediction' | 'vision';
+  icon?: React.ComponentType<{ className?: string }>;
+  color?: string;
 }
 
 interface PersonalizedInsights {
@@ -52,6 +60,9 @@ interface CrowdVisionData {
     ageGroups: Record<string, number>;
     genderDistribution: Record<string, number>;
   };
+  density: number;
+  energy: number;
+  mood: string;
 }
 
 const AIInsightsPanel: React.FC<AIInsightsPanelProps> = ({
@@ -67,11 +78,20 @@ const AIInsightsPanel: React.FC<AIInsightsPanelProps> = ({
     useState<ComputerVisionFeatures | null>(null);
   const [isAnalyzing, setIsAnalyzing] = useState(false);
   const [showAdvancedAnalytics, setShowAdvancedAnalytics] = useState(false);
+  const [analysisStage, setAnalysisStage] = useState<'idle' | 'recording' | 'analyzing' | 'generating' | 'complete'>('idle');
+  const [analysisProgress, setAnalysisProgress] = useState(0);
 
   const generateInsights = useCallback(async () => {
     setIsAnalyzing(true);
+    setAnalysisStage('recording');
+    setAnalysisProgress(0);
 
     try {
+      // Simulate recording stage
+      await new Promise(resolve => setTimeout(resolve, 2000));
+      setAnalysisProgress(25);
+      setAnalysisStage('analyzing');
+
       // Get crowd vision data
       const visionData = await aiPersonalizationService.analyzeCrowdVision();
       const visionFeatures =
@@ -79,6 +99,8 @@ const AIInsightsPanel: React.FC<AIInsightsPanelProps> = ({
 
       setCrowdVisionData(visionData);
       setComputerVisionFeatures(visionFeatures);
+      setAnalysisProgress(60);
+      setAnalysisStage('generating');
 
       // Get personalized insights
       const personalInsights =
@@ -93,417 +115,300 @@ const AIInsightsPanel: React.FC<AIInsightsPanelProps> = ({
           title: 'Crowd Density',
           value: Math.round(visionData.density * 100),
           unit: '%',
-          trend:
-            visionData.density > 0.8
-              ? 'up'
-              : visionData.density < 0.6
-                ? 'down'
-                : 'stable',
-          confidence: 0.85,
+          trend: visionData.density > 0.8 ? 'up' : visionData.density < 0.6 ? 'down' : 'stable',
+          confidence: 95,
           category: 'crowd',
+          icon: Users,
+          color: 'neon-purple',
         },
         {
-          id: 'motion-activity',
-          title: 'Motion Activity',
-          value: Math.round(visionData.motion * 100),
+          id: 'crowd-energy',
+          title: 'Energy Level',
+          value: Math.round(visionData.energy * 100),
           unit: '%',
-          trend:
-            visionData.motion > 0.7
-              ? 'up'
-              : visionData.motion < 0.4
-                ? 'down'
-                : 'stable',
-          confidence: 0.78,
+          trend: visionData.energy > 0.7 ? 'up' : visionData.energy < 0.4 ? 'down' : 'stable',
+          confidence: 92,
           category: 'crowd',
+          icon: Zap,
+          color: 'neon-green',
         },
         {
-          id: 'dancing-intensity',
-          title: 'Dancing Intensity',
-          value: Math.round(visionData.behavior.dancing * 100),
-          unit: '%',
-          trend: visionData.behavior.dancing > 0.7 ? 'up' : 'stable',
-          confidence: 0.82,
+          id: 'crowd-mood',
+          title: 'Crowd Mood',
+          value: visionData.mood,
+          confidence: 88,
           category: 'crowd',
+          icon: Heart,
+          color: 'neon-purple',
         },
-        {
-          id: 'energy-front-center',
-          title: 'Front Center Energy',
-          value: Math.round(visionData.energyZones.frontCenter * 100),
-          unit: '%',
-          trend: visionData.energyZones.frontCenter > 0.8 ? 'up' : 'stable',
-          confidence: 0.79,
-          category: 'crowd',
-        },
-
         // Personal Insights
         {
           id: 'top-genre',
           title: 'Top Genre',
-          value: personalInsights.topGenres[0] || 'Electronic',
-          trend: 'stable',
-          confidence: 0.91,
+          value: personalInsights.topGenres[0] || 'House',
+          confidence: 85,
           category: 'personal',
+          icon: Music,
+          color: 'neon-green',
         },
         {
           id: 'energy-profile',
           title: 'Energy Profile',
-          value: personalInsights.energyProfile || 'High',
-          trend: 'stable',
-          confidence: 0.87,
+          value: personalInsights.energyProfile,
+          confidence: 90,
           category: 'personal',
+          icon: Activity,
+          color: 'neon-purple',
         },
-        {
-          id: 'peak-times',
-          title: 'Peak Engagement',
-          value: personalInsights.peakTimes[0] || '8:30 PM',
-          trend: 'stable',
-          confidence: 0.83,
-          category: 'personal',
-        },
-
         // Predictions
         {
-          id: 'next-track-confidence',
-          title: 'Next Track Confidence',
-          value: Math.round(Math.random() * 20 + 80),
-          unit: '%',
-          trend: 'up',
-          confidence: 0.76,
+          id: 'peak-time',
+          title: 'Peak Time',
+          value: personalInsights.peakTimes[0] || '10 PM',
+          confidence: 87,
           category: 'prediction',
-        },
-        {
-          id: 'energy-increase',
-          title: 'Predicted Energy Increase',
-          value: Math.round(Math.random() * 30 + 15),
-          unit: '%',
-          trend: 'up',
-          confidence: 0.72,
-          category: 'prediction',
-        },
-        {
-          id: 'crowd-retention',
-          title: 'Crowd Retention Likelihood',
-          value: Math.round(Math.random() * 20 + 75),
-          unit: '%',
-          trend: 'stable',
-          confidence: 0.81,
-          category: 'prediction',
-        },
-
-        // Computer Vision
-        {
-          id: 'gesture-recognition',
-          title: 'Gesture Recognition',
-          value: Math.round(
-            visionFeatures.behaviorAnalysis.gestureRecognition[0]?.confidence *
-              100 || 75
-          ),
-          unit: '%',
-          trend: 'up',
-          confidence: 0.88,
-          category: 'vision',
-        },
-        {
-          id: 'social-interactions',
-          title: 'Social Interactions',
-          value: Math.round(
-            visionFeatures.behaviorAnalysis.socialInteractions * 100
-          ),
-          unit: '%',
-          trend:
-            visionFeatures.behaviorAnalysis.socialInteractions > 0.6
-              ? 'up'
-              : 'stable',
-          confidence: 0.74,
-          category: 'vision',
-        },
-        {
-          id: 'crowd-flow',
-          title: 'Crowd Flow',
-          value: visionFeatures.motionDetection.crowdFlow,
-          trend: 'stable',
-          confidence: 0.69,
-          category: 'vision',
+          icon: Clock,
+          color: 'neon-green',
         },
       ];
 
       setInsights(newInsights);
+      setAnalysisProgress(100);
+      setAnalysisStage('complete');
+
+      // Reset after showing completion
+      setTimeout(() => {
+        setAnalysisStage('idle');
+        setAnalysisProgress(0);
+      }, 3000);
+
     } catch (error) {
-      console.error('Failed to generate insights:', error);
+      console.error('Error generating insights:', error);
+      setAnalysisStage('idle');
     } finally {
       setIsAnalyzing(false);
     }
   }, [userId]);
 
-  useEffect(() => {
-    generateInsights();
-    const interval = setInterval(generateInsights, 10000); // Update every 10 seconds
-    return () => clearInterval(interval);
-  }, [generateInsights]);
-
-  const getCategoryIcon = (category: string) => {
-    switch (category) {
-      case 'crowd':
-        return <Users className="w-4 h-4" />;
-      case 'personal':
-        return <Brain className="w-4 h-4" />;
-      case 'prediction':
-        return <Target className="w-4 h-4" />;
-      case 'vision':
-        return <Camera className="w-4 h-4" />;
-      default:
-        return <BarChart3 className="w-4 h-4" />;
-    }
-  };
-
-  const getCategoryColor = (category: string) => {
-    switch (category) {
-      case 'crowd':
-        return 'text-blue-400';
-      case 'personal':
-        return 'text-purple-400';
-      case 'prediction':
-        return 'text-green-400';
-      case 'vision':
-        return 'text-orange-400';
-      default:
-        return 'text-gray-400';
-    }
-  };
-
-  const getTrendIcon = (trend: string) => {
+  const getTrendIcon = (trend: 'up' | 'down' | 'stable') => {
     switch (trend) {
       case 'up':
-        return <TrendingUp className="w-4 h-4 text-green-400" />;
+        return <TrendingUp className="w-4 h-4 text-neon-green" />;
       case 'down':
-        return (
-          <TrendingUp className="w-4 h-4 text-red-400 transform rotate-180" />
-        );
+        return <TrendingUp className="w-4 h-4 text-red-400 rotate-180" />;
       default:
-        return <Activity className="w-4 h-4 text-blue-400" />;
+        return <Activity className="w-4 h-4 text-gray-400" />;
     }
   };
 
   const getConfidenceColor = (confidence: number) => {
-    if (confidence > 0.8) return 'text-green-400';
-    if (confidence > 0.6) return 'text-yellow-400';
+    if (confidence >= 90) return 'text-neon-green';
+    if (confidence >= 75) return 'text-yellow-400';
     return 'text-red-400';
   };
 
-  // const getCategoryInsights = (category: string) => {
-  //   return insights.filter((insight) => insight.category === category);
-  // };
+  if (isAnalyzing) {
+    return (
+      <div className={`p-8 ${className}`}>
+        <AIAnalysisLoading
+          stage={analysisStage}
+          progress={analysisProgress}
+        />
+      </div>
+    );
+  }
 
   return (
-    <div className={`bg-gray-900 text-white p-6 rounded-xl ${className}`}>
+    <div className={`space-y-6 ${className}`}>
       {/* Header */}
-      <div className="flex items-center justify-between mb-6">
+      <motion.div
+        className="flex items-center justify-between"
+        initial={{ opacity: 0, y: -20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.5 }}
+      >
         <div className="flex items-center gap-3">
-          <Brain className="w-6 h-6 text-purple-400" />
-          <h2 className="text-2xl font-bold">AI Insights</h2>
+          <div className="p-3 bg-neon-purple/10 border border-neon-purple/30 rounded-xl">
+            <Brain className="w-6 h-6 text-neon-purple" />
+          </div>
+          <div>
+            <h2 className="heading-secondary text-white">AI Insights</h2>
+            <p className="body-small text-gray-400">Real-time crowd and personal analytics</p>
+          </div>
         </div>
-        <div className="flex items-center gap-4">
-          <button
-            onClick={() => setShowAdvancedAnalytics(!showAdvancedAnalytics)}
-            className={`flex items-center gap-2 px-3 py-2 rounded-lg transition-colors ${
-              showAdvancedAnalytics
-                ? 'bg-purple-600'
-                : 'bg-gray-700 hover:bg-gray-600'
-            }`}
-          >
-            <BarChart3 className="w-4 h-4" />
-            Advanced
-          </button>
-          <button
-            onClick={generateInsights}
-            disabled={isAnalyzing}
-            className="flex items-center gap-2 px-3 py-2 rounded-lg bg-blue-600 hover:bg-blue-700 disabled:opacity-50 transition-colors"
-          >
-            <Eye className="w-4 h-4" />
-            {isAnalyzing ? 'Analyzing...' : 'Refresh'}
-          </button>
-        </div>
-      </div>
+        
+        <motion.button
+          onClick={generateInsights}
+          className="btn-primary"
+          whileHover={{ scale: 1.05 }}
+          whileTap={{ scale: 0.95 }}
+        >
+          <Sparkles className="w-4 h-4" />
+          Generate Insights
+        </motion.button>
+      </motion.div>
 
       {/* Main Insights Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mb-6">
-        {insights.map((insight) => (
-          <motion.div
-            key={insight.id}
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            className="bg-gray-800 p-4 rounded-lg"
-          >
-            <div className="flex items-center justify-between mb-2">
-              <div className="flex items-center gap-2">
-                <div className={getCategoryColor(insight.category)}>
-                  {getCategoryIcon(insight.category)}
-                </div>
-                <h3 className="text-sm font-medium">{insight.title}</h3>
-              </div>
-              {getTrendIcon(insight.trend || 'stable')}
-            </div>
-
-            <div className="flex items-end justify-between">
-              <div className="text-2xl font-bold">
-                {insight.value}
-                {insight.unit && (
-                  <span className="text-sm text-gray-400 ml-1">
-                    {insight.unit}
-                  </span>
-                )}
-              </div>
-              <div
-                className={`text-xs ${getConfidenceColor(insight.confidence)}`}
+      {insights.length > 0 && (
+        <motion.div
+          className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ duration: 0.5, delay: 0.2 }}
+        >
+          {insights.map((insight, index) => (
+            <motion.div
+              key={insight.id}
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.5, delay: 0.1 * index }}
+            >
+              <GlassCard
+                icon={insight.icon}
+                iconPosition="top"
+                iconColor={insight.color || 'neon-purple'}
+                title={insight.title}
+                subtitle={`${insight.value}${insight.unit || ''}`}
+                className="h-full"
               >
-                {Math.round(insight.confidence * 100)}% confidence
-              </div>
-            </div>
-          </motion.div>
-        ))}
-      </div>
+                <div className="space-y-4">
+                  {/* Trend and Confidence */}
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-2">
+                      {getTrendIcon(insight.trend || 'stable')}
+                      <span className="text-sm text-gray-400 capitalize">
+                        {insight.trend || 'stable'}
+                      </span>
+                    </div>
+                    <div className={`text-sm font-medium ${getConfidenceColor(insight.confidence)}`}>
+                      {insight.confidence}% confidence
+                    </div>
+                  </div>
 
-      {/* Personalized Recommendations */}
-      {personalizedInsights && (
-        <div className="bg-gray-800 p-4 rounded-lg mb-6">
-          <div className="flex items-center gap-2 mb-4">
-            <Lightbulb className="w-5 h-5 text-yellow-400" />
-            <h3 className="text-lg font-semibold">
-              Personalized Recommendations
-            </h3>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            {personalizedInsights.recommendations.map(
-              (recommendation: string, index: number) => (
-                <div
-                  key={index}
-                  className="flex items-start gap-2 p-3 bg-gray-700 rounded-lg"
-                >
-                  <Zap className="w-4 h-4 text-yellow-400 mt-0.5 flex-shrink-0" />
-                  <span className="text-sm">{recommendation}</span>
+                  {/* Category Badge */}
+                  <div className="inline-flex items-center px-2 py-1 bg-neon-purple/10 border border-neon-purple/30 rounded-full">
+                    <span className="text-xs font-medium text-neon-purple capitalize">
+                      {insight.category}
+                    </span>
+                  </div>
                 </div>
-              )
-            )}
-          </div>
-        </div>
+              </GlassCard>
+            </motion.div>
+          ))}
+        </motion.div>
       )}
 
-      {/* Advanced Analytics */}
-      <AnimatePresence>
-        {showAdvancedAnalytics && (
-          <motion.div
-            initial={{ opacity: 0, height: 0 }}
-            animate={{ opacity: 1, height: 'auto' }}
-            exit={{ opacity: 0, height: 0 }}
-            className="bg-gray-800 p-4 rounded-lg"
+      {/* Advanced Analytics Section */}
+      {showAdvancedAnalytics && computerVisionFeatures && (
+        <motion.div
+          className="space-y-6"
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5 }}
+        >
+          <h3 className="heading-tertiary text-white">Advanced Analytics</h3>
+          
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            {/* Motion Detection */}
+            <NeonCard
+              icon={Camera}
+              iconPosition="top"
+              iconColor="neon-purple"
+              title="Motion Detection"
+              subtitle="Real-time crowd movement analysis"
+            >
+              <div className="space-y-4">
+                <div className="flex items-center justify-between">
+                  <span className="text-sm text-gray-400">Crowd Flow:</span>
+                  <span className="text-sm font-medium text-white">
+                    {computerVisionFeatures.motionDetection.crowdFlow}
+                  </span>
+                </div>
+                <div className="flex items-center justify-between">
+                  <span className="text-sm text-gray-400">Motion Vectors:</span>
+                  <span className="text-sm font-medium text-white">
+                    {computerVisionFeatures.motionDetection.motionVectors.length}
+                  </span>
+                </div>
+              </div>
+            </NeonCard>
+
+            {/* Density Mapping */}
+            <NeonCard
+              icon={Target}
+              iconPosition="top"
+              iconColor="neon-green"
+              title="Density Mapping"
+              subtitle="Crowd distribution analysis"
+            >
+              <div className="space-y-4">
+                <div className="flex items-center justify-between">
+                  <span className="text-sm text-gray-400">Capacity Utilization:</span>
+                  <span className="text-sm font-medium text-white">
+                    {Math.round(computerVisionFeatures.densityMapping.capacityUtilization * 100)}%
+                  </span>
+                </div>
+                <div className="flex items-center justify-between">
+                  <span className="text-sm text-gray-400">Hotspots:</span>
+                  <span className="text-sm font-medium text-white">
+                    {computerVisionFeatures.densityMapping.hotspots.length}
+                  </span>
+                </div>
+              </div>
+            </NeonCard>
+          </div>
+        </motion.div>
+      )}
+
+      {/* Toggle Advanced Analytics */}
+      {insights.length > 0 && (
+        <motion.div
+          className="text-center"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ duration: 0.5, delay: 0.3 }}
+        >
+          <button
+            onClick={() => setShowAdvancedAnalytics(!showAdvancedAnalytics)}
+            className="inline-flex items-center gap-2 text-sm text-gray-400 hover:text-white transition-colors duration-200"
           >
-            <h3 className="text-lg font-semibold mb-4">Advanced Analytics</h3>
+            {showAdvancedAnalytics ? 'Hide' : 'Show'} Advanced Analytics
+            <motion.div
+              animate={{ rotate: showAdvancedAnalytics ? 180 : 0 }}
+              transition={{ duration: 0.2 }}
+            >
+              <TrendingUp className="w-4 h-4" />
+            </motion.div>
+          </button>
+        </motion.div>
+      )}
 
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-              {/* Computer Vision Analysis */}
-              {computerVisionFeatures && (
-                <div className="space-y-4">
-                  <h4 className="text-sm font-medium flex items-center gap-2">
-                    <Camera className="w-4 h-4 text-orange-400" />
-                    Computer Vision Analysis
-                  </h4>
-
-                  <div className="space-y-3">
-                    <div className="flex justify-between text-sm">
-                      <span>Motion Vectors</span>
-                      <span>
-                        {
-                          computerVisionFeatures.motionDetection.motionVectors
-                            .length
-                        }{' '}
-                        detected
-                      </span>
-                    </div>
-                    <div className="flex justify-between text-sm">
-                      <span>Crowd Flow</span>
-                      <span className="capitalize">
-                        {computerVisionFeatures.motionDetection.crowdFlow}
-                      </span>
-                    </div>
-                    <div className="flex justify-between text-sm">
-                      <span>Hotspots</span>
-                      <span>
-                        {computerVisionFeatures.densityMapping.hotspots.length}{' '}
-                        active
-                      </span>
-                    </div>
-                    <div className="flex justify-between text-sm">
-                      <span>Capacity Utilization</span>
-                      <span>
-                        {Math.round(
-                          computerVisionFeatures.densityMapping
-                            .capacityUtilization * 100
-                        )}
-                        %
-                      </span>
-                    </div>
-                  </div>
-                </div>
-              )}
-
-              {/* Crowd Demographics */}
-              {crowdVisionData && (
-                <div className="space-y-4">
-                  <h4 className="text-sm font-medium flex items-center gap-2">
-                    <Users className="w-4 h-4 text-blue-400" />
-                    Crowd Demographics
-                  </h4>
-
-                  <div className="space-y-3">
-                    <div className="text-sm">
-                      <div className="flex justify-between mb-1">
-                        <span>Age Distribution</span>
-                      </div>
-                      <div className="space-y-1">
-                        {Object.entries(
-                          crowdVisionData.demographics.ageGroups
-                        ).map(([age, percentage]) => (
-                          <div
-                            key={age}
-                            className="flex justify-between text-xs"
-                          >
-                            <span>{age}</span>
-                            <span>
-                              {Math.round((percentage as number) * 100)}%
-                            </span>
-                          </div>
-                        ))}
-                      </div>
-                    </div>
-
-                    <div className="text-sm">
-                      <div className="flex justify-between mb-1">
-                        <span>Gender Distribution</span>
-                      </div>
-                      <div className="space-y-1">
-                        {Object.entries(
-                          crowdVisionData.demographics.genderDistribution
-                        ).map(([gender, percentage]) => (
-                          <div
-                            key={gender}
-                            className="flex justify-between text-xs"
-                          >
-                            <span className="capitalize">{gender}</span>
-                            <span>
-                              {Math.round((percentage as number) * 100)}%
-                            </span>
-                          </div>
-                        ))}
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              )}
-            </div>
-          </motion.div>
-        )}
-      </AnimatePresence>
+      {/* Empty State */}
+      {insights.length === 0 && !isAnalyzing && (
+        <motion.div
+          className="text-center py-12"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ duration: 0.5 }}
+        >
+          <div className="w-16 h-16 mx-auto mb-4 bg-neon-purple/10 border border-neon-purple/30 rounded-full flex items-center justify-center">
+            <Lightbulb className="w-8 h-8 text-neon-purple" />
+          </div>
+          <h3 className="heading-tertiary text-white mb-2">No Insights Yet</h3>
+          <p className="body-medium text-gray-400 mb-6">
+            Generate your first AI-powered insights to start optimizing your DJ sets
+          </p>
+          <button
+            onClick={generateInsights}
+            className="btn-primary"
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.95 }}
+          >
+            <Sparkles className="w-4 h-4" />
+            Generate First Insights
+          </button>
+        </motion.div>
+      )}
     </div>
   );
 };

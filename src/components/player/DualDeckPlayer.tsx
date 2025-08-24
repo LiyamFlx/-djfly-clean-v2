@@ -1,9 +1,10 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { motion } from 'framer-motion';
-import { Play, Pause, Settings, Zap, ChevronDown } from 'lucide-react';
+import { motion, AnimatePresence } from 'framer-motion';
+import { Play, Pause, Settings, Zap, ChevronDown, Volume2, Music, Target, Activity } from 'lucide-react';
 import { advancedAudioService } from '@/services/advancedAudio';
 import Slider from '@/components/ui/Slider';
 import { useTheme } from '@/contexts/ThemeContext';
+import { GlassCard, NeonCard } from '@/components/ui/EnhancedCard';
 
 interface DualDeckPlayerProps {
   className?: string;
@@ -52,7 +53,12 @@ const TransitionRing: React.FC<{ score: number }> = ({ score }) => {
   const color = score > 80 ? '#abff4f' : score > 60 ? '#F59E0B' : '#9d4edd';
 
   return (
-    <div className="relative w-32 h-32">
+    <motion.div 
+      className="relative w-32 h-32"
+      initial={{ scale: 0, rotate: -180 }}
+      animate={{ scale: 1, rotate: 0 }}
+      transition={{ duration: 0.6, type: "spring" }}
+    >
       <svg className="w-full h-full" viewBox="0 0 100 100">
         <circle
           cx="50"
@@ -73,15 +79,162 @@ const TransitionRing: React.FC<{ score: number }> = ({ score }) => {
           strokeDasharray={circumference}
           strokeDashoffset={offset}
           transform="rotate(-90 50 50)"
-          transition={{ duration: 0.5 }}
+          transition={{ duration: 0.8, ease: "easeOut" }}
         />
       </svg>
       <div className="absolute inset-0 flex items-center justify-center">
-        <span className="text-3xl font-bold" style={{ color }}>
+        <motion.span 
+          className="text-3xl font-bold"
+          style={{ color }}
+          initial={{ scale: 0 }}
+          animate={{ scale: 1 }}
+          transition={{ delay: 0.3, duration: 0.3 }}
+        >
           {score}
-        </span>
+        </motion.span>
       </div>
-    </div>
+      
+      {/* Glow effect */}
+      <motion.div
+        className="absolute inset-0 rounded-full"
+        style={{ boxShadow: `0 0 20px ${color}40` }}
+        animate={{ opacity: [0.5, 1, 0.5] }}
+        transition={{ duration: 2, repeat: Infinity }}
+      />
+    </motion.div>
+  );
+};
+
+const DeckDisplay: React.FC<{
+  deck: DeckControls;
+  deckLabel: 'A' | 'B';
+  onTogglePlay: () => void;
+  onVolumeChange: (volume: number) => void;
+  onPitchChange: (pitch: number) => void;
+  isActive: boolean;
+}> = ({ deck, deckLabel, onTogglePlay, onVolumeChange, onPitchChange, isActive }) => {
+  const formatTime = (seconds: number) => {
+    const mins = Math.floor(seconds / 60);
+    const secs = Math.floor(seconds % 60);
+    return `${mins}:${secs.toString().padStart(2, '0')}`;
+  };
+
+  return (
+    <motion.div
+      className={`relative ${isActive ? 'z-10' : 'z-0'}`}
+      whileHover={{ scale: 1.02 }}
+      transition={{ duration: 0.2 }}
+    >
+      <GlassCard
+        icon={Music}
+        iconPosition="top"
+        iconColor={isActive ? 'neon-purple' : 'gray'}
+        title={`Deck ${deckLabel}`}
+        subtitle={deck.isPlaying ? 'Playing' : 'Stopped'}
+        className={`h-full transition-all duration-300 ${
+          isActive ? 'border-neon-purple/50 shadow-neon-purple-soft' : ''
+        }`}
+      >
+        <div className="space-y-6">
+          {/* Play/Pause Button */}
+          <motion.button
+            onClick={onTogglePlay}
+            className={`w-16 h-16 mx-auto rounded-full flex items-center justify-center transition-all duration-300 ${
+              deck.isPlaying 
+                ? 'bg-neon-green text-rich-black shadow-neon-green-soft' 
+                : 'bg-neon-purple text-white shadow-neon-purple-soft'
+            }`}
+            whileHover={{ scale: 1.1 }}
+            whileTap={{ scale: 0.9 }}
+          >
+            <AnimatePresence mode="wait">
+              {deck.isPlaying ? (
+                <motion.div
+                  key="pause"
+                  initial={{ scale: 0, rotate: -90 }}
+                  animate={{ scale: 1, rotate: 0 }}
+                  exit={{ scale: 0, rotate: 90 }}
+                  transition={{ duration: 0.2 }}
+                >
+                  <Pause className="w-8 h-8" />
+                </motion.div>
+              ) : (
+                <motion.div
+                  key="play"
+                  initial={{ scale: 0, rotate: 90 }}
+                  animate={{ scale: 1, rotate: 0 }}
+                  exit={{ scale: 0, rotate: -90 }}
+                  transition={{ duration: 0.2 }}
+                >
+                  <Play className="w-8 h-8" />
+                </motion.div>
+              )}
+            </AnimatePresence>
+          </motion.button>
+
+          {/* Time Display */}
+          <div className="text-center">
+            <div className="text-2xl font-bold text-white mb-1">
+              {formatTime(deck.currentTime)}
+            </div>
+            <div className="text-sm text-gray-400">
+              {formatTime(deck.duration)}
+            </div>
+          </div>
+
+          {/* Energy Meter */}
+          <div className="space-y-2">
+            <div className="flex items-center justify-between text-sm">
+              <span className="text-gray-400">Energy</span>
+              <span className="text-neon-green font-medium">
+                {Math.round(deck.energy * 100)}%
+              </span>
+            </div>
+            <div className="w-full bg-gray-700 rounded-full h-2 overflow-hidden">
+              <motion.div
+                className="h-full bg-gradient-to-r from-neon-green to-neon-purple"
+                initial={{ width: 0 }}
+                animate={{ width: `${deck.energy * 100}%` }}
+                transition={{ duration: 0.3 }}
+              />
+            </div>
+          </div>
+
+          {/* Volume Control */}
+          <div className="space-y-2">
+            <div className="flex items-center justify-between text-sm">
+              <span className="text-gray-400">Volume</span>
+              <span className="text-white font-medium">
+                {Math.round(deck.volume * 100)}%
+              </span>
+            </div>
+            <Slider
+              value={deck.volume}
+              onChange={(value) => onVolumeChange(value)}
+              className="w-full"
+            />
+          </div>
+
+          {/* Pitch Control */}
+          <div className="space-y-2">
+            <div className="flex items-center justify-between text-sm">
+              <span className="text-gray-400">Pitch</span>
+              <span className="text-white font-medium">
+                {deck.pitch.toFixed(2)}x
+              </span>
+            </div>
+            <Slider
+              value={deck.pitch}
+              onChange={(value) => onPitchChange(value)}
+              min={0.5}
+              max={2.0}
+              step={0.01}
+              className="w-full"
+            />
+          </div>
+        </div>
+      </GlassCard>
+    </motion.div>
   );
 };
 
@@ -122,6 +275,9 @@ const DualDeckPlayer: React.FC<DualDeckPlayerProps> = ({ className = '' }) => {
     }
   );
 
+  const [showAdvancedControls, setShowAdvancedControls] = useState(false);
+  const [activeDeck, setActiveDeck] = useState<'A' | 'B' | null>(null);
+
   const analyticsInterval = useRef<ReturnType<typeof setInterval> | null>(null);
 
   useEffect(() => {
@@ -147,7 +303,7 @@ const DualDeckPlayer: React.FC<DualDeckPlayerProps> = ({ className = '' }) => {
           setDeckB((prev) => ({
             ...prev,
             isPlaying: analytics.deckB?.isPlaying ?? prev.isPlaying,
-            currentTime: analytics.deckB?.currentTime ?? prev.currentTime,
+            currentTime: analytics.deckA?.currentTime ?? prev.currentTime,
             volume: analytics.deckB?.volume ?? prev.volume,
             pitch: analytics.deckB?.pitch ?? prev.pitch,
             energy: analytics.deckB?.energy ?? prev.energy,
@@ -184,6 +340,7 @@ const DualDeckPlayer: React.FC<DualDeckPlayerProps> = ({ className = '' }) => {
   const togglePlay = (deck: 'A' | 'B') => {
     try {
       advancedAudioService.togglePlay(deck);
+      setActiveDeck(deck);
     } catch (error) {
       console.error(`Failed to toggle play for deck ${deck}:`, error);
     }
@@ -204,7 +361,7 @@ const DualDeckPlayer: React.FC<DualDeckPlayerProps> = ({ className = '' }) => {
 
   const setPitch = (deck: 'A' | 'B', pitch: number) => {
     try {
-      advancedAudioService.setPitch(deck, pitch);
+      advancedAudioService.setDeckPitch(deck, pitch);
       if (deck === 'A') {
         setDeckA((prev) => ({ ...prev, pitch }));
       } else {
@@ -215,420 +372,237 @@ const DualDeckPlayer: React.FC<DualDeckPlayerProps> = ({ className = '' }) => {
     }
   };
 
-  const setCrossfader = (position: number) => {
+  const setCrossfader = (value: number) => {
     try {
-      advancedAudioService.setCrossfader(position);
-      setMixingState((prev) => ({ ...prev, crossfader: position }));
+      advancedAudioService.setCrossfader(value);
+      setMixingState((prev) => ({ ...prev, crossfader: value }));
     } catch (error) {
       console.error('Failed to set crossfader:', error);
     }
   };
 
-  const setEQ = (band: 'low' | 'mid' | 'high', value: number) => {
+  const setMasterVolume = (value: number) => {
     try {
-      advancedAudioService.setEQ(band, value);
-      setMixingState((prev) => ({
-        ...prev,
-        eq: { ...prev.eq, [band]: value },
-      }));
-    } catch (error) {
-      console.error(`Failed to set EQ ${band}:`, error);
-    }
-  };
-
-  const setEffect = (effect: 'reverb' | 'delay' | 'filter', value: number) => {
-    try {
-      advancedAudioService.setEffect(effect, value);
-      setMixingState((prev) => ({
-        ...prev,
-        effects: { ...prev.effects, [effect]: value },
-      }));
-    } catch (error) {
-      console.error(`Failed to set effect ${effect}:`, error);
-    }
-  };
-
-  const setMasterVolume = (volume: number) => {
-    try {
-      // advancedAudioService.setMasterVolume?.(volume);
-      setMixingState((prev) => ({ ...prev, masterVolume: volume }));
+      advancedAudioService.setMasterVolume(value);
+      setMixingState((prev) => ({ ...prev, masterVolume: value }));
     } catch (error) {
       console.error('Failed to set master volume:', error);
     }
   };
 
-  const formatTime = (seconds: number): string => {
-    const mins = Math.floor(seconds / 60);
-    const secs = Math.floor(seconds % 60);
-    return `${mins}:${secs.toString().padStart(2, '0')}`;
-  };
-
-  const getEnergyColor = (energy: number): string => {
-    if (energy > 0.7) return 'text-red-400';
-    if (energy > 0.4) return 'text-yellow-400';
-    return 'text-green-400';
-  };
-
-  const WaveformDisplay: React.FC<{
-    waveform: Float32Array;
-    color: string;
-    energy: number;
-  }> = ({ waveform, color, energy }) => (
-    <div className="h-24 bg-gray-700 rounded-lg mb-4 relative overflow-hidden">
-      <motion.div
-        className="absolute inset-0 flex items-center justify-center"
-        animate={{ scale: 1 + energy * 0.05 }}
-        transition={{ type: 'spring', stiffness: 400, damping: 10 }}
-      >
-        {Array.from(waveform).map((value, index) => (
-          <div
-            key={index}
-            className={`${color} mx-px`}
-            style={{
-              height: `${Math.max(1, Math.abs(value) * 100)}%`,
-              width: `${100 / waveform.length}%`,
-            }}
-          />
-        ))}
-      </motion.div>
-    </div>
-  );
-
   return (
-    <div className={`bg-gray-900 text-white p-6 rounded-xl ${className}`}>
+    <div className={`space-y-6 ${className}`}>
       {/* Header */}
-      <div className="flex items-center justify-between mb-6">
-        <h2 className="text-2xl font-bold">Magic Player</h2>
-        <div className="flex items-center gap-4">
-          <div className="relative">
-            <select
-              value={skin.id}
-              onChange={(e) => setSkin(e.target.value)}
-              className="bg-gray-800 border border-gray-700 text-white pl-3 pr-8 py-2 rounded-lg appearance-none focus:outline-none focus:ring-2 focus:ring-neon-purple"
-            >
-              {availableSkins.map((s) => (
-                <option key={s.id} value={s.id}>
-                  {s.name}
-                </option>
-              ))}
-            </select>
-            <ChevronDown className="w-4 h-4 absolute right-2 top-1/2 -translate-y-1/2 pointer-events-none" />
+      <motion.div
+        className="flex items-center justify-between"
+        initial={{ opacity: 0, y: -20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.5 }}
+      >
+        <div className="flex items-center gap-3">
+          <div className="p-3 bg-neon-purple/10 border border-neon-purple/30 rounded-xl">
+            <Music className="w-6 h-6 text-neon-purple" />
           </div>
-          <button className="flex items-center gap-2 px-3 py-2 rounded-lg bg-gray-700 hover:bg-gray-600 transition-colors">
-            <Settings className="w-4 h-4" />
-            Settings
-          </button>
+          <div>
+            <h2 className="heading-secondary text-white">Dual Deck Player</h2>
+            <p className="body-small text-gray-400">Professional DJ mixing interface</p>
+          </div>
         </div>
-      </div>
+        
+        <motion.button
+          onClick={() => setShowAdvancedControls(!showAdvancedControls)}
+          className="btn-secondary"
+          whileHover={{ scale: 1.05 }}
+          whileTap={{ scale: 0.95 }}
+        >
+          <Settings className="w-4 h-4" />
+          {showAdvancedControls ? 'Hide' : 'Show'} Advanced
+        </motion.button>
+      </motion.div>
 
-      {/* Main Player Layout */}
+      {/* Main Player Interface */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {/* Deck A */}
-        <div className="glass-card p-4">
-          <div className="flex items-center justify-between mb-4">
-            <h3 className="text-lg font-semibold text-neon-purple">Deck A</h3>
-            <div
-              className={`flex items-center gap-1 ${getEnergyColor(deckA.energy)}`}
-            >
-              <Zap className="w-4 h-4" />
-              <span className="text-sm">{Math.round(deckA.energy * 100)}%</span>
-            </div>
-          </div>
-          <WaveformDisplay
-            waveform={deckA.waveform}
-            color="bg-neon-purple"
-            energy={deckA.energy}
+        <motion.div
+          initial={{ opacity: 0, x: -20 }}
+          animate={{ opacity: 1, x: 0 }}
+          transition={{ duration: 0.5, delay: 0.1 }}
+        >
+          <DeckDisplay
+            deck={deckA}
+            deckLabel="A"
+            onTogglePlay={() => togglePlay('A')}
+            onVolumeChange={(volume) => setVolume('A', volume)}
+            onPitchChange={(pitch) => setPitch('A', pitch)}
+            isActive={activeDeck === 'A'}
           />
-          <div className="space-y-4">
-            <div className="flex items-center gap-4">
-              <motion.button
-                onClick={() => togglePlay('A')}
-                className="btn-primary"
-                animate={{
-                  boxShadow: deckA.isPlaying
-                    ? '0 0 20px rgba(0, 212, 255, 0.7)'
-                    : 'none',
-                }}
-                transition={{
-                  duration: 0.8,
-                  repeat: deckA.isPlaying ? Infinity : 0,
-                  repeatType: 'reverse',
-                  ease: 'easeInOut',
-                }}
-              >
-                {deckA.isPlaying ? <Pause /> : <Play />}
-              </motion.button>
-              <span className="text-sm text-gray-400 font-mono">
-                {formatTime(deckA.currentTime)} / {formatTime(deckA.duration)}
-              </span>
-            </div>
-            <div className="space-y-2">
-              <label
-                htmlFor="deck-a-volume"
-                className="text-xs font-semibold uppercase tracking-wider"
-              >
-                Volume
-              </label>
-              <Slider
-                id="deck-a-volume"
-                min="0"
-                max="1"
-                step="0.01"
-                value={deckA.volume}
-                onChange={(e) => setVolume('A', parseFloat(e.target.value))}
-              />
-            </div>
-            <div className="space-y-2">
-              <label
-                htmlFor="deck-a-pitch"
-                className="text-xs font-semibold uppercase tracking-wider"
-              >
-                Pitch
-              </label>
-              <Slider
-                id="deck-a-pitch"
-                min="0.5"
-                max="2.0"
-                step="0.01"
-                value={deckA.pitch}
-                onChange={(e) => setPitch('A', parseFloat(e.target.value))}
-              />
-              <span className="text-xs text-gray-400">
-                {deckA.pitch.toFixed(2)}x
-              </span>
-            </div>
-          </div>
-        </div>
+        </motion.div>
 
         {/* Mixing Controls */}
-        <div className="glass-card p-4 flex flex-col gap-6">
-          <h3 className="text-lg font-semibold text-center">Mixer</h3>
-
-          <div className="flex justify-center">
-            <TransitionRing score={transitionQuality.score} />
-          </div>
-
-          <div className="space-y-2">
-            <label
-              htmlFor="master-volume"
-              className="text-xs font-semibold uppercase tracking-wider text-center block"
-            >
-              Master
-            </label>
-            <Slider
-              id="master-volume"
-              min="0"
-              max="1"
-              step="0.01"
-              value={mixingState.masterVolume}
-              onChange={(e) => setMasterVolume(parseFloat(e.target.value))}
-            />
-          </div>
-
-          <div className="space-y-2">
-            <label
-              htmlFor="crossfader"
-              className="text-xs font-semibold uppercase tracking-wider text-center block"
-            >
-              Crossfader
-            </label>
-            <Slider
-              id="crossfader"
-              min="0"
-              max="1"
-              step="0.01"
-              value={mixingState.crossfader}
-              onChange={(e) => setCrossfader(parseFloat(e.target.value))}
-            />
-          </div>
-
-          <div className="flex justify-around items-end h-full">
-            <div className="flex flex-col items-center space-y-2">
+        <motion.div
+          className="space-y-6"
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5, delay: 0.2 }}
+        >
+          {/* Crossfader */}
+          <GlassCard
+            icon={Activity}
+            iconPosition="top"
+            iconColor="neon-purple"
+            title="Crossfader"
+            subtitle="Mix between decks"
+          >
+            <div className="space-y-4">
               <Slider
-                id="eq-low"
-                min="-12"
-                max="12"
-                step="1"
-                value={mixingState.eq.low}
-                onChange={(e) => setEQ('low', parseInt(e.target.value))}
-                orientation="vertical"
+                value={mixingState.crossfader}
+                onChange={setCrossfader}
+                min={0}
+                max={1}
+                step={0.01}
+                className="w-full"
               />
-              <label
-                htmlFor="eq-low"
-                className="text-xs font-semibold uppercase"
-              >
-                Low
-              </label>
+              <div className="flex justify-between text-sm text-gray-400">
+                <span>Deck A</span>
+                <span>Deck B</span>
+              </div>
             </div>
-            <div className="flex flex-col items-center space-y-2">
+          </GlassCard>
+
+          {/* Master Volume */}
+          <GlassCard
+            icon={Volume2}
+            iconPosition="top"
+            iconColor="neon-green"
+            title="Master Volume"
+            subtitle="Overall output level"
+          >
+            <div className="space-y-4">
               <Slider
-                id="eq-mid"
-                min="-12"
-                max="12"
-                step="1"
-                value={mixingState.eq.mid}
-                onChange={(e) => setEQ('mid', parseInt(e.target.value))}
-                orientation="vertical"
+                value={mixingState.masterVolume}
+                onChange={setMasterVolume}
+                min={0}
+                max={1}
+                step={0.01}
+                className="w-full"
               />
-              <label
-                htmlFor="eq-mid"
-                className="text-xs font-semibold uppercase"
-              >
-                Mid
-              </label>
+              <div className="text-center text-sm text-gray-400">
+                {Math.round(mixingState.masterVolume * 100)}%
+              </div>
             </div>
-            <div className="flex flex-col items-center space-y-2">
-              <Slider
-                id="eq-high"
-                min="-12"
-                max="12"
-                step="1"
-                value={mixingState.eq.high}
-                onChange={(e) => setEQ('high', parseInt(e.target.value))}
-                orientation="vertical"
-              />
-              <label
-                htmlFor="eq-high"
-                className="text-xs font-semibold uppercase"
-              >
-                High
-              </label>
+          </GlassCard>
+
+          {/* Transition Quality */}
+          <NeonCard
+            icon={Target}
+            iconPosition="top"
+            iconColor="neon-purple"
+            title="Transition Quality"
+            subtitle="Mix compatibility score"
+          >
+            <div className="flex justify-center">
+              <TransitionRing score={transitionQuality.score} />
             </div>
-          </div>
-        </div>
+          </NeonCard>
+        </motion.div>
 
         {/* Deck B */}
-        <div className="glass-card p-4">
-          <div className="flex items-center justify-between mb-4">
-            <h3 className="text-lg font-semibold text-neon-green">Deck B</h3>
-            <div
-              className={`flex items-center gap-1 ${getEnergyColor(deckB.energy)}`}
-            >
-              <Zap className="w-4 h-4" />
-              <span className="text-sm">{Math.round(deckB.energy * 100)}%</span>
-            </div>
-          </div>
-          <WaveformDisplay
-            waveform={deckB.waveform}
-            color="bg-neon-green"
-            energy={deckB.energy}
+        <motion.div
+          initial={{ opacity: 0, x: 20 }}
+          animate={{ opacity: 1, x: 0 }}
+          transition={{ duration: 0.5, delay: 0.3 }}
+        >
+          <DeckDisplay
+            deck={deckB}
+            deckLabel="B"
+            onTogglePlay={() => togglePlay('B')}
+            onVolumeChange={(volume) => setVolume('B', volume)}
+            onPitchChange={(pitch) => setPitch('B', pitch)}
+            isActive={activeDeck === 'B'}
           />
-          <div className="space-y-4">
-            <div className="flex items-center gap-4">
-              <motion.button
-                onClick={() => togglePlay('B')}
-                className="btn-accent"
-                animate={{
-                  boxShadow: deckB.isPlaying
-                    ? '0 0 20px rgba(0, 255, 204, 0.7)'
-                    : 'none',
-                }}
-                transition={{
-                  duration: 0.8,
-                  repeat: deckB.isPlaying ? Infinity : 0,
-                  repeatType: 'reverse',
-                  ease: 'easeInOut',
-                }}
-              >
-                {deckB.isPlaying ? <Pause /> : <Play />}
-              </motion.button>
-              <span className="text-sm text-gray-400 font-mono">
-                {formatTime(deckB.currentTime)} / {formatTime(deckB.duration)}
-              </span>
-            </div>
-            <div className="space-y-2">
-              <label
-                htmlFor="deck-b-volume"
-                className="text-xs font-semibold uppercase tracking-wider"
-              >
-                Volume
-              </label>
-              <Slider
-                id="deck-b-volume"
-                min="0"
-                max="1"
-                step="0.01"
-                value={deckB.volume}
-                onChange={(e) => setVolume('B', parseFloat(e.target.value))}
-              />
-            </div>
-            <div className="space-y-2">
-              <label
-                htmlFor="deck-b-pitch"
-                className="text-xs font-semibold uppercase tracking-wider"
-              >
-                Pitch
-              </label>
-              <Slider
-                id="deck-b-pitch"
-                min="0.5"
-                max="2.0"
-                step="0.01"
-                value={deckB.pitch}
-                onChange={(e) => setPitch('B', parseFloat(e.target.value))}
-              />
-              <span className="text-xs text-gray-400">
-                {deckB.pitch.toFixed(2)}x
-              </span>
-            </div>
-          </div>
-        </div>
+        </motion.div>
       </div>
 
-      {/* Effects Section */}
-      <div className="mt-6 glass-card p-4">
-        <h3 className="text-lg font-semibold mb-4">Effects</h3>
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-          <div className="space-y-2">
-            <label
-              htmlFor="effect-reverb"
-              className="text-xs font-semibold uppercase"
-            >
-              Reverb
-            </label>
-            <Slider
-              id="effect-reverb"
-              min="0"
-              max="1"
-              step="0.01"
-              value={mixingState.effects.reverb}
-              onChange={(e) => setEffect('reverb', parseFloat(e.target.value))}
-            />
-          </div>
-          <div className="space-y-2">
-            <label
-              htmlFor="effect-delay"
-              className="text-xs font-semibold uppercase"
-            >
-              Delay
-            </label>
-            <Slider
-              id="effect-delay"
-              min="0"
-              max="1"
-              step="0.01"
-              value={mixingState.effects.delay}
-              onChange={(e) => setEffect('delay', parseFloat(e.target.value))}
-            />
-          </div>
-          <div className="space-y-2">
-            <label
-              htmlFor="effect-filter"
-              className="text-xs font-semibold uppercase"
-            >
-              Filter
-            </label>
-            <Slider
-              id="effect-filter"
-              min="0"
-              max="1"
-              step="0.01"
-              value={mixingState.effects.filter}
-              onChange={(e) => setEffect('filter', parseFloat(e.target.value))}
-            />
-          </div>
-        </div>
-      </div>
+      {/* Advanced Controls */}
+      <AnimatePresence>
+        {showAdvancedControls && (
+          <motion.div
+            initial={{ opacity: 0, height: 0 }}
+            animate={{ opacity: 1, height: 'auto' }}
+            exit={{ opacity: 0, height: 0 }}
+            transition={{ duration: 0.3 }}
+            className="overflow-hidden"
+          >
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 pt-6 border-t border-white/10">
+              {/* EQ Controls */}
+              <GlassCard
+                icon={Settings}
+                iconPosition="top"
+                iconColor="neon-green"
+                title="Equalizer"
+                subtitle="Frequency adjustments"
+              >
+                <div className="space-y-4">
+                  {Object.entries(mixingState.eq).map(([band, value]) => (
+                    <div key={band} className="space-y-2">
+                      <div className="flex justify-between text-sm">
+                        <span className="text-gray-400 capitalize">{band}</span>
+                        <span className="text-white">{value}dB</span>
+                      </div>
+                      <Slider
+                        value={value}
+                        onChange={(newValue) => 
+                          setMixingState(prev => ({
+                            ...prev,
+                            eq: { ...prev.eq, [band]: newValue }
+                          }))
+                        }
+                        min={-12}
+                        max={12}
+                        step={0.1}
+                        className="w-full"
+                      />
+                    </div>
+                  ))}
+                </div>
+              </GlassCard>
+
+              {/* Effects Controls */}
+              <GlassCard
+                icon={Zap}
+                iconPosition="top"
+                iconColor="neon-purple"
+                title="Effects"
+                subtitle="Audio processing"
+              >
+                <div className="space-y-4">
+                  {Object.entries(mixingState.effects).map(([effect, value]) => (
+                    <div key={effect} className="space-y-2">
+                      <div className="flex justify-between text-sm">
+                        <span className="text-gray-400 capitalize">{effect}</span>
+                        <span className="text-white">{Math.round(value * 100)}%</span>
+                      </div>
+                      <Slider
+                        value={value}
+                        onChange={(newValue) => 
+                          setMixingState(prev => ({
+                            ...prev,
+                            effects: { ...prev.effects, [effect]: newValue }
+                          }))
+                        }
+                        min={0}
+                        max={1}
+                        step={0.01}
+                        className="w-full"
+                      />
+                    </div>
+                  ))}
+                </div>
+              </GlassCard>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </div>
   );
 };

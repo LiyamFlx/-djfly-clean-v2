@@ -73,21 +73,71 @@ export const Button: React.FC<ButtonProps> = ({
       className={combinedClasses}
       disabled={isDisabled}
       whileTap={!isDisabled ? { scale: 0.95 } : {}}
-      whileHover={!isDisabled ? { scale: 1.02 } : {}}
-      transition={{ duration: 0.1 }}
+      whileHover={!isDisabled ? { 
+        scale: 1.02,
+        y: -2,
+      } : {}}
+      transition={{ 
+        duration: 0.2,
+        type: "spring",
+        stiffness: 400,
+        damping: 25
+      }}
       {...props}
     >
-      <span className="flex items-center justify-center gap-2">
+      {/* Enhanced background shimmer effect */}
+      <motion.div
+        className="absolute inset-0 bg-gradient-to-r from-white/0 via-white/10 to-white/0"
+        initial={{ x: '-100%' }}
+        whileHover={{ x: '100%' }}
+        transition={{ duration: 0.6, ease: "easeInOut" }}
+      />
+      
+      {/* Content container */}
+      <motion.span 
+        className="flex items-center justify-center gap-2 relative z-10"
+        animate={loading ? { opacity: [1, 0.7, 1] } : {}}
+        transition={{ duration: 1.5, repeat: loading ? Infinity : 0 }}
+      >
         {loading ? (
           <LoadingSpinner />
         ) : (
-          Icon && iconPosition === 'left' && <Icon className="w-4 h-4" />
+          Icon && iconPosition === 'left' && (
+            <motion.div
+              initial={{ scale: 0, rotate: -180 }}
+              animate={{ scale: 1, rotate: 0 }}
+              transition={{ duration: 0.3, type: "spring" }}
+            >
+              <Icon className="w-4 h-4" />
+            </motion.div>
+          )
         )}
-        <span className="font-medium">{children}</span>
+        <motion.span 
+          className="font-medium"
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.3, delay: 0.1 }}
+        >
+          {children}
+        </motion.span>
         {!loading && Icon && iconPosition === 'right' && (
-          <Icon className="w-4 h-4" />
+          <motion.div
+            initial={{ scale: 0, rotate: 180 }}
+            animate={{ scale: 1, rotate: 0 }}
+            transition={{ duration: 0.3, type: "spring", delay: 0.1 }}
+          >
+            <Icon className="w-4 h-4" />
+          </motion.div>
         )}
-      </span>
+      </motion.span>
+
+      {/* Enhanced focus ring */}
+      <motion.div
+        className="absolute inset-0 rounded-xl ring-2 ring-neon-purple/0 ring-offset-2 ring-offset-pure-black"
+        initial={{ opacity: 0 }}
+        whileFocus={{ opacity: 1 }}
+        transition={{ duration: 0.2 }}
+      />
     </motion.button>
   );
 };
