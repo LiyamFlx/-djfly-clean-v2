@@ -167,7 +167,7 @@ export const useDJflyStore = create<DJflyStore>()(
       }),
 
     // AI actions
-    generateSet: async (_prompt) => {
+    generateSet: async (prompt) => {
       set((state) => {
         state.ai.isAnalyzing = true;
         state.ai.confidence = 0;
@@ -175,18 +175,16 @@ export const useDJflyStore = create<DJflyStore>()(
       });
 
       try {
-        // const tracks = await getAiPlaylist(prompt, onProgress);
-        const tracks: Track[] = [];
+        const { MockPlaylistService } = await import('@/services/mockPlaylistService');
+        const recommendation = await MockPlaylistService.generatePlaylist(prompt);
 
         set((state) => {
-          state.ai.recommendations = [
-            { tracks, energy: 85, mood: 'energetic' },
-          ];
+          state.ai.recommendations = [recommendation];
           state.ai.isAnalyzing = false;
           state.ai.confidence = 0.9;
         });
-      } catch (_error) {
-        console.error('Error in generateSet store action:', _error);
+      } catch (error) {
+        console.error('Error in generateSet store action:', error);
         set((state) => {
           state.ai.isAnalyzing = false;
         });
