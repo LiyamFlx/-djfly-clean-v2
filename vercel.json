@@ -8,16 +8,7 @@
       "destination": "/index.html"
     }
   ],
-  "routes": [
-    {
-      "src": "/manifest.json",
-      "dest": "/manifest.json",
-      "headers": {
-        "Content-Type": "application/manifest+json",
-        "Cache-Control": "public, max-age=0, must-revalidate"
-      }
-    }
-  ],
+
   "headers": [
     {
       "source": "/",

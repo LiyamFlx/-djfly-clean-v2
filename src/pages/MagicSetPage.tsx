@@ -66,7 +66,7 @@ const MagicSetPage = () => {
       appState.queue = recommendation.tracks;
     } catch (error) {
       console.warn('AI generation failed, using fallback:', error);
-      const generatedTracks = await musicLibrary.generateByPrompt(prompt);
+      const generatedTracks = await musicLibrary.generatePlaylist(prompt);
       setGeneratedTracks(generatedTracks);
       setStatus('complete');
       appState.queue = generatedTracks;
@@ -89,7 +89,7 @@ const MagicSetPage = () => {
   };
 
   return (
-    <div className="min-h-screen bg-ui-bg-deep text-ui-text p-8">
+    <div className="min-h-screen bg-gradient-dj text-dj-text-primary p-8">
       <div className="max-w-4xl mx-auto">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
@@ -99,7 +99,7 @@ const MagicSetPage = () => {
           <h1 className="text-4xl font-bold mb-4 gradient-text">
             🎵 Magic Set Generator
           </h1>
-          <p className="text-lg text-gray-300">
+          <p className="text-lg text-dj-text-secondary">
             Describe your perfect playlist and let AI create the magic
           </p>
         </motion.div>
@@ -108,47 +108,47 @@ const MagicSetPage = () => {
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            className="glass-card p-6 rounded-xl mb-8"
+            className="glass-card p-6 mb-8"
           >
-            <label
-              htmlFor="prompt"
-              className="block text-sm font-medium text-gray-300 mb-2"
-            >
-              Describe your ideal set
-            </label>
-            <div className="space-y-4">
-              <textarea
-                id="prompt"
-                value={prompt}
-                onChange={(e) => setPrompt(e.target.value)}
-                placeholder="Describe your perfect playlist - mood, energy, genre, venue..."
-                className="w-full px-4 py-3 bg-rich-black/50 border border-white/20 rounded-lg text-white placeholder-gray-400 focus:border-electric-blue focus:ring-1 focus:ring-electric-blue focus:outline-none resize-none"
-                rows={4}
-              />
+                          <label
+                htmlFor="prompt"
+                className="block text-sm font-medium text-dj-text-secondary mb-2"
+              >
+                Describe your ideal set
+              </label>
+              <div className="space-y-4">
+                <textarea
+                  id="prompt"
+                  value={prompt}
+                  onChange={(e) => setPrompt(e.target.value)}
+                  placeholder="Describe your perfect playlist - mood, energy, genre, venue..."
+                  className="input w-full resize-none"
+                  rows={4}
+                />
 
-              {/* Quick Prompts */}
-              <div className="flex flex-wrap gap-2">
-                <span className="text-sm text-gray-400">Quick ideas:</span>
-                {[
-                  'Wedding reception mix',
-                  'Workout energy boost',
-                  'Chill study session',
-                  'Dance floor heater',
-                ].map((idea) => (
-                  <button
-                    key={idea}
-                    onClick={() => setPrompt(idea)}
-                    className="px-3 py-1 text-xs bg-white/10 hover:bg-white/20 rounded-full transition-colors"
-                  >
-                    {idea}
-                  </button>
-                ))}
-              </div>
+                {/* Quick Prompts */}
+                <div className="flex flex-wrap gap-2">
+                  <span className="text-sm text-dj-text-muted">Quick ideas:</span>
+                  {[
+                    'Wedding reception mix',
+                    'Workout energy boost',
+                    'Chill study session',
+                    'Dance floor heater',
+                  ].map((idea) => (
+                    <button
+                      key={idea}
+                      onClick={() => setPrompt(idea)}
+                      className="px-3 py-1 text-xs bg-dj-bg-tertiary/50 hover:bg-dj-bg-tertiary text-dj-text-secondary hover:text-dj-text-primary rounded-full transition-colors"
+                    >
+                      {idea}
+                    </button>
+                  ))}
+                </div>
 
               <button
                 onClick={generatePlaylist}
                 disabled={!prompt.trim()}
-                className="w-full px-8 py-3 bg-neon-purple hover:bg-neon-purple/80 text-white font-semibold rounded-lg transition-colors disabled:bg-gray-600 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+                className="btn btn-primary w-full flex items-center justify-center gap-2"
               >
                 <Sparkles className="w-5 h-5" />
                 Generate Playlist
@@ -163,8 +163,8 @@ const MagicSetPage = () => {
             animate={{ opacity: 1 }}
             className="text-center py-12"
           >
-            <div className="animate-spin w-12 h-12 border-4 border-neon-purple border-t-transparent rounded-full mx-auto mb-4"></div>
-            <p className="text-lg text-gray-300">
+            <div className="animate-spin w-12 h-12 border-4 border-dj-interactive border-t-transparent rounded-full mx-auto mb-4"></div>
+            <p className="text-lg text-dj-text-secondary">
               🤖 AI is generating your perfect playlist...
             </p>
           </motion.div>
@@ -220,13 +220,13 @@ const MagicSetPage = () => {
                       initial={{ opacity: 0, x: -20 }}
                       animate={{ opacity: 1, x: 0 }}
                       transition={{ delay: index * 0.1 }}
-                      className="flex items-center gap-4 p-4 bg-rich-black/30 rounded-lg hover:bg-rich-black/50 transition-colors group"
+                      className="flex items-center gap-4 p-4 bg-dj-bg-tertiary/30 rounded-lg hover:bg-dj-bg-tertiary/50 transition-colors group"
                     >
                       <div className="flex-1">
                         <p className="font-medium">{track.title}</p>
-                        <p className="text-gray-400 text-sm">{track.artist}</p>
+                        <p className="text-dj-text-muted text-sm">{track.artist}</p>
                       </div>
-                      <div className="text-sm text-gray-300">
+                      <div className="text-sm text-dj-text-secondary">
                         {track.bpm} BPM • {track.key}
                       </div>
 
@@ -240,7 +240,7 @@ const MagicSetPage = () => {
                       </motion.button>
                       <button
                         onClick={() => removeTrack(track.id)}
-                        className="p-2 text-gray-400 hover:text-red-400 transition-colors"
+                        className="p-2 text-dj-text-muted hover:text-error-500 transition-colors"
                       >
                         <Trash2 className="w-4 h-4" />
                       </button>
@@ -252,10 +252,10 @@ const MagicSetPage = () => {
                 <div className="mt-6 pt-6 border-t border-white/10">
                   <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-center">
                     <div>
-                      <div className="text-2xl font-bold text-electric-blue">
+                      <div className="text-2xl font-bold text-dj-interactive">
                         {generatedTracks.length}
                       </div>
-                      <div className="text-sm text-gray-400">Tracks</div>
+                      <div className="text-sm text-dj-text-muted">Tracks</div>
                     </div>
                     <div>
                       <div className="text-2xl font-bold text-bright-turquoise">
@@ -266,7 +266,7 @@ const MagicSetPage = () => {
                           ) / 60
                         )}
                       </div>
-                      <div className="text-sm text-gray-400">Minutes</div>
+                      <div className="text-sm text-dj-text-muted">Minutes</div>
                     </div>
                     <div>
                       <div className="text-2xl font-bold text-laser-pink">
@@ -280,7 +280,7 @@ const MagicSetPage = () => {
                         )}
                         %
                       </div>
-                      <div className="text-sm text-gray-400">Avg Energy</div>
+                      <div className="text-sm text-dj-text-muted">Avg Energy</div>
                     </div>
                     <div>
                       <div className="text-2xl font-bold text-electric-blue">
@@ -291,7 +291,7 @@ const MagicSetPage = () => {
                           ) / generatedTracks.length
                         )}
                       </div>
-                      <div className="text-sm text-gray-400">Avg BPM</div>
+                      <div className="text-sm text-dj-text-muted">Avg BPM</div>
                     </div>
                   </div>
                 </div>
@@ -308,7 +308,7 @@ const MagicSetPage = () => {
               <h3 className="text-xl font-bold gradient-text mb-4">
                 Manual Curation
               </h3>
-              <p className="text-gray-300 mb-6">
+              <p className="text-dj-text-secondary mb-6">
                 Search and add tracks manually, or upload your own music files
               </p>
 
@@ -316,7 +316,7 @@ const MagicSetPage = () => {
                 <motion.input
                   type="text"
                   placeholder="Search tracks by title, artist, or genre..."
-                  className="flex-1 px-4 py-3 bg-rich-black/50 border border-white/20 rounded-lg text-white placeholder-gray-400 focus:border-electric-blue focus:ring-1 focus:ring-electric-blue focus:outline-none transition-all"
+                  className="input flex-1"
                   whileFocus={{ scale: 1.02 }}
                 />
                 <motion.button
