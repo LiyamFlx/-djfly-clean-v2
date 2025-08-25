@@ -128,11 +128,11 @@ const DeckDisplay: React.FC<{
       <GlassCard
         icon={Music}
         iconPosition="top"
-        iconColor={isActive ? 'neon-purple' : 'gray'}
+        iconColor={isActive ? 'dj-interactive' : 'gray'}
         title={`Deck ${deckLabel}`}
         subtitle={deck.isPlaying ? 'Playing' : 'Stopped'}
         className={`h-full transition-all duration-300 ${
-          isActive ? 'border-neon-purple/50 shadow-neon-purple-soft' : ''
+          isActive ? 'border-dj-interactive/50 shadow-dj-soft' : ''
         }`}
       >
         <div className="space-y-6">
@@ -141,8 +141,8 @@ const DeckDisplay: React.FC<{
             onClick={onTogglePlay}
             className={`w-16 h-16 mx-auto rounded-full flex items-center justify-center transition-all duration-300 ${
               deck.isPlaying 
-                ? 'bg-neon-green text-rich-black shadow-neon-green-soft' 
-                : 'bg-neon-purple text-white shadow-neon-purple-soft'
+                ? 'bg-success-500 text-white shadow-success-500/20'
+: 'bg-dj-interactive text-white shadow-dj-interactive/20'
             }`}
             whileHover={{ scale: 1.1 }}
             whileTap={{ scale: 0.9 }}
@@ -186,13 +186,13 @@ const DeckDisplay: React.FC<{
           <div className="space-y-2">
             <div className="flex items-center justify-between text-sm">
               <span className="text-gray-400">Energy</span>
-              <span className="text-neon-green font-medium">
+              <span className="text-success-500 font-medium">
                 {Math.round(deck.energy * 100)}%
               </span>
             </div>
             <div className="w-full bg-gray-700 rounded-full h-2 overflow-hidden">
               <motion.div
-                className="h-full bg-gradient-to-r from-neon-green to-neon-purple"
+                className="h-full bg-gradient-to-r from-success-500 to-dj-interactive"
                 initial={{ width: 0 }}
                 animate={{ width: `${deck.energy * 100}%` }}
                 transition={{ duration: 0.3 }}
@@ -400,12 +400,12 @@ const DualDeckPlayer: React.FC<DualDeckPlayerProps> = ({ className = '' }) => {
         transition={{ duration: 0.5 }}
       >
         <div className="flex items-center gap-3">
-          <div className="p-3 bg-neon-purple/10 border border-neon-purple/30 rounded-xl">
-            <Music className="w-6 h-6 text-neon-purple" />
+          <div className="p-3 bg-dj-interactive/10 border border-dj-interactive/30 rounded-xl">
+            <Music className="w-6 h-6 text-dj-interactive" />
           </div>
           <div>
-            <h2 className="heading-secondary text-white">Dual Deck Player</h2>
-            <p className="body-small text-gray-400">Professional DJ mixing interface</p>
+            <h2 className="text-xl font-semibold text-dj-text-primary">Dual Deck Player</h2>
+            <p className="text-sm text-dj-text-secondary">Professional DJ mixing interface</p>
           </div>
         </div>
         
@@ -449,7 +449,7 @@ const DualDeckPlayer: React.FC<DualDeckPlayerProps> = ({ className = '' }) => {
           <GlassCard
             icon={Activity}
             iconPosition="top"
-            iconColor="neon-purple"
+            iconColor="dj-interactive"
             title="Crossfader"
             subtitle="Mix between decks"
           >
@@ -473,7 +473,7 @@ const DualDeckPlayer: React.FC<DualDeckPlayerProps> = ({ className = '' }) => {
           <GlassCard
             icon={Volume2}
             iconPosition="top"
-            iconColor="neon-green"
+            iconColor="success-500"
             title="Master Volume"
             subtitle="Overall output level"
           >
@@ -496,7 +496,7 @@ const DualDeckPlayer: React.FC<DualDeckPlayerProps> = ({ className = '' }) => {
           <NeonCard
             icon={Target}
             iconPosition="top"
-            iconColor="neon-purple"
+            iconColor="dj-interactive"
             title="Transition Quality"
             subtitle="Mix compatibility score"
           >
@@ -538,7 +538,7 @@ const DualDeckPlayer: React.FC<DualDeckPlayerProps> = ({ className = '' }) => {
               <GlassCard
                 icon={Settings}
                 iconPosition="top"
-                iconColor="neon-green"
+                iconColor="success-500"
                 title="Equalizer"
                 subtitle="Frequency adjustments"
               >
@@ -571,7 +571,7 @@ const DualDeckPlayer: React.FC<DualDeckPlayerProps> = ({ className = '' }) => {
               <GlassCard
                 icon={Zap}
                 iconPosition="top"
-                iconColor="neon-purple"
+                iconColor="dj-interactive"
                 title="Effects"
                 subtitle="Audio processing"
               >

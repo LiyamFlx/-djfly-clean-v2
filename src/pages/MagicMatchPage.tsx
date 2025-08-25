@@ -4,14 +4,17 @@ import { useAIActions, useAIState } from '@/store';
 import Button from '@/components/ui/button';
 import { type Track } from '@/types/shared';
 import { GlassCard, NeonCard } from '@/components/ui/EnhancedCard';
+import { useNavigate } from 'react-router-dom';
 
 const MagicMatchPage: React.FC = () => {
   const { generateSet } = useAIActions();
   const aiState = useAIState();
+  const navigate = useNavigate();
   const [status, setStatus] = useState<
     'idle' | 'recording' | 'analyzing' | 'complete'
   >('idle');
   const [prompt, setPrompt] = useState('');
+  const [currentPlaylist, setCurrentPlaylist] = useState<Track[]>([]);
 
   const handleStartRecording = async () => {
     setStatus('recording');
@@ -32,6 +35,37 @@ const MagicMatchPage: React.FC = () => {
     } catch (error) {
       console.error('Failed to generate match:', error);
       setStatus('idle');
+    }
+  };
+
+  const handlePlayTrack = (track: Track) => {
+    // Store the track in localStorage for the player to access
+    localStorage.setItem('currentTrack', JSON.stringify(track));
+    localStorage.setItem('playlist', JSON.stringify(aiState.recommendations[0]?.tracks || []));
+    // Navigate to player with track info
+    navigate('/player', { state: { track, playlist: aiState.recommendations[0]?.tracks || [] } });
+  };
+
+  const handlePlayAll = () => {
+    if (aiState.recommendations[0]?.tracks) {
+      localStorage.setItem('playlist', JSON.stringify(aiState.recommendations[0].tracks));
+      navigate('/player', { state: { playlist: aiState.recommendations[0].tracks } });
+    }
+  };
+
+  const handleSavePlaylist = () => {
+    if (aiState.recommendations[0]?.tracks) {
+      const playlistData = {
+        name: `${aiState.recommendations[0].genre} Mix`,
+        tracks: aiState.recommendations[0].tracks,
+        description: aiState.recommendations[0].description,
+        createdAt: new Date().toISOString()
+      };
+      localStorage.setItem('savedPlaylists', JSON.stringify([
+        ...JSON.parse(localStorage.getItem('savedPlaylists') || '[]'),
+        playlistData
+      ]));
+      alert('Playlist saved successfully!');
     }
   };
 
@@ -222,7 +256,7 @@ const MagicMatchPage: React.FC = () => {
                               variant="ghost"
                               size="sm"
                               icon={Play}
-                              onClick={() => console.log('Play track:', track.title)}
+                              onClick={() => handlePlayTrack(track)}
                               className="shrink-0"
                             >
                               Play
@@ -238,7 +272,7 @@ const MagicMatchPage: React.FC = () => {
                         variant="primary"
                         size="lg"
                         icon={Play}
-                        onClick={() => console.log('Play all tracks')}
+                        onClick={handlePlayAll}
                         className="flex-1"
                       >
                         Play All
@@ -247,7 +281,7 @@ const MagicMatchPage: React.FC = () => {
                         variant="secondary"
                         size="lg"
                         icon={Zap}
-                        onClick={() => console.log('Save playlist')}
+                        onClick={handleSavePlaylist}
                         className="flex-1"
                       >
                         Save Playlist
