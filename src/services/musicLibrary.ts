@@ -74,6 +74,13 @@ const demoTracks: Track[] = [
 
 class MusicLibraryService {
   /**
+   * Return all available tracks (for fallback generation or analytics)
+   */
+  getAllTracks(): Track[] {
+    return [...demoTracks];
+  }
+
+  /**
    * Search for tracks across multiple services
    */
   async searchTracks(query: string, limit: number = 10): Promise<Track[]> {

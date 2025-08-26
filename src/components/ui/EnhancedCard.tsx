@@ -10,7 +10,7 @@ interface EnhancedCardProps extends Omit<HTMLMotionProps<'div'>, 'children'> {
   iconColor?: string;
   title?: string;
   subtitle?: string;
-  children: React.ReactNode;
+  children?: React.ReactNode;
   className?: string;
   onClick?: () => void;
   loading?: boolean;
@@ -275,3 +275,4 @@ export const CardGrid: React.FC<CardGridProps> = ({
 };
 
 export default EnhancedCard;
+export { EnhancedCard };

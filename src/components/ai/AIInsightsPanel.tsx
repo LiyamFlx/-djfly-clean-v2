@@ -1,23 +1,22 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion } from 'framer-motion';
 import {
   Brain,
-  Eye,
   Users,
   TrendingUp,
   Target,
   Zap,
   Lightbulb,
-  BarChart3,
   Camera,
   Activity,
   Sparkles,
   Music,
   Heart,
   Clock,
+  type LucideIcon,
 } from 'lucide-react';
 import { aiPersonalizationService } from '@/services/aiPersonalization';
-import { EnhancedCard, GlassCard, NeonCard } from '@/components/ui/EnhancedCard';
+import { GlassCard, NeonCard } from '@/components/ui/EnhancedCard';
 import { AIAnalysisLoading } from '@/components/ui/LoadingStates';
 
 interface AIInsightsPanelProps {
@@ -33,7 +32,7 @@ interface InsightCard {
   trend?: 'up' | 'down' | 'stable';
   confidence: number;
   category: 'crowd' | 'personal' | 'prediction' | 'vision';
-  icon?: React.ComponentType<{ className?: string }>;
+  icon?: LucideIcon;
   color?: string;
 }
 
@@ -97,7 +96,7 @@ const AIInsightsPanel: React.FC<AIInsightsPanelProps> = ({
       const visionFeatures =
         await aiPersonalizationService.extractComputerVisionFeatures();
 
-      setCrowdVisionData(visionData);
+      setCrowdVisionData(visionData as CrowdVisionData);
       setComputerVisionFeatures(visionFeatures);
       setAnalysisProgress(60);
       setAnalysisStage('generating');
@@ -113,9 +112,9 @@ const AIInsightsPanel: React.FC<AIInsightsPanelProps> = ({
         {
           id: 'crowd-density',
           title: 'Crowd Density',
-          value: Math.round(visionData.density * 100),
+          value: Math.round((visionData as CrowdVisionData).density * 100),
           unit: '%',
-          trend: visionData.density > 0.8 ? 'up' : visionData.density < 0.6 ? 'down' : 'stable',
+          trend: (visionData as CrowdVisionData).density > 0.8 ? 'up' : (visionData as CrowdVisionData).density < 0.6 ? 'down' : 'stable',
           confidence: 95,
           category: 'crowd',
           icon: Users,
@@ -124,9 +123,9 @@ const AIInsightsPanel: React.FC<AIInsightsPanelProps> = ({
         {
           id: 'crowd-energy',
           title: 'Energy Level',
-          value: Math.round(visionData.energy * 100),
+          value: Math.round((visionData as CrowdVisionData).energy * 100),
           unit: '%',
-          trend: visionData.energy > 0.7 ? 'up' : visionData.energy < 0.4 ? 'down' : 'stable',
+          trend: (visionData as CrowdVisionData).energy > 0.7 ? 'up' : (visionData as CrowdVisionData).energy < 0.4 ? 'down' : 'stable',
           confidence: 92,
           category: 'crowd',
           icon: Zap,
@@ -135,7 +134,7 @@ const AIInsightsPanel: React.FC<AIInsightsPanelProps> = ({
         {
           id: 'crowd-mood',
           title: 'Crowd Mood',
-          value: visionData.mood,
+          value: (visionData as CrowdVisionData).mood,
           confidence: 88,
           category: 'crowd',
           icon: Heart,
@@ -211,7 +210,7 @@ const AIInsightsPanel: React.FC<AIInsightsPanelProps> = ({
     return (
       <div className={`p-8 ${className}`}>
         <AIAnalysisLoading
-          stage={analysisStage}
+          stage={analysisStage === 'idle' ? 'recording' : analysisStage}
           progress={analysisProgress}
         />
       </div>
@@ -398,7 +397,7 @@ const AIInsightsPanel: React.FC<AIInsightsPanelProps> = ({
           <p className="body-medium text-gray-400 mb-6">
             Generate your first AI-powered insights to start optimizing your DJ sets
           </p>
-          <button
+          <motion.button
             onClick={generateInsights}
             className="btn-primary"
             whileHover={{ scale: 1.05 }}
@@ -406,7 +405,7 @@ const AIInsightsPanel: React.FC<AIInsightsPanelProps> = ({
           >
             <Sparkles className="w-4 h-4" />
             Generate First Insights
-          </button>
+          </motion.button>
         </motion.div>
       )}
     </div>

@@ -15,6 +15,7 @@ export interface Track {
   source?: AudioSource;
   popularity?: number;
   spotify_url?: string;
+  url?: string; // optional local/demo audio URL
 }
 
 export interface Playlist {
