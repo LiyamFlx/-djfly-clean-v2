@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import {
@@ -21,11 +21,10 @@ import {
   Target,
 } from 'lucide-react';
 import Button from '@/components/ui/button';
-import { EnhancedCard, CardGrid, FeatureCard, GlassCard } from '@/components/ui/EnhancedCard';
+import { CardGrid, FeatureCard, GlassCard } from '@/components/ui/EnhancedCard';
 
 const HomePage: React.FC = () => {
   const navigate = useNavigate();
-  const [activeFeature, setActiveFeature] = useState<number | null>(null);
 
   const handleTryNow = () => {
     navigate('/studio');
@@ -237,7 +236,9 @@ const HomePage: React.FC = () => {
                     title={stat.value}
                     subtitle={stat.label}
                     className="text-center hover:scale-105 transition-transform duration-300"
-                  />
+                  >
+                    <span className="sr-only">{stat.label}</span>
+                  </GlassCard>
                 </motion.div>
               ))}
             </motion.div>
@@ -336,7 +337,9 @@ const HomePage: React.FC = () => {
                   title={feature.title}
                   subtitle={feature.description}
                   className="text-center hover:scale-105 transition-transform duration-300"
-                />
+                >
+                  <span className="sr-only">{feature.title}</span>
+                </GlassCard>
               </motion.div>
             ))}
           </CardGrid>

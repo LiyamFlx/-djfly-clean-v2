@@ -1,9 +1,8 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Play, Pause, Settings, Zap, ChevronDown, Volume2, Music, Target, Activity } from 'lucide-react';
+import { Play, Pause, Settings, Zap, Volume2, Music, Target, Activity } from 'lucide-react';
 import { advancedAudioService } from '@/services/advancedAudio';
 import Slider from '@/components/ui/Slider';
-import { useTheme } from '@/contexts/ThemeContext';
 import { GlassCard, NeonCard } from '@/components/ui/EnhancedCard';
 
 interface DualDeckPlayerProps {
@@ -142,7 +141,7 @@ const DeckDisplay: React.FC<{
             className={`w-16 h-16 mx-auto rounded-full flex items-center justify-center transition-all duration-300 ${
               deck.isPlaying 
                 ? 'bg-success-500 text-white shadow-success-500/20'
-: 'bg-dj-interactive text-white shadow-dj-interactive/20'
+                : 'bg-dj-interactive text-white shadow-dj-interactive/20'
             }`}
             whileHover={{ scale: 1.1 }}
             whileTap={{ scale: 0.9 }}
@@ -210,7 +209,7 @@ const DeckDisplay: React.FC<{
             </div>
             <Slider
               value={deck.volume}
-              onChange={(value) => onVolumeChange(value)}
+              onChange={(e) => onVolumeChange(Number((e.target as HTMLInputElement).value))}
               className="w-full"
             />
           </div>
@@ -225,7 +224,7 @@ const DeckDisplay: React.FC<{
             </div>
             <Slider
               value={deck.pitch}
-              onChange={(value) => onPitchChange(value)}
+              onChange={(e) => onPitchChange(Number((e.target as HTMLInputElement).value))}
               min={0.5}
               max={2.0}
               step={0.01}
@@ -239,7 +238,6 @@ const DeckDisplay: React.FC<{
 };
 
 const DualDeckPlayer: React.FC<DualDeckPlayerProps> = ({ className = '' }) => {
-  const { skin, setSkin, availableSkins } = useTheme();
   const [deckA, setDeckA] = useState<DeckControls>({
     isPlaying: false,
     volume: 1.0,
@@ -267,13 +265,11 @@ const DualDeckPlayer: React.FC<DualDeckPlayerProps> = ({ className = '' }) => {
     effects: { reverb: 0, delay: 0, filter: 0 },
   });
 
-  const [transitionQuality, setTransitionQuality] = useState<TransitionQuality>(
-    {
-      score: 0,
-      factors: { bpmMatch: 0, keyCompatibility: 0, energyFlow: 0, timing: 0 },
-      suggestions: [],
-    }
-  );
+  const [transitionQuality, setTransitionQuality] = useState<TransitionQuality>({
+    score: 0,
+    factors: { bpmMatch: 0, keyCompatibility: 0, energyFlow: 0, timing: 0 },
+    suggestions: [],
+  });
 
   const [showAdvancedControls, setShowAdvancedControls] = useState(false);
   const [activeDeck, setActiveDeck] = useState<'A' | 'B' | null>(null);
@@ -281,7 +277,6 @@ const DualDeckPlayer: React.FC<DualDeckPlayerProps> = ({ className = '' }) => {
   const analyticsInterval = useRef<ReturnType<typeof setInterval> | null>(null);
 
   useEffect(() => {
-    // Start analytics monitoring
     analyticsInterval.current = setInterval(() => {
       try {
         const analytics = advancedAudioService.getAnalytics() as AudioAnalytics;
@@ -361,7 +356,7 @@ const DualDeckPlayer: React.FC<DualDeckPlayerProps> = ({ className = '' }) => {
 
   const setPitch = (deck: 'A' | 'B', pitch: number) => {
     try {
-      advancedAudioService.setDeckPitch(deck, pitch);
+      advancedAudioService.setPitch(deck, pitch);
       if (deck === 'A') {
         setDeckA((prev) => ({ ...prev, pitch }));
       } else {
@@ -456,7 +451,7 @@ const DualDeckPlayer: React.FC<DualDeckPlayerProps> = ({ className = '' }) => {
             <div className="space-y-4">
               <Slider
                 value={mixingState.crossfader}
-                onChange={setCrossfader}
+                onChange={(e) => setCrossfader(Number((e.target as HTMLInputElement).value))}
                 min={0}
                 max={1}
                 step={0.01}
@@ -480,7 +475,7 @@ const DualDeckPlayer: React.FC<DualDeckPlayerProps> = ({ className = '' }) => {
             <div className="space-y-4">
               <Slider
                 value={mixingState.masterVolume}
-                onChange={setMasterVolume}
+                onChange={(e) => setMasterVolume(Number((e.target as HTMLInputElement).value))}
                 min={0}
                 max={1}
                 step={0.01}
@@ -498,10 +493,16 @@ const DualDeckPlayer: React.FC<DualDeckPlayerProps> = ({ className = '' }) => {
             iconPosition="top"
             iconColor="dj-interactive"
             title="Transition Quality"
-            subtitle="Mix compatibility score"
+            subtitle="How smooth is your current transition"
           >
-            <div className="flex justify-center">
+            <div className="flex items-center justify-between">
               <TransitionRing score={transitionQuality.score} />
+              <div className="space-y-2">
+                <div className="text-sm text-gray-400">BPM Match</div>
+                <div className="text-sm text-gray-400">Key Compatibility</div>
+                <div className="text-sm text-gray-400">Energy Flow</div>
+                <div className="text-sm text-gray-400">Timing</div>
+              </div>
             </div>
           </NeonCard>
         </motion.div>
@@ -510,7 +511,7 @@ const DualDeckPlayer: React.FC<DualDeckPlayerProps> = ({ className = '' }) => {
         <motion.div
           initial={{ opacity: 0, x: 20 }}
           animate={{ opacity: 1, x: 0 }}
-          transition={{ duration: 0.5, delay: 0.3 }}
+          transition={{ duration: 0.5, delay: 0.1 }}
         >
           <DeckDisplay
             deck={deckB}
